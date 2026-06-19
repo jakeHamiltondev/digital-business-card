@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import ProfileForm from './ProfileForm'
+import type { Profile } from '@/lib/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -11,6 +13,26 @@ export default async function DashboardPage() {
     redirect('/')
   }
 
+  let profile: Profile | null = null
+
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (existing) {
+    profile = existing as Profile
+  } else {
+    const username = `user-${user.id.replace(/-/g, '').slice(0, 8)}`
+    const { data: created } = await supabase
+      .from('profiles')
+      .insert({ id: user.id, username, email: user.email ?? null })
+      .select()
+      .single()
+    profile = created as Profile | null
+  }
+
   async function signOut() {
     'use server'
     const supabase = await createClient()
@@ -19,23 +41,36 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-black">
-      <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Welcome
-        </h1>
-        {user.email && (
-          <p className="text-zinc-500 dark:text-zinc-400">{user.email}</p>
+    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
+          <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+            Digital Business Card
+          </h1>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-2xl px-4 py-10">
+        <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Edit Profile
+        </h2>
+
+        {profile ? (
+          <ProfileForm profile={profile} />
+        ) : (
+          <p className="text-sm text-red-600 dark:text-red-400">
+            Failed to load profile. Please refresh the page.
+          </p>
         )}
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Sign out
-          </button>
-        </form>
-      </div>
+      </main>
     </div>
   )
 }
