@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
+import QRCodeMini from '@/components/QRCodeMini'
 import type { Profile } from '@/lib/types'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
 export default async function UserCardPage({
   params,
@@ -18,6 +21,7 @@ export default async function UserCardPage({
     .maybeSingle()
 
   const profile = data as Profile | null
+  const pageUrl = `${siteUrl}/${username}`
 
   if (!profile) {
     return (
@@ -44,6 +48,10 @@ export default async function UserCardPage({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
       <BusinessCard profile={profile} />
+      <div className="mt-6 flex flex-col items-center gap-1.5">
+        <QRCodeMini url={pageUrl} />
+        <p className="text-xs text-zinc-400 dark:text-zinc-600">Scan to share</p>
+      </div>
     </div>
   )
 }
