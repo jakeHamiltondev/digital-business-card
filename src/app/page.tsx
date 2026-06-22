@@ -24,10 +24,10 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-black">
       <div className="flex flex-col items-center gap-6 text-center">
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Digital Business Card
+          Linkfol
         </h1>
         <p className="max-w-sm text-zinc-500 dark:text-zinc-400">
-          Sign in to create and share your digital business card.
+          Sign in to create and share your Linkfol.
         </p>
         <form action={signInWithGoogle}>
           <button
