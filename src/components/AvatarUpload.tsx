@@ -13,7 +13,7 @@ function AvatarPreview({ name, avatarUrl }: { name: string | null; avatarUrl: st
       <img
         src={avatarUrl}
         alt={name ?? 'Profile photo'}
-        className="h-20 w-20 rounded-full object-cover"
+        className="h-20 w-20 rounded-full object-cover object-top"
       />
     )
   }

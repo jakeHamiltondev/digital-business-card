@@ -39,7 +39,7 @@ function Avatar({ name, avatarUrl }: { name: string | null; avatarUrl: string | 
       <img
         src={avatarUrl}
         alt={name ?? 'Profile photo'}
-        className="h-24 w-24 rounded-full object-cover ring-4 ring-white dark:ring-zinc-900"
+        className="h-24 w-24 rounded-full object-cover object-top ring-4 ring-white dark:ring-zinc-900"
       />
     )
   }
