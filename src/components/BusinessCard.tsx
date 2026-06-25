@@ -1,5 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import { Mail, Phone, Globe } from 'lucide-react'
 import type { Profile } from '@/lib/types'
+import QRCodeMini from '@/components/QRCodeMini'
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -51,12 +55,23 @@ function Avatar({ name, avatarUrl }: { name: string | null; avatarUrl: string | 
   )
 }
 
-export default function BusinessCard({ profile }: { profile: Profile }) {
+const faceClasses =
+  'absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white px-8 py-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-900'
+
+const contactLinkClasses =
+  'flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800'
+
+export default function BusinessCard({
+  profile,
+  pageUrl,
+}: {
+  profile: Profile
+  pageUrl: string
+}) {
+  const [isFlipped, setIsFlipped] = useState(false)
   const social = profile.social_links ?? {}
 
-  const titleLine = [profile.title, profile.company]
-    .filter(Boolean)
-    .join(' at ')
+  const titleLine = [profile.title, profile.company].filter(Boolean).join(' at ')
 
   const socialItems = [
     { href: social.linkedin, Icon: LinkedInIcon, label: 'LinkedIn' },
@@ -65,78 +80,113 @@ export default function BusinessCard({ profile }: { profile: Profile }) {
     { href: social.github, Icon: GitHubIcon, label: 'GitHub' },
   ].filter((item) => item.href)
 
+  const handleFlip = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('a, button')) return
+    setIsFlipped((prev) => !prev)
+  }
+
   return (
-    <div className="mx-auto w-full max-w-sm rounded-2xl border border-zinc-200 bg-white px-8 py-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="flex flex-col items-center text-center">
-        <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} />
+    <div
+      className="mx-auto w-full max-w-sm cursor-pointer select-none"
+      style={{ perspective: '1000px' }}
+      onClick={handleFlip}
+    >
+      <div
+        className="relative h-[540px] transition-transform duration-700"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        }}
+      >
+        {/* Front face */}
+        <div className={faceClasses} style={{ backfaceVisibility: 'hidden' }}>
+          <div className="flex flex-col items-center text-center">
+            <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} />
+            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              {profile.full_name || profile.username}
+            </h1>
+            {titleLine && (
+              <p className="mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                {titleLine}
+              </p>
+            )}
+          </div>
 
-        <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {profile.full_name || profile.username}
-        </h1>
-
-        {titleLine && (
-          <p className="mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            {titleLine}
-          </p>
-        )}
-
-        {profile.bio && (
-          <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-            {profile.bio}
-          </p>
-        )}
-      </div>
-
-      {(profile.phone || profile.email || profile.website) && (
-        <div className="mt-8 space-y-3">
-          {profile.phone && (
-            <a
-              href={`tel:${profile.phone}`}
-              className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
-              <Phone className="h-4 w-4 shrink-0 text-zinc-400" />
-              {profile.phone}
-            </a>
+          {(profile.phone || profile.email) && (
+            <div className="mt-6 space-y-3">
+              {profile.phone && (
+                <a href={`tel:${profile.phone}`} className={contactLinkClasses}>
+                  <Phone className="h-4 w-4 shrink-0 text-zinc-400" />
+                  {profile.phone}
+                </a>
+              )}
+              {profile.email && (
+                <a href={`mailto:${profile.email}`} className={contactLinkClasses}>
+                  <Mail className="h-4 w-4 shrink-0 text-zinc-400" />
+                  {profile.email}
+                </a>
+              )}
+            </div>
           )}
-          {profile.email && (
-            <a
-              href={`mailto:${profile.email}`}
-              className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
-              <Mail className="h-4 w-4 shrink-0 text-zinc-400" />
-              {profile.email}
-            </a>
+
+          {socialItems.length > 0 && (
+            <div className="mt-4 flex justify-center gap-4">
+              {socialItems.map(({ href, Icon, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
           )}
+
+          <div className="mt-auto flex flex-col items-center gap-2 pt-6">
+            <QRCodeMini url={pageUrl} />
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Tap to flip</p>
+          </div>
+        </div>
+
+        {/* Back face */}
+        <div
+          className={faceClasses}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+        >
+          <div className="flex-1 overflow-y-auto">
+            {profile.bio ? (
+              <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                {profile.bio}
+              </p>
+            ) : (
+              <p className="text-sm italic text-zinc-400 dark:text-zinc-500">No bio added yet.</p>
+            )}
+          </div>
+
           {profile.website && (
-            <a
-              href={profile.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
-              <Globe className="h-4 w-4 shrink-0 text-zinc-400" />
-              {profile.website.replace(/^https?:\/\//, '')}
-            </a>
+            <div className="mt-6">
+              <a
+                href={profile.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={contactLinkClasses}
+              >
+                <Globe className="h-4 w-4 shrink-0 text-zinc-400" />
+                {profile.website.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
           )}
-        </div>
-      )}
 
-      {socialItems.length > 0 && (
-        <div className="mt-6 flex justify-center gap-4">
-          {socialItems.map(({ href, Icon, label }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-            >
-              <Icon className="h-5 w-5" />
-            </a>
-          ))}
+          <div className="mt-auto flex flex-col items-center gap-2 pt-6">
+            <QRCodeMini url={pageUrl} />
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Tap to flip back</p>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
