@@ -61,15 +61,15 @@ export default async function Image({
         {/* Avatar */}
         <div
           style={{
-            width: 140,
-            height: 140,
+            width: 200,
+            height: 200,
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: avatarSrc ? `url(${avatarSrc})` : '#27272a',
             backgroundSize: 'cover',
-            backgroundPosition: 'center 20%',
+            backgroundPosition: 'center 30%',
             marginBottom: 36,
           }}
         >
