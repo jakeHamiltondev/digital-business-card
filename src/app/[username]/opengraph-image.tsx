@@ -64,16 +64,22 @@ export default async function Image({
             width: 200,
             height: 200,
             borderRadius: '50%',
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: avatarSrc ? `url(${avatarSrc})` : '#27272a',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            background: '#27272a',
             marginBottom: 36,
           }}
         >
-          {!avatarSrc && (
+          {avatarSrc ? (
+            <img
+              src={avatarSrc}
+              width={200}
+              height={200}
+              style={{ objectFit: 'cover', width: 200, height: 200 }}
+            />
+          ) : (
             <div
               style={{
                 fontSize: 60,
