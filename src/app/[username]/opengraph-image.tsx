@@ -69,7 +69,7 @@ export default async function Image({
             justifyContent: 'center',
             background: avatarSrc ? `url(${avatarSrc})` : '#27272a',
             backgroundSize: 'cover',
-            backgroundPosition: 'top',
+            backgroundPosition: 'center 20%',
             marginBottom: 36,
           }}
         >
