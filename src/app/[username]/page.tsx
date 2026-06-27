@@ -41,8 +41,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description = `View ${displayName}'s digital business card on Linkfol.`
   }
 
-  const ogImage = profile.avatar_url ?? `${siteUrl}/og.png`
-
   return {
     title,
     description,
@@ -50,10 +48,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       url: pageUrl,
-      images: [{ url: ogImage }],
+      siteName: 'Linkfol',
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
     },
