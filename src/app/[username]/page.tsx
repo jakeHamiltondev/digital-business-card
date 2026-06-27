@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const pageUrl = `${siteUrl}/${username}`
   const displayName = profile.full_name ?? `@${username}`
-  const title = `${displayName} | Linkfol`
+  const title = `${displayName} — Digital Business Card | Linkfol`
 
   let description: string
   if (profile.title && profile.company) {
