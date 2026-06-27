@@ -1,8 +1,22 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
 import { Pencil, QrCode, Users } from 'lucide-react'
 import type { Profile } from '@/lib/types'
+
+const landingTitle = 'Linkfol — Your Professional Identity, One Link Away'
+const landingDescription =
+  'Create a digital business card you can share with anyone. Perfect for networking, career fairs, and making lasting first impressions.'
+
+export const metadata: Metadata = {
+  title: landingTitle,
+  description: landingDescription,
+  openGraph: {
+    title: landingTitle,
+    description: landingDescription,
+  },
+}
 
 async function signInWithGoogle() {
   'use server'

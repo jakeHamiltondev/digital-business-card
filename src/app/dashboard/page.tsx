@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -7,6 +8,10 @@ import QRCodeBlock from '@/components/QRCodeBlock'
 import type { Profile } from '@/lib/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
+export const metadata: Metadata = {
+  title: 'Dashboard | Linkfol',
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()

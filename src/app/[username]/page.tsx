@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
@@ -5,11 +6,61 @@ import type { Profile } from '@/lib/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
-export default async function UserCardPage({
-  params,
-}: {
+type Props = {
   params: Promise<{ username: string }>
-}) {
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username } = await params
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('username', username)
+    .maybeSingle()
+
+  const profile = data as Profile | null
+
+  if (!profile) {
+    return { title: 'Card not found | Linkfol' }
+  }
+
+  const pageUrl = `${siteUrl}/${username}`
+  const displayName = profile.full_name ?? `@${username}`
+  const title = `${displayName} | Linkfol`
+
+  let description: string
+  if (profile.title && profile.company) {
+    description = `${profile.title} at ${profile.company}`
+  } else if (profile.title) {
+    description = profile.title
+  } else if (profile.bio) {
+    description = profile.bio.slice(0, 160)
+  } else {
+    description = `View ${displayName}'s digital business card on Linkfol.`
+  }
+
+  const ogImage = profile.avatar_url ?? `${siteUrl}/og.png`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: pageUrl,
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  }
+}
+
+export default async function UserCardPage({ params }: Props) {
   const { username } = await params
   const supabase = await createClient()
 
