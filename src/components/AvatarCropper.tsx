@@ -82,10 +82,14 @@ export default function AvatarCropper({
         data: { publicUrl },
       } = supabase.storage.from('avatars').getPublicUrl(path)
 
-      const result = await updateAvatarUrl(publicUrl)
+      // Append a timestamp so the CDN treats each upload as a distinct URL
+      // and serves the new file rather than a cached version of avatar.jpg.
+      const cacheBustedUrl = `${publicUrl}?t=${Date.now()}`
+
+      const result = await updateAvatarUrl(cacheBustedUrl)
       if (result.error) throw new Error(result.error)
 
-      onSuccess(publicUrl)
+      onSuccess(cacheBustedUrl)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
       setIsSaving(false)

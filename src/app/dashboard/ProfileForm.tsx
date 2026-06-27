@@ -91,7 +91,6 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <Field label="Email" name="email" type="email" defaultValue={profile.email} placeholder="jane@example.com" />
         <Field label="Phone" name="phone" type="tel" defaultValue={profile.phone} placeholder="+1 (555) 000-0000" />
         <Field label="Website" name="website" type="url" defaultValue={profile.website} placeholder="https://example.com" />
-        <Field label="Avatar URL" name="avatar_url" type="url" defaultValue={profile.avatar_url} placeholder="https://example.com/avatar.jpg" />
       </section>
 
       <section className="space-y-4">

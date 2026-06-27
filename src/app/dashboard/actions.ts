@@ -56,7 +56,6 @@ export async function updateProfile(
       title: str('title'),
       company: str('company'),
       bio: str('bio'),
-      avatar_url: str('avatar_url'),
       phone: str('phone'),
       email: str('email'),
       website: str('website'),

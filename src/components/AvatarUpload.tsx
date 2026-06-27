@@ -94,7 +94,7 @@ export default function AvatarUpload({
           userId={userId}
           onClose={() => setCropSrc(null)}
           onSuccess={(url) => {
-            setAvatarUrl(`${url}?t=${Date.now()}`)
+            setAvatarUrl(url)
             setCropSrc(null)
           }}
         />
