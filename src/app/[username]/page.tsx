@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
+import SaveCardButton from '@/components/SaveCardButton'
 import type { Profile } from '@/lib/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -93,9 +95,37 @@ export default async function UserCardPage({ params }: Props) {
     )
   }
 
+  const { data: { user } } = await supabase.auth.getUser()
+  const isOwnCard = user?.id === profile.id
+  const isLoggedInViewer = !!user && !isOwnCard
+
+  let initialSaved = false
+  if (isLoggedInViewer) {
+    const { data: saved } = await supabase
+      .from('saved_cards')
+      .select('id')
+      .eq('user_id', user!.id)
+      .eq('saved_profile_id', profile.id)
+      .maybeSingle()
+    initialSaved = !!saved
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
       <BusinessCard profile={profile} pageUrl={pageUrl} />
+      <div className="mx-auto mt-4 w-full max-w-sm">
+        {isLoggedInViewer ? (
+          <SaveCardButton profileId={profile.id} initialSaved={initialSaved} />
+        ) : !user ? (
+          <a
+            href={`/api/vcard/${username}`}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <Download className="h-4 w-4" />
+            Save to Contacts
+          </a>
+        ) : null}
+      </div>
     </div>
   )
 }

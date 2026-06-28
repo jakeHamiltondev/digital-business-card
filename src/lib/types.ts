@@ -20,3 +20,17 @@ export type Profile = {
   created_at: string
   updated_at: string
 }
+
+export type SavedCard = {
+  id: string
+  user_id: string
+  saved_profile_id: string
+  is_favorite: boolean
+  tags: string[]
+  notes: string | null
+  saved_at: string
+}
+
+export type SavedCardWithProfile = SavedCard & {
+  profile: Profile
+}
