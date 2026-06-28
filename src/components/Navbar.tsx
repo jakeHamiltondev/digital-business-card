@@ -27,6 +27,12 @@ export default async function Navbar() {
             Dashboard
           </Link>
           <Link
+            href="/dashboard/edit"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          >
+            Edit Profile
+          </Link>
+          <Link
             href="/cards"
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
           >
