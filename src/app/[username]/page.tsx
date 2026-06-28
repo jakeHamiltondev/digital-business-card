@@ -75,7 +75,7 @@ export default async function UserCardPage({ params }: Props) {
 
   if (!profile) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-black">
+      <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-black">
         <div className="text-center">
           <p className="text-5xl font-bold text-zinc-200 dark:text-zinc-800">404</p>
           <h1 className="mt-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
@@ -111,7 +111,7 @@ export default async function UserCardPage({ params }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
+    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
       <BusinessCard profile={profile} pageUrl={pageUrl} />
       <div className="mx-auto mt-4 w-full max-w-sm">
         {isLoggedInViewer ? (

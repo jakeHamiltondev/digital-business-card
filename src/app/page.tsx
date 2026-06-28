@@ -92,15 +92,25 @@ export default async function Home() {
           Create a digital business card you can share with anyone. Perfect for
           networking, career fairs, and making lasting first impressions.
         </p>
-        <div className="mt-10 flex flex-col items-center gap-3">
-          <form action={signInWithGoogle}>
-            <button
-              type="submit"
-              className="rounded-xl bg-zinc-900 px-8 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-            >
-              Get Started — it's free
-            </button>
-          </form>
+        <div className="mt-10 flex flex-col items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <form action={signInWithGoogle}>
+              <button
+                type="submit"
+                className="rounded-xl bg-zinc-900 px-8 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Get Started — it's free
+              </button>
+            </form>
+            <form action={signInWithGoogle}>
+              <button
+                type="submit"
+                className="rounded-xl border border-zinc-300 bg-white px-8 py-4 text-base font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                Sign In
+              </button>
+            </form>
+          </div>
           <p className="text-sm text-zinc-400 dark:text-zinc-500">No app download needed</p>
         </div>
       </section>

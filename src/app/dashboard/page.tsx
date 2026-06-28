@@ -7,6 +7,7 @@ import AvatarUpload from '@/components/AvatarUpload'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import type { Profile } from '@/lib/types'
 
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
 export const metadata: Metadata = {
@@ -43,41 +44,10 @@ export default async function DashboardPage() {
     profile = created as Profile | null
   }
 
-  async function signOut() {
-    'use server'
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-    redirect('/')
-  }
-
   const cardUrl = profile ? `${siteUrl}/${profile.username}` : null
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-          <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Linkfol
-          </h1>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/cards"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-            >
-              My Cards
-            </Link>
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-2xl space-y-12 px-4 py-10">
         <section>
           <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">

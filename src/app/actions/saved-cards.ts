@@ -13,7 +13,9 @@ export async function saveCard(profileId: string): Promise<{ error: string | nul
     .from('saved_cards')
     .insert({ user_id: user.id, saved_profile_id: profileId })
 
-  return { error: error?.message ?? null }
+  if (error) return { error: error.message }
+  revalidatePath('/cards')
+  return { error: null }
 }
 
 export async function unsaveCard(profileId: string): Promise<{ error: string | null }> {
@@ -27,7 +29,9 @@ export async function unsaveCard(profileId: string): Promise<{ error: string | n
     .eq('user_id', user.id)
     .eq('saved_profile_id', profileId)
 
-  return { error: error?.message ?? null }
+  if (error) return { error: error.message }
+  revalidatePath('/cards')
+  return { error: null }
 }
 
 export async function checkIfSaved(profileId: string): Promise<boolean> {
