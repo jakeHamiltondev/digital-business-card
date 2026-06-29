@@ -36,7 +36,6 @@ export async function GET(
   }
 
   const vcard = generateVCard(profile, avatarBase64)
-  console.log('[vcard] raw output for', username, '\n', vcard)
 
   return new NextResponse(vcard, {
     headers: {
