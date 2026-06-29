@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const saveUsername = searchParams.get('save')
 
   if (code) {
     const supabase = await createClient()
@@ -15,6 +16,22 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getUser()
 
       if (user) {
+        if (saveUsername) {
+          const { data: profileToSave } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', saveUsername)
+            .maybeSingle()
+
+          if (profileToSave && profileToSave.id !== user.id) {
+            await supabase
+              .from('saved_cards')
+              .insert({ user_id: user.id, saved_profile_id: profileToSave.id })
+          }
+
+          return NextResponse.redirect(new URL('/cards', origin))
+        }
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('username, full_name')

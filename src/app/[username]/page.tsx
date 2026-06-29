@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
@@ -110,6 +111,19 @@ export default async function UserCardPage({ params }: Props) {
     initialSaved = !!saved
   }
 
+  async function signInToSave() {
+    'use server'
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${siteUrl}/auth/callback?save=${username}`,
+      },
+    })
+    if (error) throw error
+    if (data.url) redirect(data.url)
+  }
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
       <BusinessCard profile={profile} pageUrl={pageUrl} />
@@ -117,13 +131,23 @@ export default async function UserCardPage({ params }: Props) {
         {isLoggedInViewer ? (
           <SaveCardButton profileId={profile.id} initialSaved={initialSaved} />
         ) : !user ? (
-          <a
-            href={`/api/vcard/${username}`}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            <Download className="h-4 w-4" />
-            Save to Contacts
-          </a>
+          <div className="flex flex-col items-center gap-3">
+            <form action={signInToSave} className="w-full">
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Sign in to save to My Cards
+              </button>
+            </form>
+            <a
+              href={`/api/vcard/${username}`}
+              className="flex items-center gap-1.5 text-sm text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Or download contact
+            </a>
+          </div>
         ) : null}
       </div>
     </div>
