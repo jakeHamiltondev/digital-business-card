@@ -20,7 +20,22 @@ export async function GET(
     return new NextResponse('Not found', { status: 404 })
   }
 
-  const vcard = generateVCard(data as Profile)
+  const profile = data as Profile
+  let avatarBase64: string | undefined
+
+  if (profile.avatar_url) {
+    try {
+      const res = await fetch(profile.avatar_url)
+      if (res.ok) {
+        const buffer = await res.arrayBuffer()
+        avatarBase64 = Buffer.from(buffer).toString('base64')
+      }
+    } catch {
+      // skip avatar on fetch failure
+    }
+  }
+
+  const vcard = generateVCard(profile, avatarBase64)
 
   return new NextResponse(vcard, {
     headers: {
