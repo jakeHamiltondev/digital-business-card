@@ -26,12 +26,12 @@ export function generateVCard(profile: Profile, avatarBase64?: string): string {
 
   if (profile.full_name) {
     const trimmed = profile.full_name.trim()
-    lines.push(`FN:${escapeValue(trimmed)}`)
-    // split on last space so multi-word first names stay together
+    // FN and N use raw values — iOS rejects vCard escape sequences in name fields
+    lines.push(`FN:${trimmed}`)
     const lastSpace = trimmed.lastIndexOf(' ')
     const given = lastSpace === -1 ? trimmed : trimmed.slice(0, lastSpace)
     const family = lastSpace === -1 ? '' : trimmed.slice(lastSpace + 1)
-    lines.push(`N:${escapeValue(family)};${escapeValue(given)};;;`)
+    lines.push(`N:${family};${given};;;`)
   }
 
   if (profile.title) lines.push(`TITLE:${escapeValue(profile.title)}`)
@@ -63,5 +63,6 @@ export function generateVCard(profile: Profile, avatarBase64?: string): string {
   }
 
   lines.push('END:VCARD')
-  return lines.map(foldLine).join('\r\n')
+  // trailing CRLF required by vCard spec
+  return lines.map(foldLine).join('\r\n') + '\r\n'
 }
