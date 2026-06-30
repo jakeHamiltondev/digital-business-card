@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', username)
+    .ilike('username', username)
     .maybeSingle()
 
   const profile = data as Profile | null
@@ -68,7 +68,7 @@ export default async function UserCardPage({ params }: Props) {
   const { data } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', username)
+    .ilike('username', username)
     .maybeSingle()
 
   const profile = data as Profile | null

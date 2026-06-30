@@ -30,7 +30,7 @@ export default async function EditProfilePage() {
   if (existing) {
     profile = existing as Profile
   } else {
-    const username = `user-${user.id.replace(/-/g, '').slice(0, 8)}`
+    const username = `user-${user.id.replace(/-/g, '').slice(0, 8)}`.toLowerCase()
     const { data: created } = await supabase
       .from('profiles')
       .insert({ id: user.id, username, email: user.email ?? null })

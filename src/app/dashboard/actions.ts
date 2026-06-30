@@ -27,7 +27,7 @@ export async function updateProfile(
     return val || null
   }
 
-  const username = str('username')
+  const username = str('username')?.toLowerCase() ?? null
   if (!username) {
     return { success: false, error: 'Username is required' }
   }
@@ -35,7 +35,7 @@ export async function updateProfile(
   const { data: existing } = await supabase
     .from('profiles')
     .select('id')
-    .eq('username', username)
+    .ilike('username', username)
     .neq('id', user.id)
     .maybeSingle()
 

@@ -13,7 +13,7 @@ export async function GET(
   const { data } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', username)
+    .ilike('username', username)
     .maybeSingle()
 
   if (!data) {
