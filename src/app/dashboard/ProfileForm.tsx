@@ -1,9 +1,10 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { updateProfile } from './actions'
 import type { FormState } from './actions'
 import type { Profile } from '@/lib/types'
+import { themes } from '@/lib/themes'
 
 const initialState: FormState = { success: false, error: null }
 
@@ -44,6 +45,7 @@ function Field({
 
 export default function ProfileForm({ profile }: { profile: Profile }) {
   const [state, formAction, isPending] = useActionState(updateProfile, initialState)
+  const [selectedTheme, setSelectedTheme] = useState(profile.theme ?? 'midnight')
   const social = profile.social_links ?? {}
 
   return (
@@ -101,6 +103,89 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <Field label="Twitter / X" name="twitter" defaultValue={social.twitter} placeholder="https://x.com/username" />
         <Field label="Instagram" name="instagram" defaultValue={social.instagram} placeholder="https://instagram.com/username" />
         <Field label="GitHub" name="github" defaultValue={social.github} placeholder="https://github.com/username" />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          Card Theme
+        </h2>
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {themes.map((theme) => (
+            <button
+              type="button"
+              key={theme.id}
+              onClick={() => setSelectedTheme(theme.id)}
+              className={`flex-shrink-0 overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 ${
+                selectedTheme === theme.id
+                  ? 'border-zinc-900 dark:border-zinc-100'
+                  : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500'
+              }`}
+              style={{
+                borderRadius: theme.style.borderRadius === '0' ? '0.375rem' : theme.style.borderRadius,
+                width: '80px',
+              }}
+              aria-label={`${theme.name} theme`}
+              aria-pressed={selectedTheme === theme.id}
+            >
+              {/* Mini card preview */}
+              <div
+                className="flex flex-col items-center px-2 py-3"
+                style={{ background: theme.colors.background }}
+              >
+                {/* Avatar circle */}
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    backgroundColor: theme.colors.avatarInitialBg,
+                    boxShadow: `0 0 0 2px ${theme.colors.avatarRing}`,
+                  }}
+                />
+                {/* Name line */}
+                <div
+                  style={{
+                    height: '3px',
+                    backgroundColor: theme.colors.text,
+                    width: '80%',
+                    borderRadius: '2px',
+                    marginTop: '8px',
+                    opacity: 0.8,
+                  }}
+                />
+                {/* Title line */}
+                <div
+                  style={{
+                    height: '2px',
+                    backgroundColor: theme.colors.textSecondary,
+                    width: '60%',
+                    borderRadius: '2px',
+                    marginTop: '4px',
+                    opacity: 0.7,
+                  }}
+                />
+                {/* Contact row hint */}
+                <div
+                  style={{
+                    height: '14px',
+                    backgroundColor: theme.colors.contactBg,
+                    width: '90%',
+                    borderRadius: theme.style.innerRadius,
+                    marginTop: '10px',
+                    border: `1px solid ${theme.colors.contactBorder}`,
+                  }}
+                />
+              </div>
+              {/* Theme name label */}
+              <div className="border-t border-zinc-200 bg-white py-1.5 text-center dark:border-zinc-700 dark:bg-zinc-900">
+                <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  {theme.name}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <input type="hidden" name="theme" value={selectedTheme} />
       </section>
 
       <div className="space-y-3">

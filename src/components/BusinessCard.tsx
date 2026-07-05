@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Mail, Phone, Globe } from 'lucide-react'
 import type { Profile } from '@/lib/types'
+import { getTheme, type Theme } from '@/lib/themes'
 import QRCodeMini from '@/components/QRCodeMini'
 
 function LinkedInIcon({ className }: { className?: string }) {
@@ -37,38 +38,46 @@ function GitHubIcon({ className }: { className?: string }) {
   )
 }
 
-function Avatar({ name, avatarUrl }: { name: string | null; avatarUrl: string | null }) {
+function Avatar({ name, avatarUrl, t }: { name: string | null; avatarUrl: string | null; t: Theme }) {
+  const ringStyle: React.CSSProperties = {
+    boxShadow: `0 0 0 4px ${t.colors.avatarRing}`,
+  }
   if (avatarUrl) {
     return (
       <img
         src={avatarUrl}
         alt={name ?? 'Profile photo'}
-        className="h-24 w-24 rounded-full object-cover object-top ring-4 ring-white dark:ring-zinc-900"
+        className="h-24 w-24 rounded-full object-cover object-top"
+        style={ringStyle}
       />
     )
   }
   const initial = name?.trim().charAt(0).toUpperCase() ?? '?'
   return (
-    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-900 text-3xl font-semibold text-white ring-4 ring-white dark:bg-zinc-100 dark:text-zinc-900 dark:ring-zinc-900">
+    <div
+      className="flex h-24 w-24 items-center justify-center rounded-full text-3xl font-semibold"
+      style={{
+        backgroundColor: t.colors.avatarInitialBg,
+        color: t.colors.avatarInitialText,
+        ...ringStyle,
+      }}
+    >
       {initial}
     </div>
   )
 }
 
-const faceClasses =
-  'absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white px-8 py-10 shadow-sm dark:border-zinc-800 dark:bg-zinc-900'
-
-const contactLinkClasses =
-  'flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800'
-
 export default function BusinessCard({
   profile,
   pageUrl,
+  theme: themeId,
 }: {
   profile: Profile
   pageUrl: string
+  theme?: string
 }) {
   const [isFlipped, setIsFlipped] = useState(false)
+  const t = getTheme(themeId ?? profile.theme)
   const social = profile.social_links ?? {}
 
   const titleLine = [profile.title, profile.company].filter(Boolean).join(' at ')
@@ -85,6 +94,21 @@ export default function BusinessCard({
     setIsFlipped((prev) => !prev)
   }
 
+  const faceStyle: React.CSSProperties = {
+    background: t.colors.background,
+    borderColor: t.colors.border,
+    borderRadius: t.style.borderRadius,
+    boxShadow: t.style.shadow,
+    backfaceVisibility: 'hidden',
+  }
+
+  const contactLinkStyle: React.CSSProperties = {
+    background: t.colors.contactBg,
+    borderColor: t.colors.contactBorder,
+    color: t.colors.contactText,
+    borderRadius: t.style.innerRadius,
+  }
+
   return (
     <div
       className="mx-auto w-full max-w-sm cursor-pointer select-none"
@@ -99,14 +123,20 @@ export default function BusinessCard({
         }}
       >
         {/* Front face */}
-        <div className={faceClasses} style={{ backfaceVisibility: 'hidden' }}>
+        <div
+          className="absolute inset-0 flex flex-col overflow-hidden border px-8 py-10"
+          style={faceStyle}
+        >
           <div className="flex flex-col items-center text-center">
-            <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} />
-            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} t={t} />
+            <h1
+              className="mt-4 text-2xl tracking-tight"
+              style={{ color: t.colors.text, fontWeight: t.style.fontWeight }}
+            >
               {profile.full_name || profile.username}
             </h1>
             {titleLine && (
-              <p className="mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 text-sm font-medium" style={{ color: t.colors.textSecondary }}>
                 {titleLine}
               </p>
             )}
@@ -115,14 +145,22 @@ export default function BusinessCard({
           {(profile.phone || profile.email) && (
             <div className="mt-6 space-y-3">
               {profile.phone && (
-                <a href={`tel:${profile.phone}`} className={contactLinkClasses}>
-                  <Phone className="h-4 w-4 shrink-0 text-zinc-400" />
+                <a
+                  href={`tel:${profile.phone}`}
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                  style={contactLinkStyle}
+                >
+                  <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
                   {profile.phone}
                 </a>
               )}
               {profile.email && (
-                <a href={`mailto:${profile.email}`} className={contactLinkClasses}>
-                  <Mail className="h-4 w-4 shrink-0 text-zinc-400" />
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                  style={contactLinkStyle}
+                >
+                  <Mail className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
                   {profile.email}
                 </a>
               )}
@@ -138,7 +176,8 @@ export default function BusinessCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+                  className="rounded-lg p-2 transition hover:opacity-70"
+                  style={{ color: t.colors.iconColor }}
                 >
                   <Icon className="h-5 w-5" />
                 </a>
@@ -148,22 +187,26 @@ export default function BusinessCard({
 
           <div className="mt-auto flex flex-col items-center gap-2 pt-6">
             <QRCodeMini url={pageUrl} />
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Tap to flip</p>
+            <p className="text-xs" style={{ color: t.colors.mutedText }}>
+              Tap to flip
+            </p>
           </div>
         </div>
 
         {/* Back face */}
         <div
-          className={faceClasses}
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          className="absolute inset-0 flex flex-col overflow-hidden border px-8 py-10"
+          style={{ ...faceStyle, transform: 'rotateY(180deg)' }}
         >
           <div className="flex-1 overflow-y-auto">
             {profile.bio ? (
-              <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+              <p className="text-sm leading-relaxed" style={{ color: t.colors.bioText }}>
                 {profile.bio}
               </p>
             ) : (
-              <p className="text-sm italic text-zinc-400 dark:text-zinc-500">No bio added yet.</p>
+              <p className="text-sm italic" style={{ color: t.colors.mutedText }}>
+                No bio added yet.
+              </p>
             )}
           </div>
 
@@ -173,9 +216,10 @@ export default function BusinessCard({
                 href={profile.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={contactLinkClasses}
+                className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                style={contactLinkStyle}
               >
-                <Globe className="h-4 w-4 shrink-0 text-zinc-400" />
+                <Globe className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
                 {profile.website.replace(/^https?:\/\//, '')}
               </a>
             </div>
@@ -183,7 +227,9 @@ export default function BusinessCard({
 
           <div className="mt-auto flex flex-col items-center gap-2 pt-6">
             <QRCodeMini url={pageUrl} />
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Tap to flip back</p>
+            <p className="text-xs" style={{ color: t.colors.mutedText }}>
+              Tap to flip back
+            </p>
           </div>
         </div>
       </div>

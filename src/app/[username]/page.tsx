@@ -126,7 +126,7 @@ export default async function UserCardPage({ params }: Props) {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
-      <BusinessCard profile={profile} pageUrl={pageUrl} />
+      <BusinessCard profile={profile} pageUrl={pageUrl} theme={profile.theme ?? 'midnight'} />
       <div className="mx-auto mt-4 w-full max-w-sm">
         {isLoggedInViewer ? (
           <SaveCardButton profileId={profile.id} initialSaved={initialSaved} />

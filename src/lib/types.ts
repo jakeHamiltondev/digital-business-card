@@ -17,6 +17,7 @@ export type Profile = {
   email: string | null
   website: string | null
   social_links: SocialLinks
+  theme: string | null
   created_at: string
   updated_at: string
 }

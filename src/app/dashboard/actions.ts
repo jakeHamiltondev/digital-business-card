@@ -49,6 +49,8 @@ export async function updateProfile(
     if (val) social_links[platform] = val
   }
 
+  const theme = str('theme') ?? 'midnight'
+
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -61,6 +63,7 @@ export async function updateProfile(
       email: str('email'),
       website: str('website'),
       social_links,
+      theme,
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id)

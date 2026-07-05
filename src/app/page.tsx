@@ -45,6 +45,7 @@ const demoProfile: Profile = {
   social_links: {
     linkedin: 'https://linkedin.com/in/jordantaylor',
   },
+  theme: 'midnight',
   created_at: '',
   updated_at: '',
 }
@@ -120,6 +121,7 @@ export default async function Home() {
         <BusinessCard
           profile={demoProfile}
           pageUrl={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://linkfol.co'}/jordantaylor`}
+          theme="midnight"
         />
       </section>
 
