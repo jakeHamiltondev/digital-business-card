@@ -79,16 +79,6 @@ export default async function Home() {
   } = await supabase.auth.getUser()
   if (user) redirect('/dashboard')
 
-  let profileCount = 0
-  try {
-    const { count } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-    profileCount = count ?? 0
-  } catch {
-    profileCount = 0
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-black">
       {/* Hero */}
@@ -184,12 +174,10 @@ export default async function Home() {
       {/* Social proof */}
       <section className="bg-zinc-100 px-4 py-16 text-center dark:bg-zinc-950">
         <p className="text-base font-medium text-zinc-700 dark:text-zinc-300">
-          Built by a UNCW grad for students who network
+          Join the next generation of networkers
         </p>
         <p className="mt-2 text-sm text-zinc-400 dark:text-zinc-500">
-          {profileCount > 0
-            ? `Join ${profileCount.toLocaleString()} professionals on Linkfol`
-            : 'Join professionals on Linkfol'}
+          Built by a UNCW grad for students who network
         </p>
       </section>
 
