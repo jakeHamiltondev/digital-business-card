@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
+import FeedbackModal from '@/components/FeedbackModal'
 
 export default async function Navbar() {
   const supabase = await createClient()
@@ -38,6 +39,7 @@ export default async function Navbar() {
           >
             My Cards
           </Link>
+          <FeedbackModal />
           <form action={signOut}>
             <button
               type="submit"
