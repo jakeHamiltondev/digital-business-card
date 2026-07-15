@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import FeedbackModal from '@/components/FeedbackModal'
+import NavbarMobileMenu from '@/components/NavbarMobileMenu'
 
 export default async function Navbar() {
   const supabase = await createClient()
@@ -20,7 +21,8 @@ export default async function Navbar() {
         >
           Linkfol
         </Link>
-        <nav className="flex items-center gap-1">
+
+        <nav className="hidden items-center gap-1 md:flex">
           <Link
             href="/dashboard"
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
@@ -49,6 +51,8 @@ export default async function Navbar() {
             </button>
           </form>
         </nav>
+
+        <NavbarMobileMenu />
       </div>
     </header>
   )
