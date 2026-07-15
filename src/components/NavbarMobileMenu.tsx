@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
-import FeedbackModal from '@/components/FeedbackModal'
 
 const linkClass =
   'block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
@@ -63,9 +62,6 @@ export default function NavbarMobileMenu() {
               >
                 My Cards
               </Link>
-              <div onClick={() => setOpen(false)}>
-                <FeedbackModal />
-              </div>
               <form action={signOut}>
                 <button type="submit" className={linkClass}>
                   Sign out
