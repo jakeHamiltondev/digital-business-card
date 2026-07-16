@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
 import { Pencil, QrCode } from 'lucide-react'
 import type { Profile } from '@/lib/types'
+import { signInWithGoogle, signInWithMicrosoft } from '@/app/actions/auth'
 
 const landingTitle = 'Linkfol — Your Digital Business Card for Every Opportunity'
 const landingDescription =
@@ -16,22 +17,6 @@ export const metadata: Metadata = {
     title: landingTitle,
     description: landingDescription,
   },
-}
-
-async function signInWithGoogle() {
-  'use server'
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      queryParams: {
-        prompt: 'select_account',
-      },
-    },
-  })
-  if (error) throw error
-  if (data.url) redirect(data.url)
 }
 
 const demoProfile: Profile = {
@@ -76,6 +61,17 @@ function GoogleIcon({ className }: { className?: string }) {
   )
 }
 
+function MicrosoftIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <rect x="1" y="1" width="10" height="10" fill="#f25022" />
+      <rect x="13" y="1" width="10" height="10" fill="#7fba00" />
+      <rect x="1" y="13" width="10" height="10" fill="#00a4ef" />
+      <rect x="13" y="13" width="10" height="10" fill="#ffb900" />
+    </svg>
+  )
+}
+
 export default async function Home() {
   const supabase = await createClient()
   const {
@@ -96,22 +92,49 @@ export default async function Home() {
             Share your full professional profile with a QR scan. No app needed.
           </p>
           <div className="mt-10 flex flex-col items-center gap-5">
-            <form action={signInWithGoogle}>
-              <button
-                type="submit"
-                className="rounded-xl bg-zinc-900 px-8 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                Create your free card
-              </button>
-            </form>
-            <form action={signInWithGoogle}>
-              <button
-                type="submit"
-                className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-              >
-                Already have an account? Sign in
-              </button>
-            </form>
+            <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              Create your free card
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <form action={signInWithGoogle}>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2.5 rounded-xl bg-zinc-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  <GoogleIcon className="h-5 w-5" />
+                  Sign in with Google
+                </button>
+              </form>
+              <form action={signInWithMicrosoft}>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2.5 rounded-xl bg-zinc-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  <MicrosoftIcon className="h-5 w-5" />
+                  Sign in with Microsoft
+                </button>
+              </form>
+            </div>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              Already have an account?{' '}
+              <form action={signInWithGoogle} className="inline">
+                <button
+                  type="submit"
+                  className="underline underline-offset-2 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+                >
+                  Sign in with Google
+                </button>
+              </form>
+              {' or '}
+              <form action={signInWithMicrosoft} className="inline">
+                <button
+                  type="submit"
+                  className="underline underline-offset-2 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+                >
+                  Microsoft
+                </button>
+              </form>
+            </p>
           </div>
         </div>
       </section>
@@ -141,7 +164,7 @@ export default async function Home() {
                   Icon: GoogleIcon,
                   step: '01',
                   title: 'Sign up in seconds',
-                  description: 'One click with your Google account',
+                  description: 'One click with Google or Microsoft',
                 },
                 {
                   Icon: Pencil,
@@ -191,13 +214,23 @@ export default async function Home() {
         <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
           Ready to stand out?
         </h2>
-        <div className="mt-8">
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <form action={signInWithGoogle}>
             <button
               type="submit"
-              className="rounded-xl bg-zinc-900 px-8 py-4 text-base font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="flex items-center gap-2.5 rounded-xl bg-zinc-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Create your free card
+              <GoogleIcon className="h-5 w-5" />
+              Sign in with Google
+            </button>
+          </form>
+          <form action={signInWithMicrosoft}>
+            <button
+              type="submit"
+              className="flex items-center gap-2.5 rounded-xl bg-zinc-900 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              <MicrosoftIcon className="h-5 w-5" />
+              Sign in with Microsoft
             </button>
           </form>
         </div>
