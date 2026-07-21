@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      return NextResponse.redirect(new URL('/dashboard', origin))
+      return NextResponse.redirect(new URL('/onboarding', origin))
     }
   }
 

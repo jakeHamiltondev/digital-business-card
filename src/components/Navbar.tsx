@@ -1,10 +1,14 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import NavbarMobileMenu from '@/components/NavbarMobileMenu'
 import LinkfolLogo from '@/components/LinkfolLogo'
 
 export default async function Navbar() {
+  const headersList = await headers()
+  if (headersList.get('x-pathname') === '/onboarding') return null
+
   const supabase = await createClient()
   const {
     data: { user },

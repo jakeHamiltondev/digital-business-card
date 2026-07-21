@@ -28,10 +28,12 @@ export default function AvatarUpload({
   userId,
   avatarUrl: initialAvatarUrl,
   fullName,
+  onAvatarChange,
 }: {
   userId: string
   avatarUrl: string | null
   fullName: string | null
+  onAvatarChange?: (url: string) => void
 }) {
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [cropSrc, setCropSrc] = useState<string | null>(null)
@@ -96,6 +98,7 @@ export default function AvatarUpload({
           onSuccess={(url) => {
             setAvatarUrl(url)
             setCropSrc(null)
+            onAvatarChange?.(url)
           }}
         />
       )}
