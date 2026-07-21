@@ -208,7 +208,7 @@ export default async function UserCardPage({ params }: Props) {
               className="flex items-center gap-1.5 text-sm text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
             >
               <Download className="h-3.5 w-3.5" />
-              Or save to phone contacts
+              Or download to your phone&apos;s contacts app
             </a>
           </div>
         ) : null}

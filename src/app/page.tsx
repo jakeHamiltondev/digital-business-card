@@ -26,14 +26,14 @@ const demoProfile: Profile = {
   title: 'Marketing Major',
   company: 'State University, Class of 2026',
   bio: 'Marketing student passionate about brand strategy and digital media. Actively seeking internship opportunities in marketing and communications.',
-  avatar_url: null,
+  avatar_url: 'https://api.dicebear.com/7.x/initials/svg?seed=JT',
   phone: null,
   email: 'jordan@example.com',
   website: null,
   social_links: {
     linkedin: 'https://linkedin.com/in/jordantaylor',
   },
-  theme: 'midnight',
+  theme: 'slate',
   created_at: '',
   updated_at: '',
 }
@@ -85,7 +85,8 @@ export default async function Home() {
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-28 text-center">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-6xl">
-            Your digital business card for every career fair, every handshake,{' '}
+            <span className="font-black">Linkfol</span>
+            {' — your digital business card for every career fair, every handshake, '}
             <span className="text-zinc-400 dark:text-zinc-500">every opportunity.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -147,7 +148,7 @@ export default async function Home() {
         <BusinessCard
           profile={demoProfile}
           pageUrl={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://linkfol.co'}/jordantaylor`}
-          theme="midnight"
+          theme="slate"
         />
       </section>
 

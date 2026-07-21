@@ -59,7 +59,7 @@ export async function updateProfile(
       title: str('title'),
       company: str('company'),
       bio: str('bio'),
-      phone: str('phone'),
+      phone: (() => { const v = str('phone'); return v ? v.replace(/\D/g, '') || null : null })(),
       email: str('email'),
       website: str('website'),
       social_links,

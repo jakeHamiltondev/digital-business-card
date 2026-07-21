@@ -38,6 +38,15 @@ function GitHubIcon({ className }: { className?: string }) {
   )
 }
 
+function formatPhone(raw: string | null | undefined): string {
+  if (!raw) return ''
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length === 0) return raw
+  if (digits.length <= 3) return `(${digits}`
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+}
+
 function Avatar({ name, avatarUrl, t }: { name: string | null; avatarUrl: string | null; t: Theme }) {
   const ringStyle: React.CSSProperties = {
     boxShadow: `0 0 0 4px ${t.colors.avatarRing}`,
@@ -151,7 +160,7 @@ export default function BusinessCard({
                   style={contactLinkStyle}
                 >
                   <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                  {profile.phone}
+                  {formatPhone(profile.phone)}
                 </a>
               )}
               {profile.email && (

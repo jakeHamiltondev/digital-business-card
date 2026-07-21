@@ -43,6 +43,34 @@ function Field({
   )
 }
 
+function formatPhoneDisplay(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 10)
+  if (digits.length === 0) return ''
+  if (digits.length <= 3) return `(${digits}`
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+}
+
+function PhoneField({ defaultValue }: { defaultValue?: string | null }) {
+  const [display, setDisplay] = useState(() => formatPhoneDisplay(defaultValue ?? ''))
+  return (
+    <div>
+      <label htmlFor="phone" className={labelClass}>
+        Phone
+      </label>
+      <input
+        id="phone"
+        name="phone"
+        type="tel"
+        value={display}
+        onChange={(e) => setDisplay(formatPhoneDisplay(e.target.value))}
+        placeholder="(555) 000-0000"
+        className={inputClass}
+      />
+    </div>
+  )
+}
+
 export default function ProfileForm({ profile }: { profile: Profile }) {
   const [state, formAction, isPending] = useActionState(updateProfile, initialState)
   const [selectedTheme, setSelectedTheme] = useState(profile.theme ?? 'midnight')
@@ -91,7 +119,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
           Contact
         </h2>
         <Field label="Email" name="email" type="email" defaultValue={profile.email} placeholder="jane@example.com" />
-        <Field label="Phone" name="phone" type="tel" defaultValue={profile.phone} placeholder="+1 (555) 000-0000" />
+        <PhoneField defaultValue={profile.phone} />
         <Field label="Website" name="website" type="url" defaultValue={profile.website} placeholder="https://example.com" />
       </section>
 
