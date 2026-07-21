@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
+import LinkfolLogo from '@/components/LinkfolLogo'
 
 const linkClass =
   'block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
@@ -29,9 +30,7 @@ export default function NavbarMobileMenu() {
           />
           <div className="fixed inset-x-0 top-0 z-50 border-b border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-4 dark:border-zinc-800">
-              <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                Linkfol
-              </span>
+              <LinkfolLogo size="sm" />
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"

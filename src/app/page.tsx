@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
+import LinkfolLogo from '@/components/LinkfolLogo'
 import { Pencil, QrCode } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import { signInWithGoogle, signInWithMicrosoft } from '@/app/actions/auth'
@@ -84,9 +85,11 @@ export default async function Home() {
       {/* Hero */}
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-28 text-center">
         <div className="mx-auto max-w-3xl">
+          <div className="mb-8 flex justify-center">
+            <LinkfolLogo size="lg" />
+          </div>
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-6xl">
-            <span className="font-black">Linkfol</span>
-            {' — your digital business card for every career fair, every handshake, '}
+            Your digital business card for every career fair, every handshake,{' '}
             <span className="text-zinc-400 dark:text-zinc-500">every opportunity.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">

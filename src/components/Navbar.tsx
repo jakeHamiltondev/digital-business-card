@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import NavbarMobileMenu from '@/components/NavbarMobileMenu'
+import LinkfolLogo from '@/components/LinkfolLogo'
 
 export default async function Navbar() {
   const supabase = await createClient()
@@ -14,11 +15,8 @@ export default async function Navbar() {
   return (
     <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link
-          href="/dashboard"
-          className="text-lg font-semibold text-zinc-900 dark:text-zinc-50"
-        >
-          Linkfol
+        <Link href="/dashboard" aria-label="Linkfol home">
+          <LinkfolLogo size="sm" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
