@@ -151,50 +151,54 @@ export default function BusinessCard({
             )}
           </div>
 
-          {(profile.phone || profile.email) && (
-            <div className="mt-6 space-y-3">
-              {profile.phone && (
-                <a
-                  href={`tel:${profile.phone}`}
-                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
-                  style={contactLinkStyle}
-                >
-                  <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                  {formatPhone(profile.phone)}
-                </a>
-              )}
-              {profile.email && (
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
-                  style={contactLinkStyle}
-                >
-                  <Mail className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                  {profile.email}
-                </a>
-              )}
-            </div>
-          )}
+          {/* Grows to fill available space; centers contacts+social vertically */}
+          <div className="flex flex-1 flex-col justify-center">
+            {(profile.phone || profile.email) && (
+              <div className="space-y-3">
+                {profile.phone && (
+                  <a
+                    href={`tel:${profile.phone}`}
+                    className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                    style={contactLinkStyle}
+                  >
+                    <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                    {formatPhone(profile.phone)}
+                  </a>
+                )}
+                {profile.email && (
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                    style={contactLinkStyle}
+                  >
+                    <Mail className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                    {profile.email}
+                  </a>
+                )}
+              </div>
+            )}
 
-          {socialItems.length > 0 && (
-            <div className="mt-4 flex justify-center gap-4">
-              {socialItems.map(({ href, Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="rounded-lg p-2 transition hover:opacity-70"
-                  style={{ color: t.colors.iconColor }}
-                >
-                  <Icon className="h-5 w-5" />
-                </a>
-              ))}
-            </div>
-          )}
+            {socialItems.length > 0 && (
+              <div className="mt-4 flex justify-center gap-4">
+                {socialItems.map(({ href, Icon, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="rounded-lg p-2 transition hover:opacity-70"
+                    style={{ color: t.colors.iconColor }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <div className="mt-auto flex flex-col items-center gap-2 pt-6">
+          {/* QR always anchored at the bottom — no mt-auto needed with flex-1 above */}
+          <div className="flex flex-col items-center gap-2 pt-4">
             <QRCodeMini url={pageUrl} />
             <p className="text-xs" style={{ color: t.colors.mutedText }}>
               Tap to flip
