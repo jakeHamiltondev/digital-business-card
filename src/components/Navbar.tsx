@@ -20,13 +20,19 @@ export default async function Navbar() {
   return (
     <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link href="/dashboard" aria-label="Linkfol home">
+        <div className="hidden items-center gap-3 md:flex">
+          <VeteranBadge size="sm" />
+          <Link href="/dashboard" aria-label="Linkfol home">
+            <LinkfolLogo size="sm" />
+          </Link>
+        </div>
+
+        {/* Logo only on mobile */}
+        <Link href="/dashboard" aria-label="Linkfol home" className="md:hidden">
           <LinkfolLogo size="sm" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          <VeteranBadge size="sm" />
-          <span className="mx-1 h-4 w-px bg-zinc-200 dark:bg-zinc-700" aria-hidden="true" />
           <Link
             href="/dashboard"
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
