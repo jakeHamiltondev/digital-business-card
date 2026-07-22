@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import NavbarMobileMenu from '@/components/NavbarMobileMenu'
 import LinkfolLogo from '@/components/LinkfolLogo'
+import VeteranBadge from '@/components/VeteranBadge'
 
 export default async function Navbar() {
   const headersList = await headers()
@@ -24,6 +25,8 @@ export default async function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
+          <VeteranBadge size="sm" />
+          <span className="mx-1 h-4 w-px bg-zinc-200 dark:bg-zinc-700" aria-hidden="true" />
           <Link
             href="/dashboard"
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"

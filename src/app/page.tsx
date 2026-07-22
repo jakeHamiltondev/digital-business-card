@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
 import LinkfolLogo from '@/components/LinkfolLogo'
+import VeteranBadge from '@/components/VeteranBadge'
 import { Pencil, QrCode } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import { signInWithGoogle, signInWithMicrosoft } from '@/app/actions/auth'
@@ -242,7 +243,10 @@ export default async function Home() {
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 py-8 text-center text-sm text-zinc-400 dark:border-zinc-800 dark:text-zinc-600">
-        © 2026 Linkfol
+        <p>© 2026 Linkfol</p>
+        <div className="mt-3 flex justify-center">
+          <VeteranBadge size="md" />
+        </div>
       </footer>
     </div>
   )
