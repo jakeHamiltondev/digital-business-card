@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import LinkfolLogo from '@/components/LinkfolLogo'
-import VeteranBadge from '@/components/VeteranBadge'
 
 const linkClass =
   'block w-full rounded-lg px-4 py-3 text-left text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
@@ -41,9 +40,6 @@ export default function NavbarMobileMenu() {
               </button>
             </div>
             <nav className="flex flex-col gap-1 p-3">
-              <div className="px-1 py-2">
-                <VeteranBadge size="sm" />
-              </div>
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
