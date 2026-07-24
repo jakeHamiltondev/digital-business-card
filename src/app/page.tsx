@@ -210,7 +210,7 @@ export default async function Home() {
           Join the next generation of networkers
         </p>
         <p className="mt-2 text-sm text-zinc-400 dark:text-zinc-500">
-          Built by a UNCW grad for students who network
+          Built by a Veteran and UNCW grad
         </p>
       </section>
 
