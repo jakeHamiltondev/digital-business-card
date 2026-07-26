@@ -19,17 +19,19 @@ function Field({
   defaultValue,
   placeholder,
   type = 'text',
+  required = false,
 }: {
   label: string
   name: string
   defaultValue?: string | null
   placeholder?: string
   type?: string
+  required?: boolean
 }) {
   return (
     <div>
       <label htmlFor={name} className={labelClass}>
-        {label}
+        {label}{required && <span className="text-red-500"> *</span>}
       </label>
       <input
         id={name}
@@ -78,13 +80,14 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
 
   return (
     <form action={formAction} className="space-y-8">
+      <p className="text-xs text-zinc-400 dark:text-zinc-500"><span className="text-red-500">*</span> Required</p>
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Basic Information
         </h2>
         <div>
           <label htmlFor="username" className={labelClass}>
-            Username <span className="text-red-500">*</span>
+            Card URL <span className="text-red-500">*</span>
           </label>
           <input
             id="username"
@@ -96,9 +99,9 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
             className={inputClass}
           />
         </div>
-        <Field label="Full Name" name="full_name" defaultValue={profile.full_name} placeholder="Jane Smith" />
-        <Field label="Title" name="title" defaultValue={profile.title} placeholder="Software Engineer" />
-        <Field label="Company" name="company" defaultValue={profile.company} placeholder="Acme Corp" />
+        <Field label="Full Name" name="full_name" defaultValue={profile.full_name} placeholder="Jane Smith" required />
+        <Field label="Title" name="title" defaultValue={profile.title} placeholder="Software Engineer" required />
+        <Field label="Company / University" name="company" defaultValue={profile.company} placeholder="Acme Corp / State University" />
         <div>
           <label htmlFor="bio" className={labelClass}>
             Bio
@@ -118,7 +121,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Contact
         </h2>
-        <Field label="Email" name="email" type="email" defaultValue={profile.email} placeholder="jane@example.com" />
+        <Field label="Email" name="email" type="email" defaultValue={profile.email} placeholder="jane@example.com" required />
         <PhoneField defaultValue={profile.phone} />
         <Field label="Website" name="website" type="url" defaultValue={profile.website} placeholder="https://example.com" />
       </section>
@@ -131,6 +134,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <Field label="Twitter / X" name="twitter" defaultValue={social.twitter} placeholder="https://x.com/username" />
         <Field label="Instagram" name="instagram" defaultValue={social.instagram} placeholder="https://instagram.com/username" />
         <Field label="GitHub" name="github" defaultValue={social.github} placeholder="https://github.com/username" />
+        <Field label="TikTok" name="tiktok" defaultValue={social.tiktok} placeholder="https://tiktok.com/@username" />
       </section>
 
       <section className="space-y-4">

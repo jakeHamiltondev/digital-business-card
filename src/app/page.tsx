@@ -91,7 +91,7 @@ export default async function Home() {
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-6xl">
             Your digital business card for every career fair, every handshake,{' '}
-            <span className="text-zinc-400 dark:text-zinc-500">every opportunity.</span>
+            <span className="text-blue-500">every opportunity.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
             Share your full professional profile with a QR scan. No app needed.
@@ -100,7 +100,7 @@ export default async function Home() {
             <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
               Create your free card
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
               <form action={signInWithGoogle}>
                 <button
                   type="submit"
@@ -121,24 +121,7 @@ export default async function Home() {
               </form>
             </div>
             <p className="text-sm text-zinc-400 dark:text-zinc-500">
-              Already have an account?{' '}
-              <form action={signInWithGoogle} className="inline">
-                <button
-                  type="submit"
-                  className="underline underline-offset-2 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-                >
-                  Sign in with Google
-                </button>
-              </form>
-              {' or '}
-              <form action={signInWithMicrosoft} className="inline">
-                <button
-                  type="submit"
-                  className="underline underline-offset-2 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-                >
-                  Microsoft
-                </button>
-              </form>
+              Already have an account? Same buttons, just sign in.
             </p>
           </div>
         </div>
@@ -167,19 +150,19 @@ export default async function Home() {
               [
                 {
                   Icon: GoogleIcon,
-                  step: '01',
+                  step: '1',
                   title: 'Sign up in seconds',
                   description: 'One click with Google or Microsoft',
                 },
                 {
                   Icon: Pencil,
-                  step: '02',
+                  step: '2',
                   title: 'Build your card',
                   description: 'Add your info, photo, and social links',
                 },
                 {
                   Icon: QrCode,
-                  step: '03',
+                  step: '3',
                   title: 'Share anywhere',
                   description: 'At career fairs, networking events, or online',
                 },

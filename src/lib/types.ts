@@ -3,6 +3,7 @@ export type SocialLinks = {
   twitter?: string
   instagram?: string
   github?: string
+  tiktok?: string
 }
 
 export type Profile = {

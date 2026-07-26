@@ -51,6 +51,7 @@ export function generateVCard(profile: Profile, avatarBase64?: string): string {
     { key: 'twitter' as const, label: 'Twitter', prefix: 'https://x.com/' },
     { key: 'instagram' as const, label: 'Instagram', prefix: 'https://instagram.com/' },
     { key: 'github' as const, label: 'GitHub', prefix: 'https://github.com/' },
+    { key: 'tiktok' as const, label: 'TikTok', prefix: 'https://tiktok.com/@' },
   ]
   let itemIndex = 1
   for (const { key, label, prefix } of socialDefs) {

@@ -44,7 +44,7 @@ export async function updateProfile(
   }
 
   const social_links: Record<string, string> = {}
-  for (const platform of ['linkedin', 'twitter', 'instagram', 'github']) {
+  for (const platform of ['linkedin', 'twitter', 'instagram', 'github', 'tiktok']) {
     const val = str(platform)
     if (val) social_links[platform] = val
   }

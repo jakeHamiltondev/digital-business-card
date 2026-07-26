@@ -145,11 +145,16 @@ export default function OnboardingClient({
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
   const [step1Error, setStep1Error] = useState<string | null>(null)
 
+  // Step 1 optional fields
+  const [bio, setBio] = useState('')
+
   // Step 2 fields
+  const [website, setWebsite] = useState('')
   const [linkedin, setLinkedin] = useState('')
   const [twitter, setTwitter] = useState('')
   const [instagram, setInstagram] = useState('')
   const [github, setGithub] = useState('')
+  const [tiktok, setTiktok] = useState('')
   const [theme, setTheme] = useState('midnight')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(existingAvatarUrl)
   const [isSaving, setIsSaving] = useState(false)
@@ -225,11 +230,14 @@ export default function OnboardingClient({
       company,
       email,
       phone,
+      bio,
       username,
+      website,
       linkedin,
       twitter,
       instagram,
       github,
+      tiktok,
       theme,
     })
     if (result.success && result.username) {
@@ -276,6 +284,9 @@ export default function OnboardingClient({
               Let&apos;s get your card set up. You can always edit this later.
             </p>
 
+            <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">
+              <span className="text-red-500">*</span> Required
+            </p>
             <div className="space-y-5">
               <div>
                 <label htmlFor="full_name" className={labelClass}>
@@ -294,7 +305,7 @@ export default function OnboardingClient({
 
               <div>
                 <label htmlFor="title" className={labelClass}>
-                  Title
+                  Title <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="title"
@@ -308,7 +319,7 @@ export default function OnboardingClient({
 
               <div>
                 <label htmlFor="company" className={labelClass}>
-                  Company
+                  Company / University
                 </label>
                 <input
                   id="company"
@@ -322,7 +333,7 @@ export default function OnboardingClient({
 
               <div>
                 <label htmlFor="email" className={labelClass}>
-                  Email
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
@@ -348,10 +359,24 @@ export default function OnboardingClient({
                 />
               </div>
 
+              <div>
+                <label htmlFor="bio" className={labelClass}>
+                  Short bio
+                </label>
+                <textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell people a bit about yourself"
+                  rows={3}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+
               {/* Card URL row */}
               <div>
                 <label htmlFor="username" className={labelClass}>
-                  Choose your card URL
+                  Choose your card URL <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center overflow-hidden rounded-lg border border-zinc-200 focus-within:border-zinc-400 dark:border-zinc-700 dark:focus-within:border-zinc-500">
                   <span className="shrink-0 whitespace-nowrap border-r border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
@@ -451,6 +476,23 @@ export default function OnboardingClient({
                   />
                 </section>
 
+                {/* Website */}
+                <section className="space-y-4">
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Website
+                  </h2>
+                  <div>
+                    <label className={labelClass}>Website</label>
+                    <input
+                      type="url"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://yoursite.com"
+                      className={inputClass}
+                    />
+                  </div>
+                </section>
+
                 {/* Social links */}
                 <section className="space-y-4">
                   <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -506,6 +548,19 @@ export default function OnboardingClient({
                         value={github}
                         onChange={(e) => setGithub(e.target.value)}
                         placeholder="https://github.com/username"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>TikTok</label>
+                      <p className="mb-1 text-xs text-zinc-400">
+                        Share your TikTok profile
+                      </p>
+                      <input
+                        type="url"
+                        value={tiktok}
+                        onChange={(e) => setTiktok(e.target.value)}
+                        placeholder="https://tiktok.com/@username"
                         className={inputClass}
                       />
                     </div>

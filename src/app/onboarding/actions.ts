@@ -31,11 +31,14 @@ export async function saveOnboardingProfile(data: {
   company: string
   email: string
   phone: string
+  bio: string
   username: string
+  website: string
   linkedin: string
   twitter: string
   instagram: string
   github: string
+  tiktok: string
   theme: string
 }): Promise<{ success: boolean; error: string | null; username?: string }> {
   const supabase = await createClient()
@@ -62,6 +65,7 @@ export async function saveOnboardingProfile(data: {
     twitter: data.twitter,
     instagram: data.instagram,
     github: data.github,
+    tiktok: data.tiktok,
   })) {
     if (value?.trim()) social_links[platform] = value.trim()
   }
@@ -77,6 +81,8 @@ export async function saveOnboardingProfile(data: {
       company: data.company?.trim() || null,
       email: data.email?.trim() || null,
       phone,
+      bio: data.bio?.trim() || null,
+      website: data.website?.trim() || null,
       social_links,
       theme: data.theme || 'midnight',
       updated_at: new Date().toISOString(),

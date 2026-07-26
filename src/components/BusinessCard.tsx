@@ -38,6 +38,14 @@ function GitHubIcon({ className }: { className?: string }) {
   )
 }
 
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.98a8.32 8.32 0 004.88 1.55V7.08a4.85 4.85 0 01-1.11-.39z" />
+    </svg>
+  )
+}
+
 function formatPhone(raw: string | null | undefined): string {
   if (!raw) return ''
   const digits = raw.replace(/\D/g, '')
@@ -96,6 +104,7 @@ export default function BusinessCard({
     { href: social.twitter, Icon: TwitterIcon, label: 'Twitter / X' },
     { href: social.instagram, Icon: InstagramIcon, label: 'Instagram' },
     { href: social.github, Icon: GitHubIcon, label: 'GitHub' },
+    { href: social.tiktok, Icon: TikTokIcon, label: 'TikTok' },
   ].filter((item) => item.href)
 
   const handleFlip = (e: React.MouseEvent<HTMLDivElement>) => {
