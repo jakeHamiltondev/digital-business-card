@@ -174,6 +174,16 @@ export default async function UserCardPage({ params }: Props) {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
+      {isLoggedInViewer && (
+        <div className="mb-4 w-full max-w-sm">
+          <Link
+            href="/cards"
+            className="text-sm text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+          >
+            ← Back to My Cards
+          </Link>
+        </div>
+      )}
       <BusinessCard profile={profile} pageUrl={pageUrl} theme={profile.theme ?? 'midnight'} />
       <div className="mx-auto mt-4 w-full max-w-sm">
         {isLoggedInViewer ? (

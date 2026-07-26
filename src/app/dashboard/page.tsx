@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Pencil, Eye, Bookmark, Share2 } from 'lucide-react'
+import { Pencil, Eye, Bookmark, Share2, QrCode } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import CardPreviewStatic from '@/components/CardPreviewStatic'
 import type { Profile } from '@/lib/types'
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           <Link
             href="/dashboard/edit"
             className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
@@ -143,6 +143,19 @@ export default async function DashboardPage() {
             <div>
               <p className="font-medium text-zinc-900 dark:text-zinc-50">Share</p>
               <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Your card link & QR</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/qr"
+            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+          >
+            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
+              <QrCode className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+            </div>
+            <div>
+              <p className="font-medium text-zinc-900 dark:text-zinc-50">My QR Code</p>
+              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Full screen QR</p>
             </div>
           </Link>
         </div>

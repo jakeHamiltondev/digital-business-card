@@ -61,6 +61,13 @@ export default function NavbarMobileMenu() {
               >
                 My Cards
               </Link>
+              <Link
+                href="/dashboard/qr"
+                onClick={() => setOpen(false)}
+                className={linkClass}
+              >
+                My QR Code
+              </Link>
               <form action={signOut}>
                 <button type="submit" className={linkClass}>
                   Sign out

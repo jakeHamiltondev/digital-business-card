@@ -7,7 +7,8 @@ import LinkfolLogo from '@/components/LinkfolLogo'
 
 export default async function Navbar() {
   const headersList = await headers()
-  if (headersList.get('x-pathname') === '/onboarding') return null
+  const pathname = headersList.get('x-pathname')
+  if (pathname === '/onboarding' || pathname === '/dashboard/qr') return null
 
   const supabase = await createClient()
   const {
@@ -48,6 +49,12 @@ export default async function Navbar() {
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
           >
             My Cards
+          </Link>
+          <Link
+            href="/dashboard/qr"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          >
+            My QR Code
           </Link>
           <form action={signOut}>
             <button
