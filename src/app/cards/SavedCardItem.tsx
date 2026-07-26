@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Star, Trash2, Plus, X } from 'lucide-react'
+import { Star, Trash2, Plus, X, Check } from 'lucide-react'
 import type { SavedCardWithProfile } from '@/lib/types'
 
 const TAG_COLORS = [
@@ -148,18 +148,39 @@ export default function SavedCardItem({
         ))}
 
         {isAddingTag ? (
-          <input
-            ref={tagInputRef}
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
-            onBlur={() => {
-              setTagInput('')
-              setIsAddingTag(false)
-            }}
-            placeholder="Add tag…"
-            className="h-5 rounded-full border border-zinc-300 bg-white px-2 text-xs outline-none focus:border-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
-          />
+          <div className="flex items-center gap-1">
+            <input
+              ref={tagInputRef}
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              onBlur={() => {
+                const trimmed = tagInput.trim()
+                if (trimmed && !tags.includes(trimmed)) {
+                  onAddTag(card.id, trimmed)
+                }
+                setTagInput('')
+                setIsAddingTag(false)
+              }}
+              placeholder="Add tag…"
+              className="h-5 w-24 rounded-full border border-zinc-300 bg-white px-2 text-xs outline-none focus:border-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-50"
+            />
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault()
+                const trimmed = tagInput.trim()
+                if (trimmed && !tags.includes(trimmed)) {
+                  onAddTag(card.id, trimmed)
+                }
+                setTagInput('')
+                setIsAddingTag(false)
+              }}
+              aria-label="Save tag"
+              className="rounded-full p-0.5 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+            >
+              <Check className="h-3 w-3" />
+            </button>
+          </div>
         ) : (
           <button
             onClick={() => setIsAddingTag(true)}
