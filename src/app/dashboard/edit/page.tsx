@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ProfileForm from '../ProfileForm'
 import AvatarUpload from '@/components/AvatarUpload'
+import DangerZone from './DangerZone'
 import type { Profile } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -61,6 +62,8 @@ export default async function EditProfilePage() {
             </p>
           )}
         </section>
+
+        <DangerZone />
       </main>
     </div>
   )
