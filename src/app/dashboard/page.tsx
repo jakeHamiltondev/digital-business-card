@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Pencil, Eye, Bookmark, Share2, QrCode, Camera } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import CardPreviewStatic from '@/components/CardPreviewStatic'
+import UpgradeToast from '@/components/UpgradeToast'
 import type { Profile } from '@/lib/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -13,7 +14,11 @@ export const metadata: Metadata = {
   title: 'Dashboard | Linkfol',
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const searchParams = await props.searchParams
+  const showUpgradeSuccess = searchParams.upgraded === 'true'
   const supabase = await createClient()
   const {
     data: { user },
@@ -50,6 +55,8 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <main className="mx-auto max-w-3xl space-y-8 px-4 py-10">
+        <UpgradeToast show={showUpgradeSuccess} />
+
         {isIncomplete && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-800 dark:bg-amber-950">
             <p className="text-sm text-amber-800 dark:text-amber-200">

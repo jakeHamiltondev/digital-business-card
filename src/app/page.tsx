@@ -36,6 +36,10 @@ const demoProfile: Profile = {
     linkedin: 'https://linkedin.com/in/jordantaylor',
   },
   theme: 'slate',
+  plan: null,
+  stripe_customer_id: null,
+  subscription_id: null,
+  subscription_end_date: null,
   created_at: '',
   updated_at: '',
 }

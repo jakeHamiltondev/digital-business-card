@@ -62,6 +62,12 @@ export default async function Navbar() {
           >
             Scan QR Code
           </Link>
+          <Link
+            href="/pricing"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          >
+            Pricing
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

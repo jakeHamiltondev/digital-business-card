@@ -19,6 +19,10 @@ export type Profile = {
   website: string | null
   social_links: SocialLinks
   theme: string | null
+  plan: string | null
+  stripe_customer_id: string | null
+  subscription_id: string | null
+  subscription_end_date: string | null
   created_at: string
   updated_at: string
 }
