@@ -49,10 +49,11 @@ export default async function PricingPage() {
   let isOnFree = false
 
   if (user) {
+    const userId = user!.id
     const { data: profile } = await supabase
       .from('profiles')
       .select('plan, subscription_end_date')
-      .eq('id', user.id)
+      .eq('id', userId)
       .maybeSingle()
 
     if (profile) {
