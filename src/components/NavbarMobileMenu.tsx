@@ -75,13 +75,6 @@ export default function NavbarMobileMenu() {
               >
                 Scan QR Code
               </Link>
-              <Link
-                href="/pricing"
-                onClick={() => setOpen(false)}
-                className={linkClass}
-              >
-                Pricing
-              </Link>
               <form action={signOut}>
                 <button type="submit" className={linkClass}>
                   Sign out

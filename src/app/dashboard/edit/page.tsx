@@ -64,7 +64,7 @@ export default async function EditProfilePage() {
           )}
         </section>
 
-        {profile && <SubscriptionSection profile={profile} />}
+        {false && profile && <SubscriptionSection profile={profile} />}
 
         <DangerZone />
       </main>

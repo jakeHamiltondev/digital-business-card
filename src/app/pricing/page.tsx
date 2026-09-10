@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -37,6 +38,8 @@ const proComingSoon = new Set([
 ])
 
 export default async function PricingPage() {
+  redirect('/dashboard')
+
   const supabase = await createClient()
   const {
     data: { user },
