@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
 import SaveCardButton from '@/components/SaveCardButton'
 import type { Profile } from '@/lib/types'
+import { isPro } from '@/lib/subscription'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
@@ -223,6 +224,18 @@ export default async function UserCardPage({ params }: Props) {
           </div>
         ) : null}
       </div>
+      {!isPro(profile) && (
+        <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-600">
+          <a
+            href={`https://linkfol.com?ref=${username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-zinc-500 dark:hover:text-zinc-500"
+          >
+            ✦ linkfol.com
+          </a>
+        </p>
+      )}
     </div>
   )
 }

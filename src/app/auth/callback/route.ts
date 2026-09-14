@@ -34,12 +34,20 @@ export async function GET(request: NextRequest) {
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('username, full_name')
+          .select('username, full_name, referred_by')
           .eq('id', user.id)
           .maybeSingle()
 
         if (profile?.full_name) {
           return NextResponse.redirect(new URL(`/${profile.username}`, origin))
+        }
+
+        const refCookie = request.cookies.get('lf_ref')?.value
+        if (refCookie && !profile?.referred_by) {
+          await supabase
+            .from('profiles')
+            .update({ referred_by: refCookie })
+            .eq('id', user.id)
         }
       }
 

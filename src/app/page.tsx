@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import BusinessCard from '@/components/BusinessCard'
 import LinkfolLogo from '@/components/LinkfolLogo'
 import VeteranBadge from '@/components/VeteranBadge'
+import ReferralCapture from '@/components/ReferralCapture'
 import { Pencil, QrCode } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import { signInWithGoogle, signInWithMicrosoft } from '@/app/actions/auth'
@@ -40,6 +41,7 @@ const demoProfile: Profile = {
   stripe_customer_id: null,
   subscription_id: null,
   subscription_end_date: null,
+  referred_by: null,
   created_at: '',
   updated_at: '',
 }
@@ -78,15 +80,23 @@ function MicrosoftIcon({ className }: { className?: string }) {
   )
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (user) redirect('/dashboard')
 
+  const { ref } = await searchParams
+  const referralCode = typeof ref === 'string' ? ref.slice(0, 64).replace(/[^a-zA-Z0-9_-]/g, '') : ''
+
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-black">
+      {referralCode && <ReferralCapture referralCode={referralCode} />}
       {/* Hero */}
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-28 text-center">
         <div className="mx-auto max-w-3xl">

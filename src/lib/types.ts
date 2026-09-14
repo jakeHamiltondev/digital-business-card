@@ -23,6 +23,7 @@ export type Profile = {
   stripe_customer_id: string | null
   subscription_id: string | null
   subscription_end_date: string | null
+  referred_by: string | null
   created_at: string
   updated_at: string
 }
