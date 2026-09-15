@@ -208,7 +208,7 @@ export default function BusinessCard({
 
           {/* QR always anchored at the bottom — no mt-auto needed with flex-1 above */}
           <div className="flex flex-col items-center gap-2 pt-4">
-            <QRCodeMini url={pageUrl} />
+            <QRCodeMini url={`${pageUrl}?qr=1`} />
             <p className="text-xs" style={{ color: t.colors.mutedText }}>
               Tap to flip
             </p>
@@ -248,7 +248,7 @@ export default function BusinessCard({
           )}
 
           <div className="mt-auto flex flex-col items-center gap-2 pt-6">
-            <QRCodeMini url={pageUrl} />
+            <QRCodeMini url={`${pageUrl}?qr=1`} />
             <p className="text-xs" style={{ color: t.colors.mutedText }}>
               Tap to flip back
             </p>

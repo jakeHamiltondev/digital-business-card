@@ -30,11 +30,17 @@ export default async function DashboardPage(props: {
 
   let profile: Profile | null = null
 
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle()
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [
+    { data: existing },
+    { count: totalViews },
+    { count: recentViews },
+  ] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    supabase.from('card_views').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
+    supabase.from('card_views').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).gte('created_at', sevenDaysAgo),
+  ])
 
   if (existing) {
     profile = existing as Profile
@@ -50,6 +56,7 @@ export default async function DashboardPage(props: {
 
   const displayName = profile?.full_name ?? profile?.username ?? 'there'
   const cardUrl = profile ? `${siteUrl}/${profile.username}` : null
+  const qrUrl = cardUrl ? `${cardUrl}?qr=1` : null
   const isIncomplete = profile && (!profile.full_name || !profile.title)
 
   return (
@@ -75,6 +82,17 @@ export default async function DashboardPage(props: {
           Welcome back, {displayName}
         </h1>
 
+        <div className="flex gap-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white px-6 py-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{totalViews ?? 0}</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Total card views</p>
+          </div>
+          <div className="rounded-2xl border border-zinc-200 bg-white px-6 py-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{recentViews ?? 0}</p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Views last 7 days</p>
+          </div>
+        </div>
+
         {profile && cardUrl && (
           <section id="share">
             <h2 className="mb-6 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -88,7 +106,7 @@ export default async function DashboardPage(props: {
 
               {/* Share tools */}
               <div className="flex flex-col items-center gap-5 sm:flex-1">
-                <QRCodeBlock url={cardUrl} />
+                <QRCodeBlock url={cardUrl} qrUrl={qrUrl ?? undefined} />
                 <Link
                   href={`/${profile.username}`}
                   className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"

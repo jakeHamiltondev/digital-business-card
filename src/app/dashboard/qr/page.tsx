@@ -27,6 +27,7 @@ export default async function QRPage() {
   if (!profile) redirect('/dashboard')
 
   const cardUrl = `${siteUrl}/${profile.username}`
+  const qrUrl = `${cardUrl}?qr=1`
   const displayName = profile.full_name ?? `@${profile.username}`
 
   return (
@@ -38,7 +39,7 @@ export default async function QRPage() {
         <ArrowLeft className="h-4 w-4" />
         Back
       </Link>
-      <QRDisplay url={cardUrl} />
+      <QRDisplay url={qrUrl} />
       <p className="mt-6 text-xl font-semibold text-zinc-50">{displayName}</p>
       <p className="mt-2 text-sm text-zinc-400">linkfol.com/{profile.username}</p>
     </div>

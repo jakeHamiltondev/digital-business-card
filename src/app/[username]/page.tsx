@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { after } from 'next/server'
+import { headers } from 'next/headers'
 import { Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAnonClient } from '@/lib/supabase/anon'
 import BusinessCard from '@/components/BusinessCard'
 import SaveCardButton from '@/components/SaveCardButton'
 import type { Profile } from '@/lib/types'
@@ -12,6 +15,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
 type Props = {
   params: Promise<{ username: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -96,8 +100,12 @@ function MicrosoftIcon({ className }: { className?: string }) {
   )
 }
 
-export default async function UserCardPage({ params }: Props) {
+export default async function UserCardPage({ params, searchParams }: Props) {
   const { username } = await params
+  const sp = await searchParams
+  const source = sp?.qr === '1' ? 'qr' : 'direct'
+  const referer = (await headers()).get('referer')
+
   const supabase = await createClient()
 
   const { data } = await supabase
@@ -134,6 +142,20 @@ export default async function UserCardPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
   const isOwnCard = user?.id === profile.id
   const isLoggedInViewer = !!user && !isOwnCard
+
+  if (!isOwnCard) {
+    const viewerId = user?.id ?? null
+    const profileId = profile.id
+    after(async () => {
+      const anon = createAnonClient()
+      await anon.from('card_views').insert({
+        profile_id: profileId,
+        viewer_id: viewerId,
+        referrer: referer,
+        source,
+      })
+    })
+  }
 
   let initialSaved = false
   if (isLoggedInViewer) {
