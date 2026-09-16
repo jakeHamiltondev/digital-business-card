@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Pencil, Trash2, Plus, X, Check, Loader2 } from 'lucide-react'
 import {
   addResumeEntry,
@@ -390,17 +391,12 @@ function ResumeSection({
 }
 
 export default function ResumeClient({ initialEntries }: { initialEntries: ResumeEntry[] }) {
+  const router = useRouter()
   const [entries, setEntries] = useState<ResumeEntry[]>(initialEntries)
   const [activeForm, setActiveForm] = useState<ActiveForm>(null)
-  const [, startTransition] = useTransition()
 
   function refresh() {
-    // Server actions + revalidatePath will cause the server component to rerender,
-    // but we optimistically re-fetch by triggering a router refresh via form submission.
-    // Since we're in a client component, we rely on the server revalidation.
-    startTransition(() => {
-      // no-op — revalidatePath in server actions handles the update
-    })
+    router.refresh()
   }
 
   function entriesFor(type: ResumeEntryType) {
