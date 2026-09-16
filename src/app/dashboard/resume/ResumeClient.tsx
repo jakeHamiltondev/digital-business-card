@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Trash2, Plus, X, Check, Loader2 } from 'lucide-react'
 import {
@@ -392,7 +392,7 @@ function ResumeSection({
 
 export default function ResumeClient({ initialEntries }: { initialEntries: ResumeEntry[] }) {
   const router = useRouter()
-  const [entries, setEntries] = useState<ResumeEntry[]>(initialEntries)
+  const [entries] = useState<ResumeEntry[]>(initialEntries)
   const [activeForm, setActiveForm] = useState<ActiveForm>(null)
 
   function refresh() {
