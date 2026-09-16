@@ -392,7 +392,6 @@ function ResumeSection({
 
 export default function ResumeClient({ initialEntries }: { initialEntries: ResumeEntry[] }) {
   const router = useRouter()
-  const [entries] = useState<ResumeEntry[]>(initialEntries)
   const [activeForm, setActiveForm] = useState<ActiveForm>(null)
 
   function refresh() {
@@ -400,7 +399,7 @@ export default function ResumeClient({ initialEntries }: { initialEntries: Resum
   }
 
   function entriesFor(type: ResumeEntryType) {
-    return entries.filter((e) => e.type === type)
+    return initialEntries.filter((e) => e.type === type)
   }
 
   return (
