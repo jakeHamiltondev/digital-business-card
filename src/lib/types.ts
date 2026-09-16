@@ -28,6 +28,24 @@ export type Profile = {
   updated_at: string
 }
 
+export type ResumeEntryType = 'experience' | 'education' | 'skill' | 'project' | 'certification'
+
+export type ResumeEntry = {
+  id: string
+  user_id: string
+  type: ResumeEntryType
+  title: string
+  organization: string | null
+  location: string | null
+  start_date: string | null
+  end_date: string | null
+  description: string | null
+  skills_list: string[] | null
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
 export type SavedCard = {
   id: string
   user_id: string
