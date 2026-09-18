@@ -88,10 +88,12 @@ export default function BusinessCard({
   profile,
   pageUrl,
   theme: themeId,
+  hasResume,
 }: {
   profile: Profile
   pageUrl: string
   theme?: string
+  hasResume?: boolean
 }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const t = getTheme(themeId ?? profile.theme)
@@ -229,6 +231,16 @@ export default function BusinessCard({
               <p className="text-sm italic" style={{ color: t.colors.mutedText }}>
                 No bio added yet.
               </p>
+            )}
+            {false && hasResume && (
+              <a
+                href={`/${profile.username}/resume`}
+                className="mt-4 inline-block text-sm underline underline-offset-4"
+                style={{ color: t.colors.textSecondary }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                View my resume →
+              </a>
             )}
           </div>
 

@@ -168,6 +168,12 @@ export default async function UserCardPage({ params, searchParams }: Props) {
     initialSaved = !!saved
   }
 
+  const { count: resumeCount } = await supabase
+    .from('resume_entries')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', profile.id)
+  const hasResume = (resumeCount ?? 0) > 0
+
   async function signInToSave() {
     'use server'
     const supabase = await createClient()
@@ -207,7 +213,7 @@ export default async function UserCardPage({ params, searchParams }: Props) {
           </Link>
         </div>
       )}
-      <BusinessCard profile={profile} pageUrl={pageUrl} theme={profile.theme ?? 'midnight'} />
+      <BusinessCard profile={profile} pageUrl={pageUrl} theme={profile.theme ?? 'midnight'} hasResume={hasResume} />
       <div className="mx-auto mt-4 w-full max-w-sm">
         {isLoggedInViewer ? (
           <SaveCardButton profileId={profile.id} initialSaved={initialSaved} />
