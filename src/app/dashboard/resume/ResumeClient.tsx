@@ -70,6 +70,13 @@ type ActiveForm =
   | { mode: 'edit'; entry: ResumeEntry }
   | null
 
+const CONTEXT_LABEL: Partial<Record<ResumeEntryType, string>> = {
+  experience: 'Work experience',
+  education: 'Education',
+  project: 'Project',
+  certification: 'Certification',
+}
+
 function EntryForm({
   type,
   initial,
@@ -84,9 +91,42 @@ function EntryForm({
   const [form, setForm] = useState<FormState>(initial)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [polishing, setPolishing] = useState(false)
+  const [priorDescription, setPriorDescription] = useState<string | null>(null)
 
   const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }))
+
+  async function handlePolish() {
+    if (!form.description) return
+    setPolishing(true)
+    try {
+      const contextLabel = CONTEXT_LABEL[type] ?? type
+      const context = `${contextLabel}: ${form.title}${form.organization ? ` at ${form.organization}` : ''}`
+      const res = await fetch('/api/resume/polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: form.description, context }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to polish text')
+        return
+      }
+      setPriorDescription(form.description)
+      setForm((f) => ({ ...f, description: data.polished }))
+    } catch {
+      setError('Network error — please try again')
+    } finally {
+      setPolishing(false)
+    }
+  }
+
+  function handleUndo() {
+    if (priorDescription === null) return
+    setForm((f) => ({ ...f, description: priorDescription }))
+    setPriorDescription(null)
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -160,6 +200,26 @@ function EntryForm({
             onChange={set('description')}
             placeholder={type === 'experience' ? 'Key responsibilities and achievements…' : 'Additional details…'}
           />
+          <div className="mt-1.5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePolish}
+              disabled={polishing || !form.description}
+              className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              {polishing ? <Loader2 className="h-3 w-3 animate-spin" /> : <span>✨</span>}
+              Polish with AI
+            </button>
+            {priorDescription !== null && (
+              <button
+                type="button"
+                onClick={handleUndo}
+                className="text-xs text-zinc-500 underline-offset-2 hover:underline dark:text-zinc-400"
+              >
+                Undo
+              </button>
+            )}
+          </div>
         </div>
       )}
 
