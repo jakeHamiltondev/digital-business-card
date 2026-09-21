@@ -6,6 +6,7 @@ import { getResumeEntries } from '@/app/actions/resume'
 import { isPro } from '@/lib/subscription'
 import ResumeClient from './ResumeClient'
 import type { Profile } from '@/lib/types'
+import { Download } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Resume Builder | Linkfol',
@@ -65,13 +66,24 @@ export default async function ResumePage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <main className="mx-auto max-w-2xl space-y-10 px-4 py-10">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Resume Builder
-          </h1>
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-            Build your professional history. This information will power your AI-generated resume.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Resume Builder
+            </h1>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              Build your professional history. This information will power your AI-generated resume.
+            </p>
+          </div>
+          {entries.length > 0 && profile && (
+            <a
+              href={`/api/resume/pdf/${profile.username}`}
+              className="flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF
+            </a>
+          )}
         </div>
         <ResumeClient initialEntries={entries} />
       </main>
