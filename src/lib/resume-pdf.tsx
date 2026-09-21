@@ -40,7 +40,7 @@ const s = StyleSheet.create({
     paddingBottom: 54,
     paddingLeft: 54,
     paddingRight: 54,
-    lineHeight: 1.4,
+    lineHeight: 1.55,
   },
   headerName: {
     fontSize: 22,
@@ -56,10 +56,10 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#d4d4d4',
     marginTop: 10,
-    marginBottom: 14,
+    marginBottom: 18,
   },
   section: {
-    marginBottom: 12,
+    marginBottom: 18,
   },
   sectionHeading: {
     fontSize: 8,
@@ -69,14 +69,14 @@ const s = StyleSheet.create({
     color: '#888',
     borderBottomWidth: 0.5,
     borderBottomColor: '#e5e5e5',
-    paddingBottom: 3,
-    marginBottom: 8,
+    paddingBottom: 4,
+    marginBottom: 10,
   },
   entryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 1,
+    marginBottom: 3,
   },
   entryTitle: {
     fontFamily: 'Helvetica-Bold',
@@ -89,16 +89,17 @@ const s = StyleSheet.create({
   entryOrg: {
     fontSize: 9.5,
     color: '#444',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   entryDesc: {
     fontSize: 9,
     color: '#333',
-    marginTop: 2,
+    marginTop: 4,
+    lineHeight: 1.5,
   },
   skillRow: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: 7,
   },
   skillCategory: {
     fontFamily: 'Helvetica-Bold',
@@ -118,7 +119,7 @@ const s = StyleSheet.create({
     marginTop: 2,
   },
   entryBlock: {
-    marginBottom: 8,
+    marginBottom: 14,
   },
 })
 
