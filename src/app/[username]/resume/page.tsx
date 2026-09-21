@@ -113,14 +113,21 @@ export default async function PublicResumePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 print:bg-white">
       <div className="mx-auto max-w-3xl px-6 py-12 print:px-8 print:py-8">
-        {/* Download button — hidden when printing */}
-        <div className="mb-6 flex justify-end print:hidden">
+        {/* Download buttons — hidden when printing */}
+        <div className="mb-6 flex justify-end gap-2 print:hidden">
           <a
             href={`/api/resume/pdf/${username}`}
             className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             <Download className="h-4 w-4" />
-            Download PDF
+            PDF
+          </a>
+          <a
+            href={`/api/resume/docx/${username}`}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <Download className="h-4 w-4" />
+            DOCX
           </a>
         </div>
 

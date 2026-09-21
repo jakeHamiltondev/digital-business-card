@@ -76,13 +76,22 @@ export default async function ResumePage() {
             </p>
           </div>
           {entries.length > 0 && profile && (
-            <a
-              href={`/api/resume/pdf/${profile.username}`}
-              className="flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
-              <Download className="h-4 w-4" />
-              Download PDF
-            </a>
+            <div className="flex shrink-0 items-center gap-2">
+              <a
+                href={`/api/resume/pdf/${profile.username}`}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <Download className="h-4 w-4" />
+                PDF
+              </a>
+              <a
+                href={`/api/resume/docx/${profile.username}`}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                <Download className="h-4 w-4" />
+                DOCX
+              </a>
+            </div>
           )}
         </div>
         <ResumeClient initialEntries={entries} />

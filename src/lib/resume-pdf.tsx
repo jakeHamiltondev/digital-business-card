@@ -4,14 +4,16 @@ import {
   Text,
   View,
   StyleSheet,
-  Font,
 } from '@react-pdf/renderer'
 import type { Profile, ResumeEntry, ResumeEntryType } from './types'
 
-Font.register({
-  family: 'Helvetica',
-  fonts: [],
-})
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 10)
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+  }
+  return raw
+}
 
 const SECTION_ORDER: ResumeEntryType[] = [
   'experience',
@@ -44,12 +46,7 @@ const s = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Helvetica-Bold',
     letterSpacing: 0.5,
-    marginBottom: 3,
-  },
-  headerTitle: {
-    fontSize: 11,
-    color: '#444',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   headerContact: {
     fontSize: 9,
@@ -142,16 +139,16 @@ export function ResumePDF({ profile, entries }: Props) {
     entriesByType[entry.type]!.push(entry)
   }
 
-  const titleLine = [profile.title, profile.company].filter(Boolean).join(' at ')
-
-  const contactParts = [profile.email, profile.phone].filter(Boolean)
+  const contactParts = [
+    profile.email,
+    profile.phone ? formatPhone(profile.phone) : null,
+  ].filter(Boolean)
 
   return (
     <Document>
       <Page size="LETTER" style={s.page}>
         {/* Header */}
         <Text style={s.headerName}>{profile.full_name ?? profile.username}</Text>
-        {titleLine ? <Text style={s.headerTitle}>{titleLine}</Text> : null}
         {contactParts.length > 0 ? (
           <Text style={s.headerContact}>{contactParts.join('  |  ')}</Text>
         ) : null}
