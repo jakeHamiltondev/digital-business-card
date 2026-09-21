@@ -46,7 +46,7 @@ const s = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Helvetica-Bold',
     letterSpacing: 0.5,
-    marginBottom: 6,
+    marginBottom: 10,
   },
   headerContact: {
     fontSize: 9,
@@ -55,8 +55,8 @@ const s = StyleSheet.create({
   hr: {
     borderBottomWidth: 1,
     borderBottomColor: '#d4d4d4',
-    marginTop: 10,
-    marginBottom: 18,
+    marginTop: 8,
+    marginBottom: 12,
   },
   section: {
     marginBottom: 18,
