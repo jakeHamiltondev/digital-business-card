@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import type { Persona, StudentInfo, RecruiterInfo, PhoneEntry } from '@/lib/types'
 
 export async function checkUsername(username: string): Promise<{ available: boolean }> {
   if (!username || username.length < 2) return { available: false }
@@ -26,13 +27,22 @@ export async function checkUsername(username: string): Promise<{ available: bool
 }
 
 export async function saveOnboardingProfile(data: {
+  persona: Persona
   full_name: string
+  email: string
+  username: string
+  // Professional
   title: string
   company: string
-  email: string
   phone: string
-  bio: string
-  username: string
+  // Student
+  university: string
+  major: string
+  expectedGraduation: string
+  // Recruiter
+  department: string
+  hiringFocus: string
+  // Step 3
   website: string
   linkedin: string
   twitter: string
@@ -56,7 +66,6 @@ export async function saveOnboardingProfile(data: {
     .ilike('username', username)
     .neq('id', user.id)
     .maybeSingle()
-
   if (existing) return { success: false, error: 'That username is already taken' }
 
   const social_links: Record<string, string> = {}
@@ -70,21 +79,39 @@ export async function saveOnboardingProfile(data: {
     if (value?.trim()) social_links[platform] = value.trim()
   }
 
-  const phone = data.phone ? data.phone.replace(/\D/g, '') || null : null
+  const phoneDigits = data.phone ? data.phone.replace(/\D/g, '') || null : null
+  const phones: PhoneEntry[] = phoneDigits ? [{ type: 'mobile', number: phoneDigits }] : []
+
+  const student_info: StudentInfo | null =
+    data.persona === 'student'
+      ? {
+          university: data.university.trim() || undefined,
+          major: data.major.trim() || undefined,
+          expected_graduation: data.expectedGraduation || undefined,
+        }
+      : null
+
+  const recruiter_info: RecruiterInfo | null =
+    data.persona === 'recruiter'
+      ? { hiring_focus: data.hiringFocus.trim() || undefined }
+      : null
 
   const { error } = await supabase
     .from('profiles')
     .update({
       username,
-      full_name: data.full_name?.trim() || null,
-      title: data.title?.trim() || null,
-      company: data.company?.trim() || null,
-      email: data.email?.trim() || null,
-      phone,
-      bio: data.bio?.trim() || null,
-      website: data.website?.trim() || null,
+      persona: data.persona,
+      full_name: data.full_name.trim() || null,
+      title: data.title.trim() || null,
+      company: data.company.trim() || null,
+      department: data.department.trim() || null,
+      phones,
+      email: data.email.trim() || null,
+      website: data.website.trim() || null,
       social_links,
       theme: data.theme || 'midnight',
+      student_info,
+      recruiter_info,
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id)

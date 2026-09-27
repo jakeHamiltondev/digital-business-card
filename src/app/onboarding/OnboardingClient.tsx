@@ -2,10 +2,16 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { Briefcase, GraduationCap, Users } from 'lucide-react'
 import LinkfolLogo from '@/components/LinkfolLogo'
 import AvatarUpload from '@/components/AvatarUpload'
 import { themes, getTheme } from '@/lib/themes'
+import { PERSONA_CONFIG, FIELD_DEFS } from '@/lib/persona-config'
+import type { OnboardingFieldConfig } from '@/lib/persona-config'
+import type { Persona } from '@/lib/types'
 import { checkUsername, saveOnboardingProfile } from './actions'
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatPhoneDisplay(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 10)
@@ -24,23 +30,32 @@ function nameToSlug(name: string): string {
 
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
 
+// ── Persona option card ───────────────────────────────────────────────────────
+
+const PERSONA_ICONS: Record<Persona, React.FC<{ className?: string }>> = {
+  professional: ({ className }) => <Briefcase className={className} />,
+  student: ({ className }) => <GraduationCap className={className} />,
+  recruiter: ({ className }) => <Users className={className} />,
+}
+
+const PERSONAS: Persona[] = ['professional', 'student', 'recruiter']
+
+// ── Card mini preview ─────────────────────────────────────────────────────────
+
 function CardMiniPreview({
   fullName,
-  title,
-  company,
+  subtitle,
   email,
   avatarUrl,
   theme: themeId,
 }: {
   fullName: string
-  title: string
-  company: string
+  subtitle: string
   email: string
   avatarUrl: string | null
   theme: string
 }) {
   const t = getTheme(themeId)
-  const titleLine = [title, company].filter(Boolean).join(' at ')
   const initial = fullName?.trim().charAt(0).toUpperCase() || '?'
 
   return (
@@ -79,9 +94,9 @@ function CardMiniPreview({
         >
           {fullName || 'Your Name'}
         </h2>
-        {titleLine && (
+        {subtitle && (
           <p className="mt-1 text-sm" style={{ color: t.colors.textSecondary }}>
-            {titleLine}
+            {subtitle}
           </p>
         )}
       </div>
@@ -115,10 +130,14 @@ function CardMiniPreview({
   )
 }
 
+// ── Shared styles ─────────────────────────────────────────────────────────────
+
 const inputClass =
   'w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500'
 
 const labelClass = 'block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1'
+
+// ── Main component ────────────────────────────────────────────────────────────
 
 export default function OnboardingClient({
   userId,
@@ -132,23 +151,34 @@ export default function OnboardingClient({
   existingAvatarUrl: string | null
 }) {
   const router = useRouter()
-  const [step, setStep] = useState(1)
 
-  // Step 1 fields
+  // step 1 = persona picker, 2 = the basics, 3 = make it yours
+  const [step, setStep] = useState(1)
+  const [persona, setPersona] = useState<Persona>('professional')
+
+  // ── Universal Step 2 fields
   const [fullName, setFullName] = useState('')
-  const [title, setTitle] = useState('')
-  const [company, setCompany] = useState('')
   const [email, setEmail] = useState(userEmail ?? '')
-  const [phone, setPhone] = useState('')
   const [username, setUsername] = useState(existingUsername)
   const [usernameEdited, setUsernameEdited] = useState(false)
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle')
-  const [step1Error, setStep1Error] = useState<string | null>(null)
+  const [stepError, setStepError] = useState<string | null>(null)
 
-  // Step 1 optional fields
-  const [bio, setBio] = useState('')
+  // ── Professional
+  const [title, setTitle] = useState('')
+  const [company, setCompany] = useState('')
+  const [phone, setPhone] = useState('')
 
-  // Step 2 fields
+  // ── Student
+  const [university, setUniversity] = useState('')
+  const [major, setMajor] = useState('')
+  const [expectedGraduation, setExpectedGraduation] = useState('')
+
+  // ── Recruiter (also uses company above)
+  const [department, setDepartment] = useState('')
+  const [hiringFocus, setHiringFocus] = useState('')
+
+  // ── Step 3 fields
   const [website, setWebsite] = useState('')
   const [linkedin, setLinkedin] = useState('')
   const [twitter, setTwitter] = useState('')
@@ -161,6 +191,8 @@ export default function OnboardingClient({
   const [saveError, setSaveError] = useState<string | null>(null)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // ── Username helpers ──────────────────────────────────────────────────────
 
   function scheduleUsernameCheck(value: string) {
     setUsernameStatus('checking')
@@ -196,42 +228,67 @@ export default function OnboardingClient({
     scheduleUsernameCheck(cleaned)
   }
 
-  function handleNext() {
-    if (!fullName.trim()) {
-      setStep1Error('Full name is required.')
-      return
+  // ── Field state lookup (for validation) ─────────────────────────────────
+
+  function getFieldValue(key: string): string {
+    switch (key) {
+      case 'title':                return title
+      case 'company':              return company
+      case 'phones':               return phone
+      case 'university':           return university
+      case 'major':                return major
+      case 'expected_graduation':  return expectedGraduation
+      case 'department':           return department
+      case 'hiring_focus':         return hiringFocus
+      default:                     return ''
     }
-    if (!username || username.length < 2) {
-      setStep1Error('Please choose a card URL (at least 2 characters).')
-      return
-    }
-    if (usernameStatus === 'taken') {
-      setStep1Error('That URL is already taken. Please choose another.')
-      return
-    }
-    if (usernameStatus === 'checking') {
-      setStep1Error('Please wait while we check that URL.')
-      return
-    }
-    if (usernameStatus === 'invalid') {
-      setStep1Error('Please enter a valid card URL.')
-      return
-    }
-    setStep1Error(null)
-    setStep(2)
   }
+
+  // ── Step 2 validation + advance ──────────────────────────────────────────
+
+  function handleNextStep() {
+    if (!fullName.trim()) { setStepError('Full name is required.'); return }
+    if (!email.trim()) { setStepError('Email is required.'); return }
+    if (!username || username.length < 2) {
+      setStepError('Please choose a card URL (at least 2 characters).')
+      return
+    }
+    if (usernameStatus === 'taken') { setStepError('That URL is taken. Please choose another.'); return }
+    if (usernameStatus === 'checking') { setStepError('Please wait while we check that URL.'); return }
+    if (usernameStatus === 'invalid') { setStepError('Please enter a valid card URL.'); return }
+
+    for (const fieldConfig of PERSONA_CONFIG[persona].onboardingFields) {
+      const def = FIELD_DEFS[fieldConfig.key]
+      const isRequired = fieldConfig.required ?? def.required ?? false
+      if (!isRequired) continue
+      if (!getFieldValue(fieldConfig.key).trim()) {
+        setStepError(`${def.label} is required.`)
+        return
+      }
+    }
+
+    setStepError(null)
+    setStep(3)
+  }
+
+  // ── Save ─────────────────────────────────────────────────────────────────
 
   async function handleSave() {
     setIsSaving(true)
     setSaveError(null)
     const result = await saveOnboardingProfile({
+      persona,
       full_name: fullName,
+      email,
+      username,
       title,
       company,
-      email,
       phone,
-      bio,
-      username,
+      university,
+      major,
+      expectedGraduation,
+      department,
+      hiringFocus,
       website,
       linkedin,
       twitter,
@@ -248,6 +305,155 @@ export default function OnboardingClient({
     }
   }
 
+  // ── Persona-specific field rendering (Step 2) ─────────────────────────────
+
+  function renderPersonaField(fieldConfig: OnboardingFieldConfig) {
+    const { key } = fieldConfig
+    const def = FIELD_DEFS[key]
+    const isRequired = fieldConfig.required ?? def.required ?? false
+
+    const labelEl = (
+      <label className={labelClass}>
+        {def.label}
+        {isRequired && <span className="text-red-500"> *</span>}
+      </label>
+    )
+
+    switch (key) {
+      case 'title':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'company':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'phones':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneDisplay(e.target.value))}
+              placeholder="(555) 000-0000"
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'university':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={university}
+              onChange={(e) => setUniversity(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'major':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={major}
+              onChange={(e) => setMajor(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'expected_graduation':
+        return (
+          <div key={key}>
+            {labelEl}
+            {def.hint && (
+              <p className="mb-1 text-xs text-zinc-400 dark:text-zinc-500">{def.hint}</p>
+            )}
+            <input
+              type="month"
+              value={expectedGraduation}
+              onChange={(e) => setExpectedGraduation(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'department':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      case 'hiring_focus':
+        return (
+          <div key={key}>
+            {labelEl}
+            <input
+              type="text"
+              value={hiringFocus}
+              onChange={(e) => setHiringFocus(e.target.value)}
+              placeholder={def.placeholder}
+              className={inputClass}
+            />
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  // ── Preview subtitle ─────────────────────────────────────────────────────
+
+  function getPreviewSubtitle(): string {
+    switch (persona) {
+      case 'professional':
+        return [title, company].filter(Boolean).join(' at ')
+      case 'student':
+        return [major, university].filter(Boolean).join(' · ')
+      case 'recruiter':
+        return [department, company].filter(Boolean).join(', ')
+    }
+  }
+
+  // ── Progress bar labels ──────────────────────────────────────────────────
+
+  const stepLabels: Record<number, string> = {
+    1: 'What describes you?',
+    2: 'The basics',
+    3: 'Make it yours',
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -261,21 +467,58 @@ export default function OnboardingClient({
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              Step {step} of 2
+              Step {step} of 3
             </span>
-            <span className="text-sm text-zinc-400">
-              {step === 1 ? 'The basics' : 'Make it yours'}
-            </span>
+            <span className="text-sm text-zinc-400">{stepLabels[step]}</span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-zinc-200 dark:bg-zinc-800">
             <div
               className="h-1.5 rounded-full bg-zinc-900 transition-all duration-300 dark:bg-zinc-50"
-              style={{ width: `${(step / 2) * 100}%` }}
+              style={{ width: `${(step / 3) * 100}%` }}
             />
           </div>
         </div>
 
-        {step === 1 ? (
+        {/* ── Step 1: Persona picker ── */}
+        {step === 1 && (
+          <div className="max-w-2xl">
+            <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+              What best describes you?
+            </h1>
+            <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
+              We&apos;ll tailor your card to show what matters most for your goals.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              {PERSONAS.map((p) => {
+                const config = PERSONA_CONFIG[p]
+                const Icon = PERSONA_ICONS[p]
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => {
+                      setPersona(p)
+                      setStep(2)
+                    }}
+                    className="flex flex-col items-start rounded-xl border-2 p-6 text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:border-zinc-400 dark:hover:border-zinc-500 border-zinc-200 dark:border-zinc-700"
+                  >
+                    <Icon className="mb-4 h-8 w-8 text-zinc-700 dark:text-zinc-300" />
+                    <span className="mb-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
+                      {config.label}
+                    </span>
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {config.description}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 2: The basics ── */}
+        {step === 2 && (
           <div className="max-w-xl">
             <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               The basics
@@ -287,7 +530,9 @@ export default function OnboardingClient({
             <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">
               <span className="text-red-500">*</span> Required
             </p>
+
             <div className="space-y-5">
+              {/* Universal fields */}
               <div>
                 <label htmlFor="full_name" className={labelClass}>
                   Full name <span className="text-red-500">*</span>
@@ -300,34 +545,6 @@ export default function OnboardingClient({
                   placeholder="Jane Smith"
                   className={inputClass}
                   autoFocus
-                />
-              </div>
-
-              <div>
-                <label htmlFor="title" className={labelClass}>
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Marketing Major"
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="company" className={labelClass}>
-                  Company / University
-                </label>
-                <input
-                  id="company"
-                  type="text"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="State University"
-                  className={inputClass}
                 />
               </div>
 
@@ -345,35 +562,12 @@ export default function OnboardingClient({
                 />
               </div>
 
-              <div>
-                <label htmlFor="phone" className={labelClass}>
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhoneDisplay(e.target.value))}
-                  placeholder="(555) 000-0000"
-                  className={inputClass}
-                />
-              </div>
+              {/* Persona-specific fields */}
+              {PERSONA_CONFIG[persona].onboardingFields.map((fieldConfig) =>
+                renderPersonaField(fieldConfig)
+              )}
 
-              <div>
-                <label htmlFor="bio" className={labelClass}>
-                  Short bio
-                </label>
-                <textarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell people a bit about yourself"
-                  rows={3}
-                  className={`${inputClass} resize-none`}
-                />
-              </div>
-
-              {/* Card URL row */}
+              {/* Card URL */}
               <div>
                 <label htmlFor="username" className={labelClass}>
                   Choose your card URL <span className="text-red-500">*</span>
@@ -414,9 +608,7 @@ export default function OnboardingClient({
                       </svg>
                     )}
                     {usernameStatus === 'available' && (
-                      <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                        ✓
-                      </span>
+                      <span className="text-sm font-medium text-green-600 dark:text-green-400">✓</span>
                     )}
                     {usernameStatus === 'taken' && (
                       <span className="text-sm font-medium text-red-500">✗</span>
@@ -427,28 +619,36 @@ export default function OnboardingClient({
                   <p className="mt-1 text-xs text-green-600 dark:text-green-400">Available!</p>
                 )}
                 {usernameStatus === 'taken' && (
-                  <p className="mt-1 text-xs text-red-500">
-                    That URL is taken. Try something else.
-                  </p>
+                  <p className="mt-1 text-xs text-red-500">That URL is taken. Try something else.</p>
                 )}
               </div>
             </div>
 
-            {step1Error && (
-              <p className="mt-4 text-sm text-red-600 dark:text-red-400">{step1Error}</p>
+            {stepError && (
+              <p className="mt-4 text-sm text-red-600 dark:text-red-400">{stepError}</p>
             )}
 
-            <div className="mt-8">
+            <div className="mt-8 flex gap-3">
               <button
                 type="button"
-                onClick={handleNext}
+                onClick={() => { setStepError(null); setStep(1) }}
+                className="rounded-lg border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                ← Back
+              </button>
+              <button
+                type="button"
+                onClick={handleNextStep}
                 className="rounded-lg bg-zinc-900 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
                 Next →
               </button>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* ── Step 3: Make it yours ── */}
+        {step === 3 && (
           <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
             {/* Left: form */}
             <div className="max-w-xl flex-1">
@@ -481,16 +681,13 @@ export default function OnboardingClient({
                   <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     Website
                   </h2>
-                  <div>
-                    <label className={labelClass}>Website</label>
-                    <input
-                      type="url"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://yoursite.com"
-                      className={inputClass}
-                    />
-                  </div>
+                  <input
+                    type="url"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    placeholder="https://yoursite.com"
+                    className={inputClass}
+                  />
                 </section>
 
                 {/* Social links */}
@@ -499,71 +696,24 @@ export default function OnboardingClient({
                     Social Links
                   </h2>
                   <div className="space-y-4">
-                    <div>
-                      <label className={labelClass}>LinkedIn</label>
-                      <p className="mb-1 text-xs text-zinc-400">
-                        Add your LinkedIn so people can connect with you
-                      </p>
-                      <input
-                        type="url"
-                        value={linkedin}
-                        onChange={(e) => setLinkedin(e.target.value)}
-                        placeholder="https://linkedin.com/in/username"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Twitter / X</label>
-                      <p className="mb-1 text-xs text-zinc-400">
-                        Share your Twitter so followers can find you
-                      </p>
-                      <input
-                        type="url"
-                        value={twitter}
-                        onChange={(e) => setTwitter(e.target.value)}
-                        placeholder="https://x.com/username"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>Instagram</label>
-                      <p className="mb-1 text-xs text-zinc-400">
-                        Let people see your creative side
-                      </p>
-                      <input
-                        type="url"
-                        value={instagram}
-                        onChange={(e) => setInstagram(e.target.value)}
-                        placeholder="https://instagram.com/username"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>GitHub</label>
-                      <p className="mb-1 text-xs text-zinc-400">
-                        Show off your code and projects
-                      </p>
-                      <input
-                        type="url"
-                        value={github}
-                        onChange={(e) => setGithub(e.target.value)}
-                        placeholder="https://github.com/username"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelClass}>TikTok</label>
-                      <p className="mb-1 text-xs text-zinc-400">
-                        Share your TikTok profile
-                      </p>
-                      <input
-                        type="url"
-                        value={tiktok}
-                        onChange={(e) => setTiktok(e.target.value)}
-                        placeholder="https://tiktok.com/@username"
-                        className={inputClass}
-                      />
-                    </div>
+                    {[
+                      { label: 'LinkedIn', value: linkedin, set: setLinkedin, placeholder: 'https://linkedin.com/in/username' },
+                      { label: 'Twitter / X', value: twitter, set: setTwitter, placeholder: 'https://x.com/username' },
+                      { label: 'Instagram', value: instagram, set: setInstagram, placeholder: 'https://instagram.com/username' },
+                      { label: 'GitHub', value: github, set: setGithub, placeholder: 'https://github.com/username' },
+                      { label: 'TikTok', value: tiktok, set: setTiktok, placeholder: 'https://tiktok.com/@username' },
+                    ].map(({ label, value, set, placeholder }) => (
+                      <div key={label}>
+                        <label className={labelClass}>{label}</label>
+                        <input
+                          type="url"
+                          value={value}
+                          onChange={(e) => set(e.target.value)}
+                          placeholder={placeholder}
+                          className={inputClass}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </section>
 
@@ -572,9 +722,7 @@ export default function OnboardingClient({
                   <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     Card Theme
                   </h2>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Pick a look for your card
-                  </p>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Pick a look for your card</p>
                   <div className="flex gap-3 overflow-x-auto pb-2">
                     {themes.map((t) => (
                       <button
@@ -656,7 +804,7 @@ export default function OnboardingClient({
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(2)}
                   className="rounded-lg border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 >
                   ← Back
@@ -680,8 +828,7 @@ export default function OnboardingClient({
                 </p>
                 <CardMiniPreview
                   fullName={fullName}
-                  title={title}
-                  company={company}
+                  subtitle={getPreviewSubtitle()}
                   email={email}
                   avatarUrl={avatarUrl}
                   theme={theme}
