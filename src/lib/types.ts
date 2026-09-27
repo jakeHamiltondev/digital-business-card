@@ -75,6 +75,8 @@ export type Profile = {
   // Persona-specific
   student_info: StudentInfo | null
   recruiter_info: RecruiterInfo | null
+  // Card layout
+  card_layout: string | null
 }
 
 export type ResumeEntryType = 'experience' | 'education' | 'skill' | 'project' | 'certification'
