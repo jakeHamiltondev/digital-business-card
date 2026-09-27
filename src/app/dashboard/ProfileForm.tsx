@@ -9,6 +9,8 @@ import { isPro } from '@/lib/subscription'
 import { PERSONA_CONFIG, FIELD_DEFS, UNIVERSAL_EDITOR_SECTIONS, PRO_EDITOR_SECTION } from '@/lib/persona-config'
 import type { EditorSectionDef, FieldKey } from '@/lib/persona-config'
 import { createClient } from '@/lib/supabase/client'
+import LayoutSelector from '@/components/card/LayoutSelector'
+import type { CardLayout } from '@/components/card/LayoutSelector'
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
 
@@ -343,8 +345,11 @@ export default function ProfileForm({
   const [github, setGithub] = useState(social.github ?? '')
   const [tiktok, setTiktok] = useState(social.tiktok ?? '')
 
-  // Theme + Pro
+  // Theme + Layout + Pro
   const [selectedTheme, setSelectedTheme] = useState(profile.theme ?? 'midnight')
+  const [cardLayout, setCardLayout] = useState<CardLayout>(
+    (profile.card_layout as CardLayout) ?? 'letterhead'
+  )
   const [logoUrl, setLogoUrl] = useState(profile.logo_url ?? '')
   const [brandPrimary, setBrandPrimary] = useState(profile.brand_color_primary ?? '#000000')
   const [brandAccent, setBrandAccent] = useState(profile.brand_color_accent ?? '#ffffff')
@@ -581,6 +586,7 @@ export default function ProfileForm({
         website: website || null,
         social_links: socialLinks,
         theme: selectedTheme,
+        card_layout: cardLayout,
         work_address: workAddress,
         address_visibility: addressVisibility,
         location: location || null,
@@ -754,6 +760,24 @@ export default function ProfileForm({
             </button>
           ))}
         </div>
+      </section>
+
+      {/* Card Layout */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Card Layout
+            {!userIsPro && <span className="ml-1.5 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Pro</span>}
+          </h2>
+          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+            {userIsPro ? 'Choose how your card is structured.' : 'Letterhead is free. Upgrade to unlock all layouts.'}
+          </p>
+        </div>
+        <LayoutSelector
+          value={cardLayout}
+          onChange={setCardLayout}
+          userIsPro={userIsPro}
+        />
       </section>
 
       {/* Branding (Pro-gated) */}

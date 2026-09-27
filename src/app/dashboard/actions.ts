@@ -33,6 +33,7 @@ export async function updateProfile(data: {
   website: string | null
   social_links: SocialLinks
   theme: string
+  card_layout: string
   work_address: WorkAddress | null
   address_visibility: AddressVisibility
   location: string | null
@@ -86,6 +87,12 @@ export async function updateProfile(data: {
     recruiter_info: data.recruiter_info,
     updated_at: new Date().toISOString(),
   }
+
+  // card_layout: Pro users can pick any layout; free users are locked to 'letterhead'
+  const validLayouts = ['letterhead', 'brand_front', 'executive_classic', 'photo_hero']
+  payload.card_layout = userIsPro && validLayouts.includes(data.card_layout)
+    ? data.card_layout
+    : 'letterhead'
 
   if (userIsPro) {
     payload.logo_url = data.logo_url
