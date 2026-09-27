@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, Globe } from 'lucide-react'
+import { Mail, Phone, Globe, MapPin } from 'lucide-react'
 import type { Profile } from '@/lib/types'
-import { getTheme, type Theme } from '@/lib/themes'
+import type { Theme } from '@/lib/themes'
+import { getTheme } from '@/lib/themes'
+import { isPro } from '@/lib/subscription'
+import { getPersonaConfig, getCardFrontValue } from '@/lib/persona-config'
+import type { CardFrontFieldKey } from '@/lib/persona-config'
 import QRCodeMini from '@/components/QRCodeMini'
+
+// ── Social icon SVGs ──────────────────────────────────────────────────────────
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -46,6 +52,8 @@ function TikTokIcon({ className }: { className?: string }) {
   )
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function formatPhone(raw: string | null | undefined): string {
   if (!raw) return ''
   const digits = raw.replace(/\D/g, '')
@@ -55,10 +63,25 @@ function formatPhone(raw: string | null | undefined): string {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
 }
 
-function Avatar({ name, avatarUrl, t }: { name: string | null; avatarUrl: string | null; t: Theme }) {
-  const ringStyle: React.CSSProperties = {
-    boxShadow: `0 0 0 4px ${t.colors.avatarRing}`,
+function applyBrandColors(t: Theme, profile: Profile, userIsPro: boolean): Theme {
+  if (!userIsPro) return t
+  const primary = profile.brand_color_primary
+  const accent = profile.brand_color_accent
+  if (!primary && !accent) return t
+  return {
+    ...t,
+    colors: {
+      ...t.colors,
+      ...(primary ? { iconColor: primary, avatarRing: primary } : {}),
+      ...(accent ? { textSecondary: accent } : {}),
+    },
   }
+}
+
+// ── Avatar ────────────────────────────────────────────────────────────────────
+
+function Avatar({ name, avatarUrl, t }: { name: string | null; avatarUrl: string | null; t: Theme }) {
+  const ringStyle: React.CSSProperties = { boxShadow: `0 0 0 4px ${t.colors.avatarRing}` }
   if (avatarUrl) {
     return (
       <img
@@ -84,6 +107,94 @@ function Avatar({ name, avatarUrl, t }: { name: string | null; avatarUrl: string
   )
 }
 
+// ── Persona front fields ──────────────────────────────────────────────────────
+
+function PersonaFrontFields({
+  profile,
+  t,
+  userIsPro,
+}: {
+  profile: Profile
+  t: Theme
+  userIsPro: boolean
+}) {
+  const config = getPersonaConfig(profile.persona)
+  const nodes: React.ReactNode[] = []
+  let di = 0
+
+  for (const { key, proOnly } of config.cardFront) {
+    if (proOnly) continue  // logo rendered separately at card bottom
+
+    const value = getCardFrontValue(profile, key as CardFrontFieldKey)
+    if (key !== 'recruiter_badge' && !value) continue
+
+    const idx = di++
+
+    if (key === 'name') {
+      nodes.push(
+        <h1
+          key={key}
+          className="mt-4 text-2xl tracking-tight"
+          style={{ color: t.colors.text, fontWeight: t.style.fontWeight }}
+        >
+          {value || profile.username}
+        </h1>
+      )
+      continue
+    }
+
+    if (key === 'recruiter_badge') {
+      nodes.push(
+        <span
+          key={key}
+          className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+          style={{
+            background: t.colors.contactBg,
+            color: t.colors.contactText,
+            border: `1px solid ${t.colors.contactBorder}`,
+          }}
+        >
+          Recruiter
+        </span>
+      )
+      continue
+    }
+
+    if (key === 'scheduling_link') {
+      const domain = value!.replace(/^https?:\/\//, '').split('/')[0]
+      nodes.push(
+        <a
+          key={key}
+          href={value!}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 text-xs underline underline-offset-2 transition hover:opacity-70"
+          style={{ color: t.colors.textSecondary }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {domain}
+        </a>
+      )
+      continue
+    }
+
+    // idx 1 = primary subtitle line (larger), 2+ = secondary (smaller)
+    nodes.push(
+      <p
+        key={key}
+        className={`mt-1 ${idx === 1 ? 'text-sm font-medium' : 'text-xs'}`}
+        style={{ color: idx === 1 ? t.colors.textSecondary : t.colors.mutedText }}
+      >
+        {value}
+      </p>
+    )
+  }
+
+  return <>{nodes}</>
+}
+
+// ── BusinessCard ──────────────────────────────────────────────────────────────
+
 export default function BusinessCard({
   profile,
   pageUrl,
@@ -96,17 +207,27 @@ export default function BusinessCard({
   hasResume?: boolean
 }) {
   const [isFlipped, setIsFlipped] = useState(false)
-  const t = getTheme(themeId ?? profile.theme)
+
+  const userIsPro = isPro(profile)
+  const baseTheme = getTheme(themeId ?? profile.theme)
+  const t = applyBrandColors(baseTheme, profile, userIsPro)
+
   const social = profile.social_links ?? {}
 
-  const titleLine = [profile.title, profile.company].filter(Boolean).join(' at ')
+  // Prefer phones[]; fall back to legacy phone column for users pre-migration
+  const displayPhones =
+    (profile.phones?.length ?? 0) > 0
+      ? (profile.phones ?? [])
+      : profile.phone
+        ? [{ type: 'mobile' as const, number: profile.phone }]
+        : []
 
   const socialItems = [
-    { href: social.linkedin, Icon: LinkedInIcon, label: 'LinkedIn' },
-    { href: social.twitter, Icon: TwitterIcon, label: 'Twitter / X' },
+    { href: social.linkedin,  Icon: LinkedInIcon,  label: 'LinkedIn' },
+    { href: social.twitter,   Icon: TwitterIcon,   label: 'Twitter / X' },
     { href: social.instagram, Icon: InstagramIcon, label: 'Instagram' },
-    { href: social.github, Icon: GitHubIcon, label: 'GitHub' },
-    { href: social.tiktok, Icon: TikTokIcon, label: 'TikTok' },
+    { href: social.github,    Icon: GitHubIcon,    label: 'GitHub' },
+    { href: social.tiktok,    Icon: TikTokIcon,    label: 'TikTok' },
   ].filter((item) => item.href)
 
   const handleFlip = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -129,6 +250,18 @@ export default function BusinessCard({
     borderRadius: t.style.innerRadius,
   }
 
+  // Work address formatted lines (shown when visibility = 'public')
+  const addrLines: string[] = []
+  if (profile.address_visibility === 'public' && profile.work_address) {
+    const a = profile.work_address
+    if (a.street1) addrLines.push(a.street1)
+    if (a.street2) addrLines.push(a.street2)
+    const cityState = [a.city, a.state].filter(Boolean).join(', ')
+    if (cityState) addrLines.push(cityState)
+    if (a.zip) addrLines.push(a.zip)
+    if (a.country) addrLines.push(a.country)
+  }
+
   return (
     <div
       className="mx-auto w-full max-w-sm cursor-pointer select-none"
@@ -142,74 +275,33 @@ export default function BusinessCard({
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}
       >
-        {/* Front face */}
+        {/* ── Front face ── */}
         <div
           className="absolute inset-0 flex flex-col overflow-hidden border px-8 py-10"
           style={faceStyle}
         >
+          {/* Identity block */}
           <div className="flex flex-col items-center text-center">
             <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} t={t} />
-            <h1
-              className="mt-4 text-2xl tracking-tight"
-              style={{ color: t.colors.text, fontWeight: t.style.fontWeight }}
-            >
-              {profile.full_name || profile.username}
-            </h1>
-            {titleLine && (
-              <p className="mt-1 text-sm font-medium" style={{ color: t.colors.textSecondary }}>
-                {titleLine}
-              </p>
-            )}
+            <PersonaFrontFields profile={profile} t={t} userIsPro={userIsPro} />
           </div>
 
-          {/* Grows to fill available space; centers contacts+social vertically */}
-          <div className="flex flex-1 flex-col justify-center">
-            {(profile.phone || profile.email) && (
-              <div className="space-y-3">
-                {profile.phone && (
-                  <a
-                    href={`tel:${profile.phone}`}
-                    className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
-                    style={contactLinkStyle}
-                  >
-                    <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                    {formatPhone(profile.phone)}
-                  </a>
-                )}
-                {profile.email && (
-                  <a
-                    href={`mailto:${profile.email}`}
-                    className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
-                    style={contactLinkStyle}
-                  >
-                    <Mail className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                    {profile.email}
-                  </a>
-                )}
-              </div>
-            )}
+          {/* Spacer */}
+          <div className="flex-1" />
 
-            {socialItems.length > 0 && (
-              <div className="mt-4 flex justify-center gap-4">
-                {socialItems.map(({ href, Icon, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="rounded-lg p-2 transition hover:opacity-70"
-                    style={{ color: t.colors.iconColor }}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Logo (Pro only) */}
+          {userIsPro && profile.logo_url && (
+            <div className="flex justify-center pb-3">
+              <img
+                src={profile.logo_url}
+                alt="Logo"
+                className="h-9 w-auto max-w-[140px] object-contain"
+              />
+            </div>
+          )}
 
-          {/* QR always anchored at the bottom — no mt-auto needed with flex-1 above */}
-          <div className="flex flex-col items-center gap-2 pt-4">
+          {/* QR */}
+          <div className="flex flex-col items-center gap-2">
             <QRCodeMini url={`${pageUrl}?qr=1`} />
             <p className="text-xs" style={{ color: t.colors.mutedText }}>
               Tap to flip
@@ -217,12 +309,13 @@ export default function BusinessCard({
           </div>
         </div>
 
-        {/* Back face */}
+        {/* ── Back face ── */}
         <div
           className="absolute inset-0 flex flex-col overflow-hidden border px-8 py-10"
           style={{ ...faceStyle, transform: 'rotateY(180deg)' }}
         >
           <div className="flex-1 overflow-y-auto">
+            {/* Bio */}
             {profile.bio ? (
               <p className="text-sm leading-relaxed" style={{ color: t.colors.bioText }}>
                 {profile.bio}
@@ -242,24 +335,98 @@ export default function BusinessCard({
                 View my resume →
               </a>
             )}
+
+            {/* Contact rows */}
+            <div className="mt-4 space-y-2">
+              {displayPhones.map((p, i) => (
+                <a
+                  key={i}
+                  href={`tel:${p.number}`}
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                  style={contactLinkStyle}
+                >
+                  <Phone className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                  <span className="flex-1">{formatPhone(p.number)}</span>
+                  {displayPhones.length > 1 && (
+                    <span className="text-xs capitalize opacity-50">{p.type}</span>
+                  )}
+                </a>
+              ))}
+
+              {profile.email && (
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                  style={contactLinkStyle}
+                >
+                  <Mail className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                  <span className="truncate">{profile.email}</span>
+                </a>
+              )}
+
+              {/* Address (public only — server-enforced by this visibility check) */}
+              {addrLines.length > 0 && (
+                <div
+                  className="flex items-start gap-3 border px-4 py-3 text-sm"
+                  style={contactLinkStyle}
+                >
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                  <div className="leading-snug">
+                    {addrLines.map((line, i) => (
+                      <div key={i}>{line}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Location */}
+              {profile.location && (
+                <div
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium"
+                  style={contactLinkStyle}
+                >
+                  <MapPin className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                  <span>{profile.location}</span>
+                </div>
+              )}
+
+              {/* Website */}
+              {profile.website && (
+                <a
+                  href={profile.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
+                  style={contactLinkStyle}
+                >
+                  <Globe className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
+                  <span className="truncate">{profile.website.replace(/^https?:\/\//, '')}</span>
+                </a>
+              )}
+            </div>
+
+            {/* Social icons */}
+            {socialItems.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {socialItems.map(({ href, Icon, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="rounded-lg p-2 transition hover:opacity-70"
+                    style={{ color: t.colors.iconColor }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {profile.website && (
-            <div className="mt-6">
-              <a
-                href={profile.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition hover:brightness-110"
-                style={contactLinkStyle}
-              >
-                <Globe className="h-4 w-4 shrink-0" style={{ color: t.colors.iconColor }} />
-                {profile.website.replace(/^https?:\/\//, '')}
-              </a>
-            </div>
-          )}
-
-          <div className="mt-auto flex flex-col items-center gap-2 pt-6">
+          {/* QR anchored at bottom */}
+          <div className="mt-auto flex flex-col items-center gap-2 pt-4">
             <QRCodeMini url={`${pageUrl}?qr=1`} />
             <p className="text-xs" style={{ color: t.colors.mutedText }}>
               Tap to flip back
