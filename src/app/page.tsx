@@ -44,6 +44,17 @@ const demoProfile: Profile = {
   referred_by: null,
   created_at: '',
   updated_at: '',
+  persona: 'professional',
+  department: null,
+  phones: [],
+  work_address: null,
+  address_visibility: 'vcard_only',
+  location: null,
+  logo_url: null,
+  brand_color_primary: null,
+  brand_color_accent: null,
+  student_info: null,
+  recruiter_info: null,
 }
 
 function GoogleIcon({ className }: { className?: string }) {

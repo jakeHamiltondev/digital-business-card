@@ -6,6 +6,39 @@ export type SocialLinks = {
   tiktok?: string
 }
 
+export type Persona = 'professional' | 'student' | 'recruiter'
+
+export type AddressVisibility = 'public' | 'vcard_only' | 'hidden'
+
+export type PhoneType = 'mobile' | 'office' | 'fax'
+
+export type PhoneEntry = {
+  type: PhoneType
+  number: string
+}
+
+export type WorkAddress = {
+  street1?: string
+  street2?: string
+  city?: string
+  state?: string
+  zip?: string
+  country?: string
+}
+
+export type StudentInfo = {
+  university?: string
+  major?: string
+  expected_graduation?: string  // "YYYY-MM"
+  campus_org?: string
+}
+
+export type RecruiterInfo = {
+  hiring_focus?: string
+  scheduling_link?: string
+  careers_page_url?: string
+}
+
 export type Profile = {
   id: string
   username: string
@@ -14,6 +47,7 @@ export type Profile = {
   company: string | null
   bio: string | null
   avatar_url: string | null
+  // Legacy single-phone field — read-only after migration; use phones[] for writes
   phone: string | null
   email: string | null
   website: string | null
@@ -26,6 +60,21 @@ export type Profile = {
   referred_by: string | null
   created_at: string
   updated_at: string
+  // Persona
+  persona: Persona
+  // Professional fields
+  department: string | null
+  phones: PhoneEntry[]
+  work_address: WorkAddress | null
+  address_visibility: AddressVisibility
+  location: string | null
+  // Pro-only
+  logo_url: string | null
+  brand_color_primary: string | null
+  brand_color_accent: string | null
+  // Persona-specific
+  student_info: StudentInfo | null
+  recruiter_info: RecruiterInfo | null
 }
 
 export type ResumeEntryType = 'experience' | 'education' | 'skill' | 'project' | 'certification'
