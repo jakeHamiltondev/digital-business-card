@@ -55,7 +55,7 @@ export default async function EditProfilePage() {
                 avatarUrl={profile.avatar_url}
                 fullName={profile.full_name}
               />
-              <ProfileForm profile={profile} />
+              <ProfileForm profile={profile} userId={user.id} />
             </div>
           ) : (
             <p className="text-sm text-red-600 dark:text-red-400">
