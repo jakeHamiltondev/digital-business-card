@@ -1,7 +1,8 @@
 'use client'
 
 import type { LayoutFaceProps } from '../types'
-import { generateCardColors } from '@/lib/color-utils'
+import type { Theme } from '@/lib/themes'
+import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
 import { getPersonaConfig, getCardFrontValue, type CardFrontFieldKey } from '@/lib/persona-config'
 import Avatar from '../shared/Avatar'
 import ActionButtons from '../shared/ActionButtons'
@@ -11,9 +12,35 @@ import QRCodeMini from '@/components/QRCodeMini'
 
 const SHADOW = '0 18px 40px -18px rgba(10,20,40,0.45), 0 2px 6px rgba(10,20,40,0.12)'
 
+// Builds a Theme whose color keys are driven by brand color tokens.
+// Passed to shared components (ActionButtons, ContactRows, Avatar) so they
+// render in brand colors without changing their signatures.
+function makeBrandTheme(cc: CardColorTokens, t: Theme): Theme {
+  const isDark = cc.text === '#ffffff'
+  return {
+    ...t,
+    colors: {
+      ...t.colors,
+      background: cc.bg,
+      cardBg: cc.bg,
+      text: cc.text,
+      textSecondary: cc.textMuted,
+      mutedText: cc.textMuted,
+      bioText: cc.textMuted,
+      iconColor: cc.iconColor,
+      contactBg: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.06)',
+      contactBorder: cc.border,
+      contactText: cc.text,
+      border: cc.border,
+      accent: cc.buttonBg,
+      avatarRing: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)',
+      avatarInitialBg: cc.buttonBg,
+      avatarInitialText: cc.buttonText,
+    },
+  }
+}
+
 // ── Persona subtitle lines (front) ────────────────────────────────────────────
-// Renders persona-specific fields below the name. Excludes name, logo, and
-// scheduling_link (scheduling link is a contact row on the back).
 
 function PersonaSubtitleLines({
   profile,
@@ -76,7 +103,7 @@ function PersonaSubtitleLines({
   return <>{nodes}</>
 }
 
-// ── Back header org name (resolves company or university by persona) ───────────
+// ── Back header org name ───────────────────────────────────────────────────────
 
 function orgName(profile: LayoutFaceProps['profile']): string | null {
   const src = getPersonaConfig(profile.persona).vcard.orgSource
@@ -92,6 +119,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
     userIsPro ? profile.brand_color_primary : null,
     userIsPro ? profile.brand_color_accent : null,
   )
+  const brandT = makeBrandTheme(cc, t)
 
   return (
     <div
@@ -100,7 +128,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: t.colors.background,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         display: 'flex',
@@ -124,7 +152,12 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           <img
             src={profile.logo_url}
             alt="Logo"
-            style={{ height: 32, maxWidth: 100, objectFit: 'contain' }}
+            style={{
+              height: 32,
+              maxWidth: 100,
+              objectFit: 'contain',
+              mixBlendMode: 'multiply',
+            }}
           />
         )}
         {/* 5px accent stripe at band bottom */}
@@ -151,12 +184,12 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           overflow: 'hidden',
         }}
       >
-        {/* Avatar overlapping band by 50px, 4px white ring */}
+        {/* Avatar overlapping band by 50px, white ring */}
         <div style={{ marginTop: -50 }}>
           <Avatar
             name={profile.full_name}
             avatarUrl={profile.avatar_url}
-            t={t}
+            t={brandT}
             size={96}
             ringColor="#ffffff"
           />
@@ -164,7 +197,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
 
         <h1
           style={{
-            color: t.colors.text,
+            color: cc.text,
             fontSize: 19,
             fontWeight: 700,
             marginTop: 10,
@@ -175,12 +208,12 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           {profile.full_name || profile.username}
         </h1>
 
-        <PersonaSubtitleLines profile={profile} t={t} />
+        <PersonaSubtitleLines profile={profile} t={brandT} />
 
         {/* Push action buttons to bottom */}
         <div style={{ flex: 1 }} />
 
-        <ActionButtons profile={profile} t={t} />
+        <ActionButtons profile={profile} t={brandT} />
       </div>
     </div>
   )
@@ -193,6 +226,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
     userIsPro ? profile.brand_color_primary : null,
     userIsPro ? profile.brand_color_accent : null,
   )
+  const brandT = makeBrandTheme(cc, t)
 
   const org = orgName(profile)
 
@@ -203,7 +237,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: t.colors.background,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
@@ -227,7 +261,12 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
           <img
             src={profile.logo_url}
             alt="Logo"
-            style={{ height: 24, maxWidth: 100, objectFit: 'contain' }}
+            style={{
+              height: 24,
+              maxWidth: 100,
+              objectFit: 'contain',
+              mixBlendMode: 'multiply',
+            }}
           />
         ) : (
           <span
@@ -259,14 +298,14 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
           <a
             href={`/${profile.username}/resume`}
             className="mb-2 inline-block text-sm underline underline-offset-4"
-            style={{ color: t.colors.textSecondary }}
+            style={{ color: cc.textMuted }}
             onClick={e => e.stopPropagation()}
           >
             View my resume →
           </a>
         )}
 
-        <ContactRows profile={profile} pageUrl={pageUrl} t={t} maxRows={5} />
+        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={5} />
 
         {/* Spacer pushes QR + button to bottom */}
         <div style={{ flex: 1 }} />

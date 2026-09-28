@@ -205,6 +205,31 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
     ? (profile.student_info?.university ?? null)
     : (profile.company ?? null)
 
+  // Build contact items for the middle section
+  const addrDisplay = (() => {
+    if (profile.address_visibility === 'public' && profile.work_address) {
+      const a = profile.work_address
+      const cs = [a.city, a.state].filter(Boolean).join(', ')
+      return cs || a.country || null
+    }
+    return profile.location ?? null
+  })()
+
+  const phones =
+    (profile.phones?.length ?? 0) > 0
+      ? profile.phones
+      : profile.phone
+        ? [{ type: 'mobile' as const, number: profile.phone }]
+        : []
+
+  const primaryPhone = phones?.[0]?.number ?? null
+
+  const contactItems = [
+    primaryPhone ? formatPhone(primaryPhone) : null,
+    profile.email,
+    addrDisplay,
+  ].filter(Boolean) as string[]
+
   return (
     <div
       style={{
@@ -219,13 +244,12 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '40px 24px 30px',
+        padding: '32px 24px 24px',
       }}
     >
-      {/* ── Top: logo + company name ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-        {userIsPro && profile.logo_url ? (
+      {/* ── Top: logo + company name + rule ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        {userIsPro && profile.logo_url && (
           <img
             src={profile.logo_url}
             alt="Logo"
@@ -233,11 +257,9 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
               height: 48,
               maxWidth: 160,
               objectFit: 'contain',
-              // Invert to white for legibility on dark navy
-              filter: 'brightness(0) invert(1) opacity(0.9)',
             }}
           />
-        ) : null}
+        )}
 
         {orgDisplay && (
           <p
@@ -255,9 +277,39 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           </p>
         )}
 
-        {/* Gold rule under the brand section */}
         <div style={{ width: 64, height: 1, background: GOLD }} />
       </div>
+
+      {/* ── Middle: contact rows ── */}
+      {contactItems.length > 0 && (
+        <div
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 6,
+            width: '100%',
+          }}
+        >
+          {contactItems.map((item, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: cormorant.style.fontFamily,
+                fontWeight: 500,
+                fontSize: 13,
+                color: CREAM,
+                textAlign: 'center',
+                margin: 0,
+                opacity: 0.85,
+              }}
+            >
+              {item}
+            </p>
+          ))}
+        </div>
+      )}
 
       {/* Resume link — gated until Pro launch (do not change false &&) */}
       {false && hasResume && (
@@ -269,6 +321,9 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           View my resume →
         </a>
       )}
+
+      {/* Spacer pushes QR + save to bottom */}
+      <div style={{ flex: 1 }} />
 
       {/* ── Bottom: QR + save button ── */}
       <div

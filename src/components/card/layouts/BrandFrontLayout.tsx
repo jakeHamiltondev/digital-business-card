@@ -4,8 +4,9 @@
 // Front is 100% brand. Person info lives on the back.
 
 import type { Profile } from '@/lib/types'
+import type { Theme } from '@/lib/themes'
 import type { LayoutFaceProps } from '../types'
-import { generateCardColors } from '@/lib/color-utils'
+import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
 import { getPersonaConfig } from '@/lib/persona-config'
 import Avatar from '../shared/Avatar'
 import ActionButtons from '../shared/ActionButtons'
@@ -18,6 +19,31 @@ const LINKFOL_PRIMARY = '#6366f1'
 const LINKFOL_ACCENT  = '#8b5cf6'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+function makeBrandTheme(cc: CardColorTokens, t: Theme): Theme {
+  const isDark = cc.text === '#ffffff'
+  return {
+    ...t,
+    colors: {
+      ...t.colors,
+      background: cc.bg,
+      cardBg: cc.bg,
+      text: cc.text,
+      textSecondary: cc.textMuted,
+      mutedText: cc.textMuted,
+      bioText: cc.textMuted,
+      iconColor: cc.iconColor,
+      contactBg: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.06)',
+      contactBorder: cc.border,
+      contactText: cc.text,
+      border: cc.border,
+      accent: cc.buttonBg,
+      avatarRing: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)',
+      avatarInitialBg: cc.buttonBg,
+      avatarInitialText: cc.buttonText,
+    },
+  }
+}
 
 function getInitials(name: string | null): string {
   if (!name?.trim()) return '?'
@@ -86,7 +112,12 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
         <img
           src={profile.logo_url}
           alt="Logo"
-          style={{ height: 110, maxWidth: 200, objectFit: 'contain' }}
+          style={{
+            height: 110,
+            maxWidth: 200,
+            objectFit: 'contain',
+            mixBlendMode: 'multiply',
+          }}
         />
       ) : (
         <div
@@ -188,6 +219,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
     userIsPro ? profile.brand_color_primary : null,
     userIsPro ? profile.brand_color_accent  : null,
   )
+  const brandT = makeBrandTheme(cc, t)
 
   const orgName = getOrgName(profile)
 
@@ -198,7 +230,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: t.colors.background,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
@@ -210,12 +242,12 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
       {/* ── Identity row: avatar + name/title/org side-by-side ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ flexShrink: 0 }}>
-          <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} t={t} size={72} />
+          <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} t={brandT} size={72} />
         </div>
         <div style={{ minWidth: 0 }}>
           <p
             style={{
-              color: t.colors.text,
+              color: cc.text,
               fontSize: 16,
               fontWeight: 700,
               lineHeight: 1.2,
@@ -229,12 +261,14 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
           {profile.title && (
             <p
               style={{
-                color: t.colors.textSecondary,
-                fontSize: 12,
+                color: cc.textMuted,
+                fontSize: 13,
                 marginTop: 2,
-                whiteSpace: 'nowrap',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                lineHeight: 1.35,
               }}
             >
               {profile.title}
@@ -243,7 +277,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
           {orgName && (
             <p
               style={{
-                color: t.colors.mutedText,
+                color: cc.textMuted,
                 fontSize: 11,
                 marginTop: 1,
                 whiteSpace: 'nowrap',
@@ -262,7 +296,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         <a
           href={`/${profile.username}/resume`}
           className="mt-2 inline-block text-xs underline underline-offset-4"
-          style={{ color: t.colors.textSecondary }}
+          style={{ color: cc.textMuted }}
           onClick={e => e.stopPropagation()}
         >
           View my resume →
@@ -271,12 +305,12 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
 
       {/* ── Action buttons ── */}
       <div style={{ marginTop: 8 }}>
-        <ActionButtons profile={profile} t={t} />
+        <ActionButtons profile={profile} t={brandT} />
       </div>
 
       {/* ── Contact rows (max 3 keeps layout on-card without scrolling) ── */}
       <div style={{ marginTop: 8 }}>
-        <ContactRows profile={profile} pageUrl={pageUrl} t={t} maxRows={3} />
+        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} />
       </div>
 
       {/* Spacer pushes QR + save to bottom */}

@@ -3,8 +3,9 @@
 // Layout D — Photo Hero
 // Full-bleed photo with gradient overlay. Bold, visual-first.
 
+import type { Theme } from '@/lib/themes'
 import type { LayoutFaceProps } from '../types'
-import { generateCardColors } from '@/lib/color-utils'
+import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
 import { getPersonaConfig } from '@/lib/persona-config'
 import ActionButtons from '../shared/ActionButtons'
 import ContactRows from '../shared/ContactRows'
@@ -23,11 +24,41 @@ function getInitials(name: string | null): string {
   return ((parts[0][0] ?? '') + (parts[parts.length - 1][0] ?? '')).toUpperCase()
 }
 
+function makeBrandTheme(cc: CardColorTokens, t: Theme): Theme {
+  const isDark = cc.text === '#ffffff'
+  return {
+    ...t,
+    colors: {
+      ...t.colors,
+      background: cc.bg,
+      cardBg: cc.bg,
+      text: cc.text,
+      textSecondary: cc.textMuted,
+      mutedText: cc.textMuted,
+      bioText: cc.textMuted,
+      iconColor: cc.iconColor,
+      contactBg: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.06)',
+      contactBorder: cc.border,
+      contactText: cc.text,
+      border: cc.border,
+      accent: cc.buttonBg,
+      avatarRing: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)',
+      avatarInitialBg: cc.buttonBg,
+      avatarInitialText: cc.buttonText,
+    },
+  }
+}
+
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
   const rawPrimary = (userIsPro ? profile.brand_color_primary : null) ?? LINKFOL_PRIMARY
   const rawAccent  = (userIsPro ? profile.brand_color_accent  : null) ?? LINKFOL_ACCENT
+  const cc = generateCardColors(
+    userIsPro ? profile.brand_color_primary : null,
+    userIsPro ? profile.brand_color_accent  : null,
+  )
+  const brandT = makeBrandTheme(cc, t)
 
   const vcardCfg = getPersonaConfig(profile.persona).vcard
 
@@ -48,7 +79,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: t.colors.background,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         display: 'flex',
@@ -110,6 +141,28 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
           }}
         />
 
+        {/* Logo badge — top-left corner, 36px tall */}
+        {userIsPro && profile.logo_url && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 12,
+              left: 12,
+              zIndex: 10,
+              background: 'rgba(0,0,0,0.45)',
+              borderRadius: 8,
+              padding: '4px 8px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+            }}
+          >
+            <img
+              src={profile.logo_url}
+              alt="Logo"
+              style={{ height: 36, maxWidth: 120, objectFit: 'contain', display: 'block' }}
+            />
+          </div>
+        )}
+
         {/* Name + title rendered on top of the overlay */}
         <div
           style={{
@@ -146,7 +199,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
         </div>
       </div>
 
-      {/* ── Bottom section: theme background, org name + action buttons ── */}
+      {/* ── Bottom section: brand background, org name + action buttons ── */}
       <div
         style={{
           flex: 1,
@@ -161,7 +214,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
         {orgDisplay && (
           <p
             style={{
-              color: t.colors.mutedText,
+              color: cc.textMuted,
               fontSize: 12,
               textAlign: 'center',
               lineHeight: 1.3,
@@ -170,7 +223,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
             {orgDisplay}
           </p>
         )}
-        <ActionButtons profile={profile} t={t} />
+        <ActionButtons profile={profile} t={brandT} />
       </div>
     </div>
   )
@@ -183,6 +236,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
     userIsPro ? profile.brand_color_primary : null,
     userIsPro ? profile.brand_color_accent  : null,
   )
+  const brandT = makeBrandTheme(cc, t)
 
   const vcardCfg = getPersonaConfig(profile.persona).vcard
   const orgDisplay = vcardCfg.orgSource === 'university'
@@ -196,7 +250,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: t.colors.background,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
@@ -209,7 +263,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
       <div style={{ marginBottom: 8 }}>
         <p
           style={{
-            color: t.colors.text,
+            color: cc.text,
             fontSize: 17,
             fontWeight: 700,
             lineHeight: 1.2,
@@ -220,7 +274,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         {orgDisplay && (
           <p
             style={{
-              color: t.colors.textSecondary,
+              color: cc.textMuted,
               fontSize: 12,
               marginTop: 2,
             }}
@@ -235,7 +289,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         <a
           href={`/${profile.username}/resume`}
           className="mb-2 inline-block text-xs underline underline-offset-4"
-          style={{ color: t.colors.textSecondary }}
+          style={{ color: cc.textMuted }}
           onClick={e => e.stopPropagation()}
         >
           View my resume →
@@ -243,7 +297,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
       )}
 
       {/* ── Contact rows ── */}
-      <ContactRows profile={profile} pageUrl={pageUrl} t={t} maxRows={4} />
+      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} />
 
       {/* Spacer pushes QR + save to bottom */}
       <div style={{ flex: 1 }} />
