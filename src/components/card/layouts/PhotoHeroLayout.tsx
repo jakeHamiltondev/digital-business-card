@@ -51,10 +51,10 @@ function makeBrandTheme(cc: CardColorTokens, t: Theme): Theme {
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const rawPrimary = (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary
-  const rawAccent  = (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent
-  const cc = generateCardColors(rawPrimary, rawAccent)
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
   const brandT = makeBrandTheme(cc, t)
 
   const vcardCfg = getPersonaConfig(profile.persona).vcard
@@ -126,7 +126,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
             style={{
               width: '100%',
               height: '100%',
-              background: `radial-gradient(circle at 30% 30%, ${rawPrimary}, ${rawAccent})`,
+              background: `radial-gradient(circle at 30% 30%, ${cc.bg}, ${cc.buttonBg})`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -269,11 +269,10 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
 // ── Back ──────────────────────────────────────────────────────────────────────
 
 export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const cc = generateCardColors(
-    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
-    (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent,
-  )
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
   const brandT = makeBrandTheme(cc, t)
 
   const vcardCfg = getPersonaConfig(profile.persona).vcard

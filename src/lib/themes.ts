@@ -1,3 +1,10 @@
+import type { CardColorTokens } from '@/lib/color-utils'
+
+export type ThemeCardTokens = CardColorTokens & {
+  /** Top-band background for Letterhead and similar layouts */
+  bandBg: string
+}
+
 export type Theme = {
   id: string
   name: string
@@ -170,15 +177,71 @@ export function getTheme(id: string | null | undefined): Theme {
   return themeMap[id ?? 'midnight'] ?? themeMap['midnight']
 }
 
-// Solid hex colors for each theme — used as generateCardColors() fallback for free users.
-export const CARD_THEME_COLORS: Record<string, { primary: string; accent: string }> = {
-  midnight: { primary: '#121217', accent: '#a78bfa' },  // Near-black surface + violet accent
-  clean:    { primary: '#ffffff', accent: '#0f766e' },   // White surface + teal accent
-  ocean:    { primary: '#0b2a40', accent: '#5eead4' },   // Deep navy surface + aqua accent
-  forest:   { primary: '#14241a', accent: '#bef264' },   // Dark green surface + lime accent
-  slate:    { primary: '#1b2230', accent: '#fbbf24' },   // Dark charcoal surface + amber accent
+// Full pre-built card token sets for each theme.
+// Free users get these directly — no generateCardColors() derivation.
+export const CARD_THEME_COLORS: Record<string, ThemeCardTokens> = {
+  midnight: {
+    bandBg:     '#1a1a2e',
+    bg:         '#121217',
+    bgGradient: 'linear-gradient(135deg, #1a1a2e 0%, #121217 100%)',
+    text:       '#f5f5f7',
+    textMuted:  '#a1a1aa',
+    iconColor:  '#c4b5fd',
+    buttonBg:   '#a78bfa',
+    buttonText: '#16112b',
+    border:     '#2a2a35',
+    qrBg:       '#ffffff',
+  },
+  clean: {
+    bandBg:     '#e6f4f1',
+    bg:         '#ffffff',
+    bgGradient: 'linear-gradient(135deg, #f0f9f8 0%, #ffffff 100%)',
+    text:       '#0f172a',
+    textMuted:  '#526071',
+    iconColor:  '#0f766e',
+    buttonBg:   '#0f766e',
+    buttonText: '#ffffff',
+    border:     '#e3e8ee',
+    qrBg:       '#ffffff',
+  },
+  ocean: {
+    bandBg:     '#0c4a6e',
+    bg:         '#0b2a40',
+    bgGradient: 'linear-gradient(135deg, #0c4a6e 0%, #0b2a40 100%)',
+    text:       '#f0f9ff',
+    textMuted:  '#a9c7d9',
+    iconColor:  '#67e8f9',
+    buttonBg:   '#5eead4',
+    buttonText: '#042f2e',
+    border:     '#1a4562',
+    qrBg:       '#ffffff',
+  },
+  forest: {
+    bandBg:     '#1a3a24',
+    bg:         '#14241a',
+    bgGradient: 'linear-gradient(135deg, #1a3a24 0%, #14241a 100%)',
+    text:       '#f0fdf4',
+    textMuted:  '#a6c2ad',
+    iconColor:  '#bef264',
+    buttonBg:   '#bef264',
+    buttonText: '#1a2e05',
+    border:     '#27402f',
+    qrBg:       '#ffffff',
+  },
+  slate: {
+    bandBg:     '#2b3444',
+    bg:         '#1b2230',
+    bgGradient: 'linear-gradient(135deg, #2b3444 0%, #1b2230 100%)',
+    text:       '#f8fafc',
+    textMuted:  '#a7b3c4',
+    iconColor:  '#fcd34d',
+    buttonBg:   '#fbbf24',
+    buttonText: '#2a1d02',
+    border:     '#313c4e',
+    qrBg:       '#ffffff',
+  },
 }
 
-export function getThemeCardColors(themeId: string | null | undefined): { primary: string; accent: string } {
+export function getThemeCardColors(themeId: string | null | undefined): ThemeCardTokens {
   return CARD_THEME_COLORS[themeId ?? 'midnight'] ?? CARD_THEME_COLORS['midnight']
 }

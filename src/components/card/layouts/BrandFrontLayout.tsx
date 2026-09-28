@@ -72,10 +72,10 @@ function getTagline(profile: Profile): string | null {
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const rawPrimary = (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary
-  const rawAccent  = (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent
-  const cc = generateCardColors(rawPrimary, rawAccent)
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
 
   const orgName  = getOrgName(profile)
   const tagline  = getTagline(profile)
@@ -88,7 +88,7 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: rawPrimary,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         display: 'flex',
@@ -227,11 +227,10 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
 // maxRows=3 keeps everything on-card without scrolling.
 
 export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const cc = generateCardColors(
-    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
-    (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent,
-  )
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
   const brandT = makeBrandTheme(cc, t)
 
   const orgName = getOrgName(profile)

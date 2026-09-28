@@ -116,11 +116,12 @@ function orgName(profile: LayoutFaceProps['profile']): string | null {
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const cc = generateCardColors(
-    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
-    (userIsPro ? profile.brand_color_accent : null) ?? themeColors.accent,
-  )
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const themeTokens = getThemeCardColors(profile.theme)
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : themeTokens
+  const bandBg = hasBrandColors ? cc.bg : themeTokens.bandBg
   const brandT = makeBrandTheme(cc, t)
 
   return (
@@ -137,12 +138,12 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         flexDirection: 'column',
       }}
     >
-      {/* ── Brand band (150px) — solid primary, logo centered ── */}
+      {/* ── Brand band (150px) — bandBg for themes, primary bg for brand-color Pro users ── */}
       <div
         style={{
           height: 150,
           flexShrink: 0,
-          background: cc.bg,
+          background: bandBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -218,11 +219,12 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
 // ── Back ──────────────────────────────────────────────────────────────────────
 
 export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
-  const themeColors = getThemeCardColors(profile.theme)
-  const cc = generateCardColors(
-    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
-    (userIsPro ? profile.brand_color_accent : null) ?? themeColors.accent,
-  )
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const themeTokens = getThemeCardColors(profile.theme)
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : themeTokens
+  const bandBg = hasBrandColors ? cc.bg : themeTokens.bandBg
   const brandT = makeBrandTheme(cc, t)
 
   const org = orgName(profile)
@@ -247,7 +249,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         style={{
           height: 40,
           flexShrink: 0,
-          background: cc.bg,
+          background: bandBg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
