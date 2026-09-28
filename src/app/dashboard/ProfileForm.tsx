@@ -353,6 +353,7 @@ export default function ProfileForm({
   const [logoUrl, setLogoUrl] = useState(profile.logo_url ?? '')
   const [brandPrimary, setBrandPrimary] = useState(profile.brand_color_primary ?? '#000000')
   const [brandAccent, setBrandAccent] = useState(profile.brand_color_accent ?? '#ffffff')
+  const [useCustomColors, setUseCustomColors] = useState(!!(profile.brand_color_primary))
 
   // Submit state
   const [isSaving, setIsSaving] = useState(false)
@@ -591,8 +592,8 @@ export default function ProfileForm({
         address_visibility: addressVisibility,
         location: location || null,
         logo_url: logoUrl || null,
-        brand_color_primary: brandPrimary || null,
-        brand_color_accent: brandAccent || null,
+        brand_color_primary: useCustomColors ? (brandPrimary || null) : null,
+        brand_color_accent: useCustomColors ? (brandAccent || null) : null,
         student_info: hasStudentInfo ? studentInfo : null,
         recruiter_info: hasRecruiterInfo ? recruiterInfo : null,
       })
@@ -730,7 +731,10 @@ export default function ProfileForm({
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Card Theme
         </h2>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div
+          className="flex gap-3 overflow-x-auto pb-2"
+          style={{ opacity: userIsPro && useCustomColors ? 0.45 : 1, pointerEvents: userIsPro && useCustomColors ? 'none' : 'auto' }}
+        >
           {themes.map((theme) => (
             <button
               type="button"
@@ -760,6 +764,11 @@ export default function ProfileForm({
             </button>
           ))}
         </div>
+        {userIsPro && useCustomColors && (
+          <p className="text-xs text-zinc-400 dark:text-zinc-500">
+            Theme selection is overridden by your custom brand colors. Turn off &ldquo;Use custom brand colors&rdquo; in Branding to use a theme.
+          </p>
+        )}
       </section>
 
       {/* Card Layout */}
@@ -791,7 +800,45 @@ export default function ProfileForm({
         )}
         {userIsPro ? (
           <div className="space-y-4">
-            {PRO_EDITOR_SECTION.fields.map((key) => renderField(key))}
+            {/* Custom brand colors toggle */}
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-700">
+              <div>
+                <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Use custom brand colors</div>
+                <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                  Override your theme with custom Primary and Accent colors
+                </div>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={useCustomColors}
+                onClick={() => setUseCustomColors(!useCustomColors)}
+                className="relative ml-4 shrink-0 cursor-pointer rounded-full border-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+                style={{
+                  width: 44,
+                  height: 24,
+                  background: useCustomColors ? '#6366f1' : '#d1d5db',
+                }}
+              >
+                <span
+                  className="absolute top-0.5 block rounded-full bg-white shadow transition-all"
+                  style={{
+                    width: 20,
+                    height: 20,
+                    left: useCustomColors ? 22 : 2,
+                  }}
+                />
+              </button>
+            </div>
+            {/* Logo always visible */}
+            {renderField('logo_url')}
+            {/* Color pickers only when toggle is ON */}
+            {useCustomColors && (
+              <>
+                {renderField('brand_color_primary')}
+                {renderField('brand_color_accent')}
+              </>
+            )}
           </div>
         ) : (
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
