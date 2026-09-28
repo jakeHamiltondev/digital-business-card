@@ -135,45 +135,41 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         flexDirection: 'column',
       }}
     >
-      {/* ── Brand band (150px) ── */}
+      {/* ── Brand band (150px) — solid primary, logo centered ── */}
       <div
         style={{
           height: 150,
           flexShrink: 0,
           background: cc.bg,
-          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {/* Logo centered in band — hero brand element */}
         {userIsPro && profile.logo_url && (
           <img
             src={profile.logo_url}
             alt="Logo"
             style={{
-              height: 90,
+              height: 88,
               maxWidth: 200,
               objectFit: 'contain',
               mixBlendMode: 'multiply',
             }}
           />
         )}
-        {/* 6px accent stripe at band bottom */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 6,
-            background: cc.buttonBg,
-          }}
-        />
       </div>
 
-      {/* ── Card body ── */}
+      {/* ── Accent stripe — 6px solid, separate from band so avatar can overlap it ── */}
+      <div
+        style={{
+          height: 6,
+          flexShrink: 0,
+          background: cc.buttonBg,
+        }}
+      />
+
+      {/* ── Card body — no overflow:hidden so avatar can overlap the stripe above ── */}
       <div
         style={{
           flex: 1,
@@ -181,11 +177,10 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           flexDirection: 'column',
           alignItems: 'center',
           padding: '0 16px 16px',
-          overflow: 'hidden',
         }}
       >
-        {/* Avatar overlapping band by 25px so full circle stays visible */}
-        <div style={{ marginTop: -25 }}>
+        {/* Avatar overlapping the stripe by ~12px; z-index keeps it on top */}
+        <div style={{ marginTop: -12, position: 'relative', zIndex: 2 }}>
           <Avatar
             name={profile.full_name}
             avatarUrl={profile.avatar_url}
