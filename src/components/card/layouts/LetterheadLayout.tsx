@@ -152,8 +152,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
             alt="Logo"
             style={{
               height: 88,
-              maxWidth: 200,
-              objectFit: 'contain',
+              width: 'auto',
               mixBlendMode: 'multiply',
             }}
           />
@@ -169,7 +168,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         }}
       />
 
-      {/* ── Card body — no overflow:hidden so avatar can overlap the stripe above ── */}
+      {/* ── Card body — explicit background matches banner; no overflow:hidden so avatar can overlap stripe ── */}
       <div
         style={{
           flex: 1,
@@ -177,6 +176,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           flexDirection: 'column',
           alignItems: 'center',
           padding: '0 16px 16px',
+          background: cc.bg,
         }}
       >
         {/* Avatar overlapping the stripe by ~12px; z-index keeps it on top */}
