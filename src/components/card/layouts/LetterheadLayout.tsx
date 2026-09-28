@@ -153,7 +153,6 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
             style={{
               height: 88,
               width: 'auto',
-              filter: 'brightness(0) invert(1)',
             }}
           />
         )}
@@ -260,7 +259,6 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
               height: 24,
               maxWidth: 100,
               objectFit: 'contain',
-              mixBlendMode: 'multiply',
             }}
           />
         ) : (

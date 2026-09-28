@@ -115,7 +115,6 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
             height: 110,
             maxWidth: 200,
             objectFit: 'contain',
-            mixBlendMode: 'multiply',
           }}
         />
       ) : (
