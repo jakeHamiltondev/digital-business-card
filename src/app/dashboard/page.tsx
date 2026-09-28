@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Pencil, Eye, Bookmark, Share2, QrCode, Camera } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
-import CardPreviewStatic from '@/components/CardPreviewStatic'
+import BusinessCard from '@/components/BusinessCard'
 import UpgradeToast from '@/components/UpgradeToast'
 import type { Profile } from '@/lib/types'
 
@@ -101,7 +101,7 @@ export default async function DashboardPage(props: {
             <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
               {/* Card preview */}
               <div className="flex justify-center sm:flex-1">
-                <CardPreviewStatic profile={profile} />
+                <BusinessCard profile={profile} pageUrl={cardUrl!} theme={profile.theme ?? 'midnight'} />
               </div>
 
               {/* Share tools */}
