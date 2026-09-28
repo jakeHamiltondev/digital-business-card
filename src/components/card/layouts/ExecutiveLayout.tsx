@@ -64,14 +64,14 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
     ? (profile.student_info?.major ?? null)
     : (profile.title ?? profile.department ?? null)
 
-  // Contact stack: compact address → phone → email
-  const addrDisplay = (() => {
+  // Prefer personal location; fall back to work address city/state
+  const addrDisplay = profile.location ?? (() => {
     if (profile.address_visibility === 'public' && profile.work_address) {
       const a = profile.work_address
       const cs = [a.city, a.state].filter(Boolean).join(', ')
       return cs || a.country || null
     }
-    return profile.location ?? null
+    return null
   })()
 
   const phones =
@@ -112,7 +112,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
           <img
             src={profile.logo_url}
             alt="Logo"
-            style={{ height: 48, maxWidth: 160, objectFit: 'contain', marginBottom: 8 }}
+            style={{ height: 68, maxWidth: 180, objectFit: 'contain', marginBottom: 8 }}
           />
         </>
       )}
@@ -254,8 +254,8 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
             src={profile.logo_url}
             alt="Logo"
             style={{
-              height: 48,
-              maxWidth: 160,
+              height: 62,
+              maxWidth: 180,
               objectFit: 'contain',
             }}
           />

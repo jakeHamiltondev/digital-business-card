@@ -80,7 +80,6 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
     userIsPro ? profile.brand_color_accent  : null,
   )
 
-  const radialBg = `radial-gradient(circle at 30% 30%, ${rawPrimary}, ${rawAccent})`
   const orgName  = getOrgName(profile)
   const tagline  = getTagline(profile)
   const initials = getInitials(profile.full_name)
@@ -92,7 +91,7 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: radialBg,
+        background: rawPrimary,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         display: 'flex',
@@ -157,13 +156,30 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
         </p>
       )}
 
+      {/* Job title */}
+      {profile.title && (
+        <p
+          style={{
+            color: cc.text,
+            fontSize: 14,
+            fontWeight: 400,
+            opacity: 0.85,
+            marginTop: 6,
+            textAlign: 'center',
+            lineHeight: 1.3,
+          }}
+        >
+          {profile.title}
+        </p>
+      )}
+
       {/* Tagline / department */}
       {tagline && (
         <p
           style={{
             color: cc.text,
             fontSize: 13,
-            opacity: 0.8,
+            opacity: 0.7,
             marginTop: 4,
             textAlign: 'center',
           }}
@@ -236,7 +252,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         transform: 'rotateY(180deg)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '10px 16px 10px',
+        padding: '8px 16px 8px',
       }}
     >
       {/* ── Identity row: avatar + name/title/org side-by-side ── */}
@@ -262,10 +278,10 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
             <p
               style={{
                 color: cc.textMuted,
-                fontSize: 13,
+                fontSize: 12,
                 marginTop: 2,
                 display: '-webkit-box',
-                WebkitLineClamp: 2,
+                WebkitLineClamp: 3,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 lineHeight: 1.35,
@@ -304,20 +320,20 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
       )}
 
       {/* ── Action buttons ── */}
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: 6 }}>
         <ActionButtons profile={profile} t={brandT} />
       </div>
 
       {/* ── Contact rows (max 3 keeps layout on-card without scrolling) ── */}
-      <div style={{ marginTop: 8 }}>
-        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} />
+      <div style={{ marginTop: 6 }}>
+        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} hideOverflowLink />
       </div>
 
       {/* Spacer pushes QR + save to bottom */}
       <div style={{ flex: 1 }} />
 
       {/* ── QR code ── */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>
         <QRCodeMini url={`${pageUrl}?qr=1`} />
       </div>
 

@@ -140,34 +140,34 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         style={{
           height: 150,
           flexShrink: 0,
-          background: cc.bgGradient,
+          background: cc.bg,
           position: 'relative',
-          padding: '10px 14px',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {/* Logo top-left — Pro users with logo only */}
+        {/* Logo centered in band — hero brand element */}
         {userIsPro && profile.logo_url && (
           <img
             src={profile.logo_url}
             alt="Logo"
             style={{
-              height: 32,
-              maxWidth: 100,
+              height: 90,
+              maxWidth: 200,
               objectFit: 'contain',
               mixBlendMode: 'multiply',
             }}
           />
         )}
-        {/* 5px accent stripe at band bottom */}
+        {/* 6px accent stripe at band bottom */}
         <div
           style={{
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            height: 5,
+            height: 6,
             background: cc.buttonBg,
           }}
         />
@@ -184,8 +184,8 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
           overflow: 'hidden',
         }}
       >
-        {/* Avatar overlapping band by 50px, white ring */}
-        <div style={{ marginTop: -50 }}>
+        {/* Avatar overlapping band by 25px so full circle stays visible */}
+        <div style={{ marginTop: -25 }}>
           <Avatar
             name={profile.full_name}
             avatarUrl={profile.avatar_url}
@@ -250,7 +250,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         style={{
           height: 40,
           flexShrink: 0,
-          background: cc.bgGradient,
+          background: cc.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

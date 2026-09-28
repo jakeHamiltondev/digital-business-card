@@ -72,6 +72,29 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
 
   const initials = getInitials(profile.full_name)
 
+  const phones =
+    (profile.phones?.length ?? 0) > 0
+      ? profile.phones
+      : profile.phone
+        ? [{ type: 'mobile' as const, number: profile.phone }]
+        : []
+  const primaryPhone = phones?.[0] ?? null
+
+  const ghostBtn: React.CSSProperties = {
+    display: 'block',
+    width: '100%',
+    borderRadius: '0.75rem',
+    padding: '10px 0',
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#ffffff',
+    background: 'rgba(255,255,255,0.14)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    textDecoration: 'none',
+    boxSizing: 'border-box',
+  }
+
   return (
     <div
       style={{
@@ -163,7 +186,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
           </div>
         )}
 
-        {/* Name + title rendered on top of the overlay */}
+        {/* Name + title + company rendered on top of the overlay */}
         <div
           style={{
             position: 'absolute',
@@ -176,7 +199,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
             style={{
               color: '#ffffff',
               fontSize: 22,
-              fontWeight: 700,
+              fontWeight: 800,
               lineHeight: 1.15,
               textShadow: '0 1px 4px rgba(0,0,0,0.4)',
               margin: 0,
@@ -196,34 +219,51 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
               {titleLine}
             </p>
           )}
+          {orgDisplay && (
+            <p
+              style={{
+                color: 'rgba(255,255,255,0.75)',
+                fontSize: 12,
+                marginTop: 2,
+                textShadow: '0 1px 3px rgba(0,0,0,0.35)',
+              }}
+            >
+              {orgDisplay}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* ── Bottom section: brand background, org name + action buttons ── */}
+      {/* ── Bottom section: save + call + email ghost buttons ── */}
       <div
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
           justifyContent: 'center',
-          gap: 10,
+          gap: 8,
           padding: '14px 16px',
         }}
       >
-        {orgDisplay && (
-          <p
-            style={{
-              color: cc.textMuted,
-              fontSize: 12,
-              textAlign: 'center',
-              lineHeight: 1.3,
-            }}
+        <SaveContactButton profile={profile} bg={cc.buttonBg} textColor={cc.buttonText} />
+        {primaryPhone && (
+          <a
+            href={`tel:${primaryPhone.number}`}
+            style={ghostBtn}
+            onClick={e => e.stopPropagation()}
           >
-            {orgDisplay}
-          </p>
+            Call
+          </a>
         )}
-        <ActionButtons profile={profile} t={brandT} />
+        {profile.email && (
+          <a
+            href={`mailto:${profile.email}`}
+            style={ghostBtn}
+            onClick={e => e.stopPropagation()}
+          >
+            Email
+          </a>
+        )}
       </div>
     </div>
   )

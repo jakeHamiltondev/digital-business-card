@@ -70,8 +70,14 @@ function buildRows(profile: Profile, iconColor: string): Row[] {
     })
   }
 
-  // Location: prefer work address (public) over city/state — never both
-  if (profile.address_visibility === 'public' && profile.work_address) {
+  // Prefer personal location (city the user lives in) over work address
+  if (profile.location) {
+    rows.push({
+      id: 'location',
+      icon: <MapPin className="h-4 w-4 shrink-0" style={{ color: iconColor }} />,
+      label: profile.location,
+    })
+  } else if (profile.address_visibility === 'public' && profile.work_address) {
     const a = profile.work_address
     const lines: string[] = []
     if (a.street1) lines.push(a.street1)
@@ -88,12 +94,6 @@ function buildRows(profile: Profile, iconColor: string): Row[] {
         multiline: lines,
       })
     }
-  } else if (profile.location) {
-    rows.push({
-      id: 'location',
-      icon: <MapPin className="h-4 w-4 shrink-0" style={{ color: iconColor }} />,
-      label: profile.location,
-    })
   }
 
   const schedulingLink = profile.recruiter_info?.scheduling_link
@@ -115,11 +115,13 @@ export default function ContactRows({
   pageUrl,
   t,
   maxRows = 5,
+  hideOverflowLink = false,
 }: {
   profile: Profile
   pageUrl: string
   t: Theme
   maxRows?: number
+  hideOverflowLink?: boolean
 }) {
   const rows = buildRows(profile, t.colors.iconColor)
   const visible = rows.slice(0, maxRows)
@@ -183,7 +185,7 @@ export default function ContactRows({
         )
       })}
 
-      {hasOverflow && (
+      {hasOverflow && !hideOverflowLink && (
         <a
           href={pageUrl}
           target="_blank"
