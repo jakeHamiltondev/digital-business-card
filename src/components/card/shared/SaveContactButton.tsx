@@ -8,11 +8,13 @@ export default function SaveContactButton({
   bg,
   textColor,
   label = 'Save Contact',
+  icon,
 }: {
   profile: Profile
   bg: string
   textColor: string
   label?: string
+  icon?: React.ReactNode
 }) {
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -31,9 +33,10 @@ export default function SaveContactButton({
   return (
     <button
       onClick={handleSave}
-      className="w-full rounded-xl py-3 text-sm font-bold transition hover:brightness-110 active:scale-[0.98]"
-      style={{ background: bg, color: textColor }}
+      className="w-full rounded-xl py-3 text-sm font-extrabold transition hover:brightness-110 active:scale-[0.98]"
+      style={{ background: bg, color: textColor, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
     >
+      {icon}
       {label}
     </button>
   )
