@@ -171,13 +171,12 @@ export function getTheme(id: string | null | undefined): Theme {
 }
 
 // Solid hex colors for each theme — used as generateCardColors() fallback for free users.
-// Derived from the theme's cardBg and accent values so the card matches the preview thumbnail.
 export const CARD_THEME_COLORS: Record<string, { primary: string; accent: string }> = {
-  midnight: { primary: '#18181b', accent: '#fafafa' },
-  clean:    { primary: '#ffffff', accent: '#18181b' },
-  ocean:    { primary: '#1e3a5f', accent: '#38bdf8' },
-  forest:   { primary: '#1c2b1c', accent: '#5a9e3c' },
-  slate:    { primary: '#334155', accent: '#e2e8f0' },
+  midnight: { primary: '#121217', accent: '#a78bfa' },  // Near-black surface + violet accent
+  clean:    { primary: '#ffffff', accent: '#0f766e' },   // White surface + teal accent
+  ocean:    { primary: '#0b2a40', accent: '#5eead4' },   // Deep navy surface + aqua accent
+  forest:   { primary: '#14241a', accent: '#bef264' },   // Dark green surface + lime accent
+  slate:    { primary: '#1b2230', accent: '#fbbf24' },   // Dark charcoal surface + amber accent
 }
 
 export function getThemeCardColors(themeId: string | null | undefined): { primary: string; accent: string } {
