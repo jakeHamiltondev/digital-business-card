@@ -3,6 +3,7 @@
 import type { LayoutFaceProps } from '../types'
 import type { Theme } from '@/lib/themes'
 import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
+import { getThemeCardColors } from '@/lib/themes'
 import { getPersonaConfig, getCardFrontValue, type CardFrontFieldKey } from '@/lib/persona-config'
 import Avatar from '../shared/Avatar'
 import ActionButtons from '../shared/ActionButtons'
@@ -115,9 +116,10 @@ function orgName(profile: LayoutFaceProps['profile']): string | null {
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFaceProps) {
+  const themeColors = getThemeCardColors(profile.theme)
   const cc = generateCardColors(
-    userIsPro ? profile.brand_color_primary : null,
-    userIsPro ? profile.brand_color_accent : null,
+    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
+    (userIsPro ? profile.brand_color_accent : null) ?? themeColors.accent,
   )
   const brandT = makeBrandTheme(cc, t)
 
@@ -216,9 +218,10 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
 // ── Back ──────────────────────────────────────────────────────────────────────
 
 export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
+  const themeColors = getThemeCardColors(profile.theme)
   const cc = generateCardColors(
-    userIsPro ? profile.brand_color_primary : null,
-    userIsPro ? profile.brand_color_accent : null,
+    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
+    (userIsPro ? profile.brand_color_accent : null) ?? themeColors.accent,
   )
   const brandT = makeBrandTheme(cc, t)
 

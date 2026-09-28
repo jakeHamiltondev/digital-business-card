@@ -7,6 +7,7 @@ import type { Profile } from '@/lib/types'
 import type { Theme } from '@/lib/themes'
 import type { LayoutFaceProps } from '../types'
 import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
+import { getThemeCardColors } from '@/lib/themes'
 import { getPersonaConfig } from '@/lib/persona-config'
 import Avatar from '../shared/Avatar'
 import ActionButtons from '../shared/ActionButtons'
@@ -15,8 +16,6 @@ import SaveContactButton from '../shared/SaveContactButton'
 import QRCodeMini from '@/components/QRCodeMini'
 
 const SHADOW = '0 18px 40px -18px rgba(10,20,40,0.45), 0 2px 6px rgba(10,20,40,0.12)'
-const LINKFOL_PRIMARY = '#6366f1'
-const LINKFOL_ACCENT  = '#8b5cf6'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -73,12 +72,10 @@ function getTagline(profile: Profile): string | null {
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
-  const rawPrimary = (userIsPro ? profile.brand_color_primary : null) ?? LINKFOL_PRIMARY
-  const rawAccent  = (userIsPro ? profile.brand_color_accent  : null) ?? LINKFOL_ACCENT
-  const cc = generateCardColors(
-    userIsPro ? profile.brand_color_primary : null,
-    userIsPro ? profile.brand_color_accent  : null,
-  )
+  const themeColors = getThemeCardColors(profile.theme)
+  const rawPrimary = (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary
+  const rawAccent  = (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent
+  const cc = generateCardColors(rawPrimary, rawAccent)
 
   const orgName  = getOrgName(profile)
   const tagline  = getTagline(profile)
@@ -230,9 +227,10 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
 // maxRows=3 keeps everything on-card without scrolling.
 
 export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
+  const themeColors = getThemeCardColors(profile.theme)
   const cc = generateCardColors(
-    userIsPro ? profile.brand_color_primary : null,
-    userIsPro ? profile.brand_color_accent  : null,
+    (userIsPro ? profile.brand_color_primary : null) ?? themeColors.primary,
+    (userIsPro ? profile.brand_color_accent  : null) ?? themeColors.accent,
   )
   const brandT = makeBrandTheme(cc, t)
 

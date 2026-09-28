@@ -169,3 +169,17 @@ export const themeMap = Object.fromEntries(themes.map((t) => [t.id, t])) as Reco
 export function getTheme(id: string | null | undefined): Theme {
   return themeMap[id ?? 'midnight'] ?? themeMap['midnight']
 }
+
+// Solid hex colors for each theme — used as generateCardColors() fallback for free users.
+// Derived from the theme's cardBg and accent values so the card matches the preview thumbnail.
+export const CARD_THEME_COLORS: Record<string, { primary: string; accent: string }> = {
+  midnight: { primary: '#18181b', accent: '#fafafa' },
+  clean:    { primary: '#ffffff', accent: '#18181b' },
+  ocean:    { primary: '#1e3a5f', accent: '#38bdf8' },
+  forest:   { primary: '#1c2b1c', accent: '#5a9e3c' },
+  slate:    { primary: '#334155', accent: '#e2e8f0' },
+}
+
+export function getThemeCardColors(themeId: string | null | undefined): { primary: string; accent: string } {
+  return CARD_THEME_COLORS[themeId ?? 'midnight'] ?? CARD_THEME_COLORS['midnight']
+}
