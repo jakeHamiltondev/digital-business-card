@@ -153,7 +153,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
             style={{
               height: 88,
               width: 'auto',
-              mixBlendMode: 'multiply',
+              filter: 'brightness(0) invert(1)',
             }}
           />
         )}
