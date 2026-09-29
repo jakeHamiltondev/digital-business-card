@@ -47,7 +47,7 @@ export const FIELD_DEFS: Record<FieldKey, FieldDef> = {
   company:             { label: 'Company',             placeholder: 'Acme Corp',                           inputType: 'text' },
   department:          { label: 'Department',          placeholder: 'Engineering',                         inputType: 'text' },
   phones:              { label: 'Phone(s)',            placeholder: '',                                    inputType: 'phones' },
-  website:             { label: 'Website',             placeholder: 'https://yoursite.com',                inputType: 'url' },
+  website:             { label: 'Website',             placeholder: 'yourwebsite.com',                     inputType: 'text' },
   location:            { label: 'Location',            placeholder: 'Wilmington, NC',                      inputType: 'text',    hint: 'City and state — always shown publicly' },
   work_address:        { label: 'Work Address',        placeholder: '',                                    inputType: 'address' },
   address_visibility:  { label: 'Address Visibility',  placeholder: '',                                    inputType: 'visibility' },

@@ -402,7 +402,7 @@ export default function ProfileForm({
         return (
           <div key={key}>
             {label}
-            <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder={def.placeholder} className={inputClass} />
+            <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder={def.placeholder} className={inputClass} />
           </div>
         )
       case 'location':
@@ -558,17 +558,24 @@ export default function ProfileForm({
 
   // ── Submit ─────────────────────────────────────────────────────────────────
 
+  function normalizeUrl(url: string): string {
+    const trimmed = url.trim()
+    if (!trimmed) return ''
+    if (/^https?:\/\//i.test(trimmed)) return trimmed
+    return `https://${trimmed}`
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsSaving(true)
     setSaveError(null)
 
     const socialLinks: SocialLinks = {}
-    if (linkedin.trim()) socialLinks.linkedin = linkedin.trim()
-    if (twitter.trim()) socialLinks.twitter = twitter.trim()
-    if (instagram.trim()) socialLinks.instagram = instagram.trim()
-    if (github.trim()) socialLinks.github = github.trim()
-    if (tiktok.trim()) socialLinks.tiktok = tiktok.trim()
+    if (linkedin.trim()) socialLinks.linkedin = normalizeUrl(linkedin)
+    if (twitter.trim()) socialLinks.twitter = normalizeUrl(twitter)
+    if (instagram.trim()) socialLinks.instagram = normalizeUrl(instagram)
+    if (github.trim()) socialLinks.github = normalizeUrl(github)
+    if (tiktok.trim()) socialLinks.tiktok = normalizeUrl(tiktok)
 
     const hasStudentInfo = Object.values(studentInfo).some(Boolean)
     const hasRecruiterInfo = Object.values(recruiterInfo).some(Boolean)
@@ -584,7 +591,7 @@ export default function ProfileForm({
         bio: bio || null,
         phones,
         email: email || null,
-        website: website || null,
+        website: normalizeUrl(website) || null,
         social_links: socialLinks,
         theme: selectedTheme,
         card_layout: cardLayout,
@@ -648,7 +655,7 @@ export default function ProfileForm({
         <div className="space-y-4">
           <div>
             <label htmlFor="username" className={labelClass}>
-              Card URL <span className="text-red-500">*</span>
+              Username <span className="text-red-500">*</span>
             </label>
             <input
               id="username"
@@ -659,6 +666,9 @@ export default function ProfileForm({
               placeholder="your-username"
               className={inputClass}
             />
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Your card will be at linkfol.com/{username || 'username'}
+            </p>
           </div>
           <div>
             <label htmlFor="full_name" className={labelClass}>
@@ -712,15 +722,15 @@ export default function ProfileForm({
         </h2>
         <div className="space-y-4">
           {[
-            { label: 'LinkedIn',    value: linkedin,  set: setLinkedin,  placeholder: 'https://linkedin.com/in/username' },
-            { label: 'Twitter / X', value: twitter,   set: setTwitter,   placeholder: 'https://x.com/username' },
-            { label: 'Instagram',   value: instagram, set: setInstagram, placeholder: 'https://instagram.com/username' },
-            { label: 'GitHub',      value: github,    set: setGithub,    placeholder: 'https://github.com/username' },
-            { label: 'TikTok',      value: tiktok,    set: setTiktok,    placeholder: 'https://tiktok.com/@username' },
+            { label: 'LinkedIn',    value: linkedin,  set: setLinkedin,  placeholder: 'linkedin.com/in/username' },
+            { label: 'Twitter / X', value: twitter,   set: setTwitter,   placeholder: 'x.com/username' },
+            { label: 'Instagram',   value: instagram, set: setInstagram, placeholder: 'instagram.com/username' },
+            { label: 'GitHub',      value: github,    set: setGithub,    placeholder: 'github.com/username' },
+            { label: 'TikTok',      value: tiktok,    set: setTiktok,    placeholder: 'tiktok.com/@username' },
           ].map(({ label, value, set, placeholder }) => (
             <div key={label}>
               <label className={labelClass}>{label}</label>
-              <input type="url" value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder} className={inputClass} />
+              <input type="text" value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder} className={inputClass} />
             </div>
           ))}
         </div>
@@ -849,14 +859,11 @@ export default function ProfileForm({
                   Logo and brand colors are available on Pro
                 </p>
                 <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                  Upgrade to add your logo and use custom brand colors on your card.
+                  Logo and custom brand colors will be available with Pro.
                 </p>
-                <a
-                  href="/pricing"
-                  className="mt-2 inline-block text-xs font-medium text-zinc-900 underline underline-offset-2 hover:no-underline dark:text-zinc-100"
-                >
-                  View Pro plans →
-                </a>
+                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  Pro plans are coming soon — stay tuned!
+                </p>
               </div>
             </div>
           </div>
