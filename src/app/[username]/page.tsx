@@ -202,18 +202,17 @@ export default async function UserCardPage({ params, searchParams }: Props) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
-      {isOwnCard ? (
-        <div className="mb-4 w-full max-w-sm">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </div>
-      ) : isLoggedInViewer && (
+    <div className="relative flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
+      {isOwnCard && (
+        <Link
+          href="/dashboard"
+          className="absolute left-4 top-4 flex items-center gap-1.5 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Link>
+      )}
+      {isLoggedInViewer && (
         <div className="mb-4 w-full max-w-sm">
           <Link
             href="/cards"
