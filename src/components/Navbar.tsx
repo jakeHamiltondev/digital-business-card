@@ -3,9 +3,7 @@ import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import LinkfolLogo from '@/components/LinkfolLogo'
 import AvatarDropdown from '@/components/AvatarDropdown'
-
-const activeClass = 'rounded-lg px-3 py-1.5 text-sm font-medium bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50'
-const inactiveClass = 'rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
+import NavLinks from '@/components/NavLinks'
 
 export default async function Navbar() {
   const headersList = await headers()
@@ -29,17 +27,7 @@ export default async function Navbar() {
           <LinkfolLogo size="sm" />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          <Link href="/dashboard" className={pathname === '/dashboard' ? activeClass : inactiveClass}>
-            My Card
-          </Link>
-          <Link href="/dashboard/edit" className={pathname === '/dashboard/edit' ? activeClass : inactiveClass}>
-            Edit Profile
-          </Link>
-          <Link href="/cards" className={pathname === '/cards' ? activeClass : inactiveClass}>
-            Contacts
-          </Link>
-        </nav>
+        <NavLinks />
 
         <AvatarDropdown initial={initial} email={email} />
       </div>

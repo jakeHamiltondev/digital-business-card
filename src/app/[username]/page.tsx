@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { after } from 'next/server'
 import { headers } from 'next/headers'
-import { Download } from 'lucide-react'
+import { ArrowLeft, Download } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAnonClient } from '@/lib/supabase/anon'
 import BusinessCard from '@/components/BusinessCard'
@@ -203,7 +203,17 @@ export default async function UserCardPage({ params, searchParams }: Props) {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
-      {isLoggedInViewer && (
+      {isOwnCard ? (
+        <div className="mb-4 w-full max-w-sm">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </div>
+      ) : isLoggedInViewer && (
         <div className="mb-4 w-full max-w-sm">
           <Link
             href="/cards"
