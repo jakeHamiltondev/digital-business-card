@@ -209,7 +209,7 @@ export default async function UserCardPage({ params, searchParams }: Props) {
           className="absolute left-4 top-4 flex items-center gap-1.5 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          Back
         </Link>
       )}
       {isLoggedInViewer && (
