@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import FeedbackWrapper from "@/components/FeedbackWrapper";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar />
         {children}
+        <BottomNav />
         <FeedbackWrapper />
         <Analytics />
       </body>

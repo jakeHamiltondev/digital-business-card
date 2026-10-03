@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Pencil, Eye, Bookmark, Share2, QrCode, Camera } from 'lucide-react'
+import { Eye, QrCode, Camera } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import BusinessCard from '@/components/BusinessCard'
 import UpgradeToast from '@/components/UpgradeToast'
@@ -11,7 +11,7 @@ import type { Profile } from '@/lib/types'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
 export const metadata: Metadata = {
-  title: 'Dashboard | Linkfol',
+  title: 'My Card | Linkfol',
 }
 
 export default async function DashboardPage(props: {
@@ -61,7 +61,7 @@ export default async function DashboardPage(props: {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <main className="mx-auto max-w-3xl space-y-8 px-4 py-10">
+      <main className="mx-auto max-w-3xl space-y-8 px-4 py-10 pb-24 md:pb-10">
         <UpgradeToast show={showUpgradeSuccess} />
 
         {isIncomplete && (
@@ -118,83 +118,28 @@ export default async function DashboardPage(props: {
           </section>
         )}
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <Link
-            href="/dashboard/edit"
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <Pencil className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">Edit Profile</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Update your info</p>
-            </div>
-          </Link>
-
+        {/* Quick actions */}
+        <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href={profile ? `/${profile.username}` : '#'}
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <Eye className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">View My Card</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">See your public card</p>
-            </div>
+            <Eye className="h-4 w-4" />
+            View My Card
           </Link>
-
-          <Link
-            href="/cards"
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <Bookmark className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">My Cards</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Saved contacts</p>
-            </div>
-          </Link>
-
-          <Link
-            href="#share"
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <Share2 className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">Share</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Your card link & QR</p>
-            </div>
-          </Link>
-
           <Link
             href="/dashboard/qr"
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <QrCode className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">My QR Code</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Full screen QR</p>
-            </div>
+            <QrCode className="h-4 w-4" />
+            Full Screen QR
           </Link>
-
           <Link
             href="/dashboard/scan"
-            className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <div className="rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800">
-              <Camera className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-            </div>
-            <div>
-              <p className="font-medium text-zinc-900 dark:text-zinc-50">Scan QR Code</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Scan a card</p>
-            </div>
+            <Camera className="h-4 w-4" />
+            Scan QR Code
           </Link>
         </div>
       </main>
