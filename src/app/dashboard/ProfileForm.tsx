@@ -2,6 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { X, Plus, Lock } from 'lucide-react'
+import ProfileTabs from '@/components/ProfileTabs'
+import type { TabId } from '@/components/ProfileTabs'
+import AvatarUpload from '@/components/AvatarUpload'
 import { updateProfile } from './actions'
 import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks } from '@/lib/types'
 import { themes } from '@/lib/themes'
@@ -359,6 +362,8 @@ export default function ProfileForm({
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  const [activeTab, setActiveTab] = useState<TabId>('basic')
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   function updateStudentInfo<K extends keyof StudentInfo>(key: K, val: string) {
@@ -615,270 +620,289 @@ export default function ProfileForm({
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <p className="text-xs text-zinc-400 dark:text-zinc-500">
-        <span className="text-red-500">*</span> Required
-      </p>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Persona switcher */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Persona
-        </h2>
-        <div>
-          <label htmlFor="persona" className={labelClass}>
-            Card type
-          </label>
-          <select
-            id="persona"
-            value={persona}
-            onChange={(e) => setPersona(e.target.value as Persona)}
-            className={`${selectClass} w-full`}
-          >
-            {(['professional', 'student', 'recruiter'] as Persona[]).map((p) => (
-              <option key={p} value={p}>
-                {PERSONA_CONFIG[p].label}
-              </option>
-            ))}
-          </select>
-          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-            {PERSONA_CONFIG[persona].description}
-          </p>
-        </div>
-      </section>
+      <div className="min-h-[400px] space-y-8">
+        {activeTab === 'basic' && (
+          <>
+            <AvatarUpload userId={userId} avatarUrl={profile.avatar_url} fullName={profile.full_name} />
+            <p className="text-xs text-zinc-400 dark:text-zinc-500"><span className="text-red-500">*</span> Required</p>
 
-      {/* Universal: Basic Info */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Basic Information
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="username" className={labelClass}>
-              Username <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30))}
-              required
-              placeholder="your-username"
-              className={inputClass}
-            />
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-              Your card will be at linkfol.com/{username || 'username'}
-            </p>
-          </div>
-          <div>
-            <label htmlFor="full_name" className={labelClass}>
-              Full Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="full_name"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Jane Smith"
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className={labelClass}>
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jane@example.com"
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label htmlFor="bio" className={labelClass}>
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={4}
-              placeholder="A short description about yourself..."
-              className={`${inputClass} resize-none`}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Persona-specific sections */}
-      {PERSONA_CONFIG[persona].editorSections.map(renderSection)}
-
-      {/* Social Links */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Social Links
-        </h2>
-        <div className="space-y-4">
-          {[
-            { label: 'LinkedIn',    value: linkedin,  set: setLinkedin,  placeholder: 'linkedin.com/in/username' },
-            { label: 'Twitter / X', value: twitter,   set: setTwitter,   placeholder: 'x.com/username' },
-            { label: 'Instagram',   value: instagram, set: setInstagram, placeholder: 'instagram.com/username' },
-            { label: 'GitHub',      value: github,    set: setGithub,    placeholder: 'github.com/username' },
-            { label: 'TikTok',      value: tiktok,    set: setTiktok,    placeholder: 'tiktok.com/@username' },
-          ].map(({ label, value, set, placeholder }) => (
-            <div key={label}>
-              <label className={labelClass}>{label}</label>
-              <input type="text" value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder} className={inputClass} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Card Theme */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Card Theme
-        </h2>
-        <div
-          className="flex gap-3 overflow-x-auto pb-2"
-          style={{ opacity: userIsPro && useCustomColors ? 0.45 : 1, pointerEvents: userIsPro && useCustomColors ? 'none' : 'auto' }}
-        >
-          {themes.map((theme) => (
-            <button
-              type="button"
-              key={theme.id}
-              onClick={() => setSelectedTheme(theme.id)}
-              className={`flex-shrink-0 overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 ${
-                selectedTheme === theme.id
-                  ? 'border-zinc-900 dark:border-zinc-100'
-                  : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500'
-              }`}
-              style={{
-                borderRadius: theme.style.borderRadius === '0' ? '0.375rem' : theme.style.borderRadius,
-                width: '80px',
-              }}
-              aria-label={`${theme.name} theme`}
-              aria-pressed={selectedTheme === theme.id}
-            >
-              <div className="flex flex-col items-center px-2 py-3" style={{ background: theme.colors.background }}>
-                <div className="rounded-full" style={{ width: '22px', height: '22px', backgroundColor: theme.colors.avatarInitialBg, boxShadow: `0 0 0 2px ${theme.colors.avatarRing}` }} />
-                <div style={{ height: '3px', backgroundColor: theme.colors.text, width: '80%', borderRadius: '2px', marginTop: '8px', opacity: 0.8 }} />
-                <div style={{ height: '2px', backgroundColor: theme.colors.textSecondary, width: '60%', borderRadius: '2px', marginTop: '4px', opacity: 0.7 }} />
-                <div style={{ height: '14px', backgroundColor: theme.colors.contactBg, width: '90%', borderRadius: theme.style.innerRadius, marginTop: '10px', border: `1px solid ${theme.colors.contactBorder}` }} />
-              </div>
-              <div className="border-t border-zinc-200 bg-white py-1.5 text-center dark:border-zinc-700 dark:bg-zinc-900">
-                <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{theme.name}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-        {userIsPro && useCustomColors && (
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            Theme selection is overridden by your custom brand colors. Turn off &ldquo;Use custom brand colors&rdquo; in Branding to use a theme.
-          </p>
-        )}
-      </section>
-
-      {/* Card Layout */}
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Card Layout
-            {!userIsPro && <span className="ml-1.5 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Pro</span>}
-          </h2>
-          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-            {userIsPro ? 'Choose how your card is structured.' : 'Letterhead is free. Upgrade to unlock all layouts.'}
-          </p>
-        </div>
-        <LayoutSelector
-          value={cardLayout}
-          onChange={setCardLayout}
-          userIsPro={userIsPro}
-        />
-      </section>
-
-      {/* Branding (Pro-gated) */}
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          {PRO_EDITOR_SECTION.heading}
-          {!userIsPro && <ProBadge />}
-        </h2>
-        {PRO_EDITOR_SECTION.description && (
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">{PRO_EDITOR_SECTION.description}</p>
-        )}
-        {userIsPro ? (
-          <div className="space-y-4">
-            {/* Custom brand colors toggle */}
-            <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-700">
+            {/* Persona switcher */}
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Persona
+              </h2>
               <div>
-                <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Use custom brand colors</div>
-                <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                  Override your theme with custom Primary and Accent colors
+                <label htmlFor="persona" className={labelClass}>
+                  Card type
+                </label>
+                <select
+                  id="persona"
+                  value={persona}
+                  onChange={(e) => setPersona(e.target.value as Persona)}
+                  className={`${selectClass} w-full`}
+                >
+                  {(['professional', 'student', 'recruiter'] as Persona[]).map((p) => (
+                    <option key={p} value={p}>
+                      {PERSONA_CONFIG[p].label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  {PERSONA_CONFIG[persona].description}
+                </p>
+              </div>
+            </section>
+
+            {/* Basic Information */}
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Basic Information
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="username" className={labelClass}>
+                    Username <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30))}
+                    required
+                    placeholder="your-username"
+                    className={inputClass}
+                  />
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Your card will be at linkfol.com/{username || 'username'}
+                  </p>
+                </div>
+                <div>
+                  <label htmlFor="full_name" className={labelClass}>
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="full_name"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Jane Smith"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className={labelClass}>
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="jane@example.com"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="bio" className={labelClass}>
+                    Bio
+                  </label>
+                  <textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    rows={4}
+                    placeholder="A short description about yourself..."
+                    className={`${inputClass} resize-none`}
+                  />
                 </div>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={useCustomColors}
-                onClick={() => setUseCustomColors(!useCustomColors)}
-                className="relative ml-4 shrink-0 cursor-pointer rounded-full border-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
-                style={{
-                  width: 44,
-                  height: 24,
-                  background: useCustomColors ? '#6366f1' : '#d1d5db',
-                }}
-              >
-                <span
-                  className="absolute top-0.5 block rounded-full bg-white shadow transition-all"
-                  style={{
-                    width: 20,
-                    height: 20,
-                    left: useCustomColors ? 22 : 2,
-                  }}
-                />
-              </button>
+            </section>
+
+            {/* Persona-specific non-contact sections */}
+            {PERSONA_CONFIG[persona].editorSections
+              .filter((s) => s.id !== 'contact' && s.id !== 'address' && s.id !== 'scheduling')
+              .map(renderSection)}
+          </>
+        )}
+
+        {activeTab === 'contact' && (
+          <>
+            {PERSONA_CONFIG[persona].editorSections
+              .filter((s) => s.id === 'contact' || s.id === 'address' || s.id === 'scheduling')
+              .map(renderSection)}
+          </>
+        )}
+
+        {activeTab === 'social' && (
+          <section className="space-y-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              Social Links
+            </h2>
+            <div className="space-y-4">
+              {[
+                { label: 'LinkedIn',    value: linkedin,  set: setLinkedin,  placeholder: 'linkedin.com/in/username' },
+                { label: 'Twitter / X', value: twitter,   set: setTwitter,   placeholder: 'x.com/username' },
+                { label: 'Instagram',   value: instagram, set: setInstagram, placeholder: 'instagram.com/username' },
+                { label: 'GitHub',      value: github,    set: setGithub,    placeholder: 'github.com/username' },
+                { label: 'TikTok',      value: tiktok,    set: setTiktok,    placeholder: 'tiktok.com/@username' },
+              ].map(({ label, value, set, placeholder }) => (
+                <div key={label}>
+                  <label className={labelClass}>{label}</label>
+                  <input type="text" value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder} className={inputClass} />
+                </div>
+              ))}
             </div>
-            {/* Logo always visible */}
-            {renderField('logo_url')}
-            {/* Color pickers only when toggle is ON */}
-            {useCustomColors && (
-              <>
-                {renderField('brand_color_primary')}
-                {renderField('brand_color_accent')}
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
-            <div className="flex items-start gap-3">
-              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+          </section>
+        )}
+
+        {activeTab === 'appearance' && (
+          <>
+            {/* Card Theme */}
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Card Theme
+              </h2>
+              <div
+                className="flex gap-3 overflow-x-auto pb-2"
+                style={{ opacity: userIsPro && useCustomColors ? 0.45 : 1, pointerEvents: userIsPro && useCustomColors ? 'none' : 'auto' }}
+              >
+                {themes.map((theme) => (
+                  <button
+                    type="button"
+                    key={theme.id}
+                    onClick={() => setSelectedTheme(theme.id)}
+                    className={`flex-shrink-0 overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 ${
+                      selectedTheme === theme.id
+                        ? 'border-zinc-900 dark:border-zinc-100'
+                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500'
+                    }`}
+                    style={{
+                      borderRadius: theme.style.borderRadius === '0' ? '0.375rem' : theme.style.borderRadius,
+                      width: '80px',
+                    }}
+                    aria-label={`${theme.name} theme`}
+                    aria-pressed={selectedTheme === theme.id}
+                  >
+                    <div className="flex flex-col items-center px-2 py-3" style={{ background: theme.colors.background }}>
+                      <div className="rounded-full" style={{ width: '22px', height: '22px', backgroundColor: theme.colors.avatarInitialBg, boxShadow: `0 0 0 2px ${theme.colors.avatarRing}` }} />
+                      <div style={{ height: '3px', backgroundColor: theme.colors.text, width: '80%', borderRadius: '2px', marginTop: '8px', opacity: 0.8 }} />
+                      <div style={{ height: '2px', backgroundColor: theme.colors.textSecondary, width: '60%', borderRadius: '2px', marginTop: '4px', opacity: 0.7 }} />
+                      <div style={{ height: '14px', backgroundColor: theme.colors.contactBg, width: '90%', borderRadius: theme.style.innerRadius, marginTop: '10px', border: `1px solid ${theme.colors.contactBorder}` }} />
+                    </div>
+                    <div className="border-t border-zinc-200 bg-white py-1.5 text-center dark:border-zinc-700 dark:bg-zinc-900">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{theme.name}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {userIsPro && useCustomColors && (
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  Theme selection is overridden by your custom brand colors. Turn off &ldquo;Use custom brand colors&rdquo; in Branding to use a theme.
+                </p>
+              )}
+            </section>
+
+            {/* Card Layout */}
+            <section className="space-y-4">
               <div>
-                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Logo and brand colors are available on Pro
-                </p>
-                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                  Logo and custom brand colors will be available with Pro.
-                </p>
-                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  Pro plans are coming soon — stay tuned!
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Card Layout
+                  {!userIsPro && <span className="ml-1.5 inline-flex items-center rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Pro</span>}
+                </h2>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  {userIsPro ? 'Choose how your card is structured.' : 'Letterhead is free. Upgrade to unlock all layouts.'}
                 </p>
               </div>
-            </div>
-          </div>
-        )}
-      </section>
+              <LayoutSelector
+                value={cardLayout}
+                onChange={setCardLayout}
+                userIsPro={userIsPro}
+              />
+            </section>
 
-      {/* Save */}
-      <div className="space-y-3">
+            {/* Branding (Pro-gated) */}
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                {PRO_EDITOR_SECTION.heading}
+                {!userIsPro && <ProBadge />}
+              </h2>
+              {PRO_EDITOR_SECTION.description && (
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">{PRO_EDITOR_SECTION.description}</p>
+              )}
+              {userIsPro ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-zinc-200 pb-4 dark:border-zinc-700">
+                    <div>
+                      <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Use custom brand colors</div>
+                      <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                        Override your theme with custom Primary and Accent colors
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={useCustomColors}
+                      onClick={() => setUseCustomColors(!useCustomColors)}
+                      className="relative ml-4 shrink-0 cursor-pointer rounded-full border-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+                      style={{
+                        width: 44,
+                        height: 24,
+                        background: useCustomColors ? '#6366f1' : '#d1d5db',
+                      }}
+                    >
+                      <span
+                        className="absolute top-0.5 block rounded-full bg-white shadow transition-all"
+                        style={{
+                          width: 20,
+                          height: 20,
+                          left: useCustomColors ? 22 : 2,
+                        }}
+                      />
+                    </button>
+                  </div>
+                  {renderField('logo_url')}
+                  {useCustomColors && (
+                    <>
+                      {renderField('brand_color_primary')}
+                      {renderField('brand_color_accent')}
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                  <div className="flex items-start gap-3">
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+                    <div>
+                      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Logo and brand colors are available on Pro
+                      </p>
+                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                        Logo and custom brand colors will be available with Pro.
+                      </p>
+                      <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        Pro plans are coming soon — stay tuned!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </>
+        )}
+      </div>
+
+      {/* Sticky save — always visible */}
+      <div className="sticky bottom-20 z-30 flex items-center gap-3 rounded-xl border border-zinc-200 bg-white/80 px-4 py-3 shadow-lg backdrop-blur-sm md:bottom-4 dark:border-zinc-700 dark:bg-zinc-900/80">
         {saveError && (
-          <p className="text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
+          <p className="flex-1 text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
         )}
         <button
           type="submit"
           disabled={isSaving}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="ml-auto rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isSaving ? 'Saving…' : 'Save Profile'}
         </button>

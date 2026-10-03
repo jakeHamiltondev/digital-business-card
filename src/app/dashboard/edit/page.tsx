@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ProfileForm from '../ProfileForm'
-import AvatarUpload from '@/components/AvatarUpload'
 import DangerZone from './DangerZone'
 import type { Profile } from '@/lib/types'
 
@@ -48,14 +47,7 @@ export default async function EditProfilePage() {
             Edit Profile
           </h2>
           {profile ? (
-            <div className="space-y-8">
-              <AvatarUpload
-                userId={user.id}
-                avatarUrl={profile.avatar_url}
-                fullName={profile.full_name}
-              />
-              <ProfileForm profile={profile} userId={user.id} />
-            </div>
+            <ProfileForm profile={profile} userId={user.id} />
           ) : (
             <p className="text-sm text-red-600 dark:text-red-400">
               Failed to load profile. Please refresh the page.
