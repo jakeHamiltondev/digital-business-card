@@ -895,14 +895,14 @@ export default function ProfileForm({
       </div>
 
       {/* Sticky save — always visible */}
-      <div className="sticky bottom-20 z-30 flex items-center gap-3 rounded-xl border border-zinc-200 bg-white/80 px-4 py-3 shadow-lg backdrop-blur-sm md:bottom-4 dark:border-zinc-700 dark:bg-zinc-900/80">
+      <div className="sticky bottom-20 z-30 flex items-center justify-end gap-3 py-3 md:bottom-4">
         {saveError && (
-          <p className="flex-1 text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
+          <p className="text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
         )}
         <button
           type="submit"
           disabled={isSaving}
-          className="ml-auto rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isSaving ? 'Saving…' : 'Save Profile'}
         </button>
