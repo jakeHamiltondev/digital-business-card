@@ -77,6 +77,8 @@ export type Profile = {
   recruiter_info: RecruiterInfo | null
   // Card layout
   card_layout: string | null
+  // Card back field visibility — null = show all (backward compat)
+  card_back_fields: string[] | null
 }
 
 export type ResumeEntryType = 'experience' | 'education' | 'skill' | 'project' | 'certification'

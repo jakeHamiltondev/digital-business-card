@@ -56,6 +56,7 @@ const demoProfile: Profile = {
   student_info: null,
   recruiter_info: null,
   card_layout: null,
+  card_back_fields: null,
 }
 
 function GoogleIcon({ className }: { className?: string }) {

@@ -280,6 +280,8 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
   const orgDisplay = vcardCfg.orgSource === 'university'
     ? (profile.student_info?.university ?? null)
     : (profile.company ?? null)
+  const selectedFields = profile.card_back_fields
+  const showQR = !selectedFields || selectedFields.includes('qr')
 
   return (
     <div
@@ -336,15 +338,17 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
       )}
 
       {/* ── Contact rows ── */}
-      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} />
+      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} selectedFields={selectedFields} />
 
       {/* Spacer pushes QR + save to bottom */}
       <div style={{ flex: 1 }} />
 
       {/* ── QR code ── */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
-        <QRCodeMini url={`${pageUrl}?qr=1`} />
-      </div>
+      {showQR && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+          <QRCodeMini url={`${pageUrl}?qr=1`} />
+        </div>
+      )}
 
       {/* ── Save contact ── */}
       <SaveContactButton profile={profile} bg={cc.buttonBg} textColor={cc.buttonText} />

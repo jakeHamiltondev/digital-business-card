@@ -42,6 +42,7 @@ export async function updateProfile(data: {
   brand_color_accent: string | null
   student_info: StudentInfo | null
   recruiter_info: RecruiterInfo | null
+  card_back_fields: string[] | null
 }): Promise<FormState> {
   const supabase = await createClient()
   const {
@@ -85,6 +86,7 @@ export async function updateProfile(data: {
     location: data.location,
     student_info: data.student_info,
     recruiter_info: data.recruiter_info,
+    card_back_fields: data.card_back_fields,
     updated_at: new Date().toISOString(),
   }
 

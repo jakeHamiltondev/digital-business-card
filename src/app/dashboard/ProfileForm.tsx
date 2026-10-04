@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { X, Plus, Lock } from 'lucide-react'
+import { X, Plus, Lock, Mail, Phone, Globe, MapPin, QrCode } from 'lucide-react'
 import ProfileTabs from '@/components/ProfileTabs'
 import type { TabId } from '@/components/ProfileTabs'
 import AvatarUpload from '@/components/AvatarUpload'
@@ -299,6 +299,137 @@ function LogoUpload({
   )
 }
 
+// ── Card Back Picker ──────────────────────────────────────────────────────────
+
+function PickerToggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className="relative shrink-0 cursor-pointer rounded-full border-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+      style={{ width: 36, height: 20, background: checked ? '#6366f1' : '#d1d5db' }}
+    >
+      <span
+        className="absolute top-0.5 block rounded-full bg-white shadow transition-all"
+        style={{ width: 16, height: 16, left: checked ? 18 : 2 }}
+      />
+    </button>
+  )
+}
+
+function LinkedInPickerIcon() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 shrink-0 text-zinc-500"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.1c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V21h-4z" /></svg>
+}
+function TwitterPickerIcon() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 shrink-0 text-zinc-500"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+}
+function InstagramPickerIcon() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0 text-zinc-500"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><circle cx="12" cy="12" r="3" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+}
+function GitHubPickerIcon() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 shrink-0 text-zinc-500"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" /></svg>
+}
+function TikTokPickerIcon() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 shrink-0 text-zinc-500"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.18 8.18 0 0 0 4.78 1.52V6.56a4.85 4.85 0 0 1-1.01.13z" /></svg>
+}
+
+function CardBackPicker({
+  email, phones, linkedin, twitter, instagram, github, tiktok, website, location,
+  value, onChange,
+}: {
+  email: string; phones: PhoneEntry[]; linkedin: string; twitter: string; instagram: string
+  github: string; tiktok: string; website: string; location: string
+  value: string[] | null; onChange: (v: string[] | null) => void
+}) {
+  type FieldRow = { id: string; label: string; displayValue: string; icon: React.ReactNode }
+  const available: FieldRow[] = []
+
+  if (email)
+    available.push({ id: 'email', label: 'Email', displayValue: email, icon: <Mail className="h-4 w-4 shrink-0 text-zinc-500" /> })
+  const primaryPhone = phones.find(p => p.number)
+  if (primaryPhone)
+    available.push({ id: 'phone', label: 'Phone', displayValue: formatPhoneDisplay(primaryPhone.number), icon: <Phone className="h-4 w-4 shrink-0 text-zinc-500" /> })
+  if (linkedin)
+    available.push({ id: 'linkedin', label: 'LinkedIn', displayValue: linkedin.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <LinkedInPickerIcon /> })
+  if (twitter)
+    available.push({ id: 'twitter', label: 'Twitter / X', displayValue: twitter.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <TwitterPickerIcon /> })
+  if (instagram)
+    available.push({ id: 'instagram', label: 'Instagram', displayValue: instagram.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <InstagramPickerIcon /> })
+  if (github)
+    available.push({ id: 'github', label: 'GitHub', displayValue: github.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <GitHubPickerIcon /> })
+  if (tiktok)
+    available.push({ id: 'tiktok', label: 'TikTok', displayValue: tiktok.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <TikTokPickerIcon /> })
+  if (website)
+    available.push({ id: 'website', label: 'Website', displayValue: website.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <Globe className="h-4 w-4 shrink-0 text-zinc-500" /> })
+  if (location)
+    available.push({ id: 'location', label: 'Location', displayValue: location, icon: <MapPin className="h-4 w-4 shrink-0 text-zinc-500" /> })
+
+  const allIds = [...available.map(f => f.id), 'qr']
+  const effectiveSelected = value ?? allIds
+
+  const isOn = (id: string) => effectiveSelected.includes(id)
+  const qrOn = isOn('qr')
+  const maxContact = qrOn ? 4 : 6
+  const contactSelected = effectiveSelected.filter(id => id !== 'qr')
+  const overLimit = contactSelected.length > maxContact
+
+  function toggle(id: string) {
+    const current = value ?? allIds
+    const next = current.includes(id) ? current.filter(x => x !== id) : [...current, id]
+    onChange(next)
+  }
+
+  return (
+    <section className="space-y-3">
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Card back</h2>
+          <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">Choose what appears on the back of your card.</p>
+        </div>
+        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500 pb-0.5">
+          {contactSelected.length}/{maxContact}
+        </span>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+        {available.map((field, i) => (
+          <div
+            key={field.id}
+            className={`flex items-center gap-3 px-3 py-2.5 ${i > 0 ? 'border-t border-zinc-100 dark:border-zinc-800' : ''}`}
+          >
+            {field.icon}
+            <div className="min-w-0 flex-1">
+              <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{field.label}</span>
+              <span className="ml-2 truncate text-xs text-zinc-400 dark:text-zinc-500">{field.displayValue}</span>
+            </div>
+            <PickerToggle checked={isOn(field.id)} onChange={() => toggle(field.id)} />
+          </div>
+        ))}
+
+        <div className="border-t border-zinc-200 bg-zinc-50 px-3 py-1.5 dark:border-zinc-700 dark:bg-zinc-800/50">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">QR Code</span>
+        </div>
+        <div className={`flex items-center gap-3 px-3 py-2.5 ${available.length > 0 ? '' : ''}`}>
+          <QrCode className="h-4 w-4 shrink-0 text-zinc-500" />
+          <div className="min-w-0 flex-1">
+            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">QR Code</span>
+            <span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">Scan to connect</span>
+          </div>
+          <PickerToggle checked={isOn('qr')} onChange={() => toggle('qr')} />
+        </div>
+      </div>
+
+      {overLimit && (
+        <p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+          Too many fields selected (max {maxContact} with QR {qrOn ? 'on' : 'off'})
+        </p>
+      )}
+    </section>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ProfileForm({
@@ -357,6 +488,11 @@ export default function ProfileForm({
   const [brandPrimary, setBrandPrimary] = useState(profile.brand_color_primary ?? '#000000')
   const [brandAccent, setBrandAccent] = useState(profile.brand_color_accent ?? '#ffffff')
   const [useCustomColors, setUseCustomColors] = useState(!!(profile.brand_color_primary))
+
+  // Card back fields
+  const [cardBackFields, setCardBackFields] = useState<string[] | null>(
+    profile.card_back_fields ?? null
+  )
 
   // Submit state
   const [isSaving, setIsSaving] = useState(false)
@@ -608,6 +744,7 @@ export default function ProfileForm({
         brand_color_accent: useCustomColors ? (brandAccent || null) : null,
         student_info: hasStudentInfo ? studentInfo : null,
         recruiter_info: hasRecruiterInfo ? recruiterInfo : null,
+        card_back_fields: cardBackFields,
       })
       setSaveError(result.error)
     } catch {
@@ -730,6 +867,19 @@ export default function ProfileForm({
 
         {activeTab === 'contact' && (
           <>
+            <CardBackPicker
+              email={email}
+              phones={phones}
+              linkedin={linkedin}
+              twitter={twitter}
+              instagram={instagram}
+              github={github}
+              tiktok={tiktok}
+              website={website}
+              location={location}
+              value={cardBackFields}
+              onChange={setCardBackFields}
+            />
             {PERSONA_CONFIG[persona].editorSections
               .filter((s) => s.id === 'contact' || s.id === 'address' || s.id === 'scheduling')
               .map(renderSection)}
@@ -901,7 +1051,11 @@ export default function ProfileForm({
         )}
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || (() => {
+            if (!cardBackFields) return false
+            const qrOn = cardBackFields.includes('qr')
+            return cardBackFields.filter(id => id !== 'qr').length > (qrOn ? 4 : 6)
+          })()}
           className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isSaving ? 'Saving…' : 'Save Profile'}

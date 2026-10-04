@@ -224,12 +224,29 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         : []
 
   const primaryPhone = phones?.[0]?.number ?? null
+  const selectedFields = profile.card_back_fields
+  const showQR = !selectedFields || selectedFields.includes('qr')
+  const sl = profile.social_links
 
-  const contactItems = [
-    primaryPhone ? formatPhone(primaryPhone) : null,
-    profile.email,
-    addrDisplay,
-  ].filter(Boolean) as string[]
+  const contactItems: string[] = []
+  if (primaryPhone && (!selectedFields || selectedFields.includes('phone')))
+    contactItems.push(formatPhone(primaryPhone))
+  if (profile.email && (!selectedFields || selectedFields.includes('email')))
+    contactItems.push(profile.email)
+  if (addrDisplay && (!selectedFields || selectedFields.includes('location')))
+    contactItems.push(addrDisplay)
+  if (sl?.linkedin && (!selectedFields || selectedFields.includes('linkedin')))
+    contactItems.push(sl.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\//, '').replace(/\/$/, ''))
+  if (sl?.twitter && (!selectedFields || selectedFields.includes('twitter')))
+    contactItems.push(sl.twitter.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))
+  if (sl?.instagram && (!selectedFields || selectedFields.includes('instagram')))
+    contactItems.push(sl.instagram.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))
+  if (sl?.github && (!selectedFields || selectedFields.includes('github')))
+    contactItems.push(sl.github.replace(/^https?:\/\/(www\.)?github\.com\//, '').replace(/\/$/, ''))
+  if (sl?.tiktok && (!selectedFields || selectedFields.includes('tiktok')))
+    contactItems.push(sl.tiktok.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))
+  if (profile.website && (!selectedFields || selectedFields.includes('website')))
+    contactItems.push(profile.website.replace(/^https?:\/\//, ''))
 
   return (
     <div
@@ -338,21 +355,23 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         }}
       >
         {/* QR — cream tinted */}
-        <div
-          style={{
-            background: CREAM,
-            borderRadius: 10,
-            padding: 6,
-          }}
-        >
-          <QRCodeSVG
-            value={`${pageUrl}?qr=1`}
-            size={72}
-            marginSize={1}
-            fgColor={NAVY}
-            bgColor={CREAM}
-          />
-        </div>
+        {showQR && (
+          <div
+            style={{
+              background: CREAM,
+              borderRadius: 10,
+              padding: 6,
+            }}
+          >
+            <QRCodeSVG
+              value={`${pageUrl}?qr=1`}
+              size={72}
+              marginSize={1}
+              fgColor={NAVY}
+              bgColor={CREAM}
+            />
+          </div>
+        )}
 
         <SaveContactButton
           profile={profile}
