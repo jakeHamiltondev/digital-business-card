@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Profile } from '@/lib/types'
 import type { Theme } from '@/lib/themes'
 import { getTheme } from '@/lib/themes'
@@ -35,6 +35,16 @@ export default function CardContainer({
   hasResume?: boolean
 }) {
   const [isFlipped, setIsFlipped] = useState(false)
+  const [hideFront, setHideFront] = useState(false)
+
+  useEffect(() => {
+    if (isFlipped) {
+      const timer = setTimeout(() => setHideFront(true), 350)
+      return () => clearTimeout(timer)
+    } else {
+      setHideFront(false)
+    }
+  }, [isFlipped])
 
   const userIsPro = isPro(profile)
   const baseTheme = getTheme(themeId ?? profile.theme)
@@ -66,8 +76,9 @@ export default function CardContainer({
           style={{
             position: 'absolute',
             inset: 0,
-            visibility: isFlipped ? 'hidden' : 'visible',
-            transition: `visibility 0s linear ${isFlipped ? '0.35s' : '0s'}`,
+            transformStyle: 'preserve-3d',
+            WebkitTransformStyle: 'preserve-3d',
+            opacity: hideFront ? 0 : 1,
           }}
         >
           <CardFront
@@ -78,22 +89,13 @@ export default function CardContainer({
             hasResume={hasResume}
           />
         </div>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            visibility: isFlipped ? 'visible' : 'hidden',
-            transition: `visibility 0s linear ${isFlipped ? '0s' : '0.35s'}`,
-          }}
-        >
-          <CardBack
-            profile={profile}
-            pageUrl={pageUrl}
-            userIsPro={userIsPro}
-            t={t}
-            hasResume={hasResume}
-          />
-        </div>
+        <CardBack
+          profile={profile}
+          pageUrl={pageUrl}
+          userIsPro={userIsPro}
+          t={t}
+          hasResume={hasResume}
+        />
       </div>
     </div>
   )
