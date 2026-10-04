@@ -62,20 +62,38 @@ export default function CardContainer({
           transition: 'transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1)',
         }}
       >
-        <CardFront
-          profile={profile}
-          pageUrl={pageUrl}
-          userIsPro={userIsPro}
-          t={t}
-          hasResume={hasResume}
-        />
-        <CardBack
-          profile={profile}
-          pageUrl={pageUrl}
-          userIsPro={userIsPro}
-          t={t}
-          hasResume={hasResume}
-        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            visibility: isFlipped ? 'hidden' : 'visible',
+            transition: `visibility 0s linear ${isFlipped ? '0.35s' : '0s'}`,
+          }}
+        >
+          <CardFront
+            profile={profile}
+            pageUrl={pageUrl}
+            userIsPro={userIsPro}
+            t={t}
+            hasResume={hasResume}
+          />
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            visibility: isFlipped ? 'visible' : 'hidden',
+            transition: `visibility 0s linear ${isFlipped ? '0s' : '0.35s'}`,
+          }}
+        >
+          <CardBack
+            profile={profile}
+            pageUrl={pageUrl}
+            userIsPro={userIsPro}
+            t={t}
+            hasResume={hasResume}
+          />
+        </div>
       </div>
     </div>
   )
