@@ -38,12 +38,7 @@ export default function CardContainer({
   const [hideFront, setHideFront] = useState(false)
 
   useEffect(() => {
-    if (isFlipped) {
-      const timer = setTimeout(() => setHideFront(true), 350)
-      return () => clearTimeout(timer)
-    } else {
-      setHideFront(false)
-    }
+    setHideFront(isFlipped)
   }, [isFlipped])
 
   const userIsPro = isPro(profile)
