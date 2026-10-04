@@ -102,6 +102,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
         background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -290,6 +291,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
         display: 'flex',
         flexDirection: 'column',

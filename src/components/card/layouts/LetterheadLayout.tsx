@@ -151,6 +151,7 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
         background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -358,6 +359,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
         display: 'flex',
         flexDirection: 'column',
@@ -418,7 +420,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
               textOverflow: 'ellipsis',
             }}
           >
-            {profile.title}{profile.company ? ` · ${profile.company}` : ''}
+            {profile.title || profile.company}
           </div>
         </div>
       </div>

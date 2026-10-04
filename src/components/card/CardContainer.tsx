@@ -48,7 +48,7 @@ export default function CardContainer({
   return (
     <div
       className="mx-auto cursor-pointer select-none"
-      style={{ width: 280, perspective: '1200px' }}
+      style={{ width: 280, perspective: '1200px', WebkitPerspective: '1200px' }}
       onClick={handleFlip}
     >
       <div
@@ -57,6 +57,7 @@ export default function CardContainer({
           width: 280,
           height: 420,
           transformStyle: 'preserve-3d',
+          WebkitTransformStyle: 'preserve-3d',
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
           transition: 'transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1)',
         }}
