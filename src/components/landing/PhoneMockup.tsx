@@ -38,6 +38,7 @@ const BASE: Omit<Profile, 'username' | 'full_name' | 'title' | 'company' | 'bio'
   recruiter_info: null,
   card_layout: null,
   card_back_fields: null,
+  resume_url: null,
 }
 
 const studentProfile: Profile = {
