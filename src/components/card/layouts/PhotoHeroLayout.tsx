@@ -325,8 +325,8 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         )}
       </div>
 
-      {/* Resume link — gated until Pro launch (do not change false &&) */}
-      {false && hasResume && (
+      {/* Resume link — shows when user has a resume (uploaded or built) */}
+      {hasResume && (
         <a
           href={`/${profile.username}/resume`}
           className="mb-2 inline-block text-xs underline underline-offset-4"

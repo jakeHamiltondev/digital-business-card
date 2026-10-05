@@ -330,8 +330,8 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         </div>
       )}
 
-      {/* Resume link — gated until Pro launch (do not change false &&) */}
-      {false && hasResume && (
+      {/* Resume link — shows when user has a resume (uploaded or built) */}
+      {hasResume && (
         <a
           href={`/${profile.username}/resume`}
           style={{ color: GOLD, fontSize: 12, textDecoration: 'underline' }}

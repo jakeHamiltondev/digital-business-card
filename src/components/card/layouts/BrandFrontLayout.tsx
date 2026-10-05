@@ -307,8 +307,8 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         </div>
       </div>
 
-      {/* Resume link — gated until Pro launch (do not change false &&) */}
-      {false && hasResume && (
+      {/* Resume link — shows when user has a resume (uploaded or built) */}
+      {hasResume && (
         <a
           href={`/${profile.username}/resume`}
           className="mt-2 inline-block text-xs underline underline-offset-4"
