@@ -108,7 +108,7 @@ function SignInButtonsDark() {
 const comparisonRows = [
   { paper: 'Runs out before the event ends', linkfol: 'Never runs out' },
   { paper: 'Reprint every time info changes', linkfol: 'Edit your profile in seconds' },
-  { paper: 'In-person handoff only', linkfol: 'QR code, link, or NFC tap' },
+  { paper: 'In-person handoff only', linkfol: 'QR code or shareable link' },
   { paper: 'No way to follow up', linkfol: 'See who scanned your card' },
   { paper: 'Just a name and number', linkfol: 'Full profile — bio, links, resume' },
 ]
