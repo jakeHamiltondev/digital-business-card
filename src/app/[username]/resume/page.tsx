@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Profile, ResumeEntry, ResumeEntryType } from '@/lib/types'
 import { Download } from 'lucide-react'
@@ -82,6 +83,16 @@ export default async function PublicResumePage({ params }: Props) {
   const entries = (entriesData ?? []) as ResumeEntry[]
 
   if (entries.length === 0) {
+    // If they uploaded a PDF but haven't used the builder, redirect to the PDF directly
+    if (profile.resume_url) {
+      const { data: signedData } = await supabase.storage
+        .from('resumes')
+        .createSignedUrl(profile.resume_url, 3600)
+      if (signedData?.signedUrl) {
+        redirect(signedData.signedUrl)
+      }
+    }
+
     return (
       <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-4 dark:bg-black">
         <div className="text-center">

@@ -79,6 +79,8 @@ export type Profile = {
   card_layout: string | null
   // Card back field visibility — null = show all (backward compat)
   card_back_fields: string[] | null
+  // Uploaded resume PDF — Supabase Storage path, not a signed URL
+  resume_url: string | null
 }
 
 export type ResumeEntryType = 'experience' | 'education' | 'skill' | 'project' | 'certification'

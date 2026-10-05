@@ -4,6 +4,58 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { ResumeEntry, ResumeEntryType } from '@/lib/types'
 
+export async function uploadResume(formData: FormData): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const file = formData.get('file') as File | null
+  if (!file) return { error: 'No file provided.' }
+  if (file.type !== 'application/pdf') return { error: 'File must be a PDF.' }
+  if (file.size > 5 * 1024 * 1024) return { error: 'File must be under 5 MB.' }
+
+  const path = `${user.id}/resume.pdf`
+
+  const { error: uploadError } = await supabase.storage
+    .from('resumes')
+    .upload(path, file, { upsert: true, contentType: 'application/pdf' })
+
+  if (uploadError) return { error: 'Upload failed. Please try again.' }
+
+  const { error: dbError } = await supabase
+    .from('profiles')
+    .update({ resume_url: path })
+    .eq('id', user.id)
+
+  if (dbError) return { error: dbError.message }
+
+  revalidatePath('/dashboard/resume')
+  return { error: null }
+}
+
+export async function deleteResume(): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const path = `${user.id}/resume.pdf`
+  await supabase.storage.from('resumes').remove([path])
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ resume_url: null })
+    .eq('id', user.id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/resume')
+  return { error: null }
+}
+
 export async function getResumeEntries(userId: string): Promise<ResumeEntry[]> {
   const supabase = await createClient()
   const { data } = await supabase

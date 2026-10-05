@@ -172,7 +172,7 @@ export default async function UserCardPage({ params, searchParams }: Props) {
     .from('resume_entries')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', profile.id)
-  const hasResume = (resumeCount ?? 0) > 0
+  const hasResume = (resumeCount ?? 0) > 0 || !!profile.resume_url
 
   async function signInToSave() {
     'use server'
