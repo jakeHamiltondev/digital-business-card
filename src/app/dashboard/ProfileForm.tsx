@@ -874,21 +874,6 @@ export default function ProfileForm({
 
         {activeTab === 'contact' && (
           <>
-            <CardBackPicker
-              email={email}
-              phones={phones}
-              linkedin={linkedin}
-              twitter={twitter}
-              instagram={instagram}
-              github={github}
-              tiktok={tiktok}
-              website={website}
-              location={location}
-              hasResume={hasResume}
-              username={username}
-              value={cardBackFields}
-              onChange={setCardBackFields}
-            />
             {PERSONA_CONFIG[persona].editorSections
               .filter((s) => s.id === 'contact' || s.id === 'address' || s.id === 'scheduling')
               .map(renderSection)}
@@ -1052,6 +1037,25 @@ export default function ProfileForm({
           </>
         )}
       </div>
+
+      {/* Card Back — standalone section, always visible */}
+      <section className="border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <CardBackPicker
+          email={email}
+          phones={phones}
+          linkedin={linkedin}
+          twitter={twitter}
+          instagram={instagram}
+          github={github}
+          tiktok={tiktok}
+          website={website}
+          location={location}
+          hasResume={hasResume}
+          username={username}
+          value={cardBackFields}
+          onChange={setCardBackFields}
+        />
+      </section>
 
       {/* Sticky save — always visible */}
       <div className="sticky bottom-20 z-30 flex items-center justify-end gap-3 py-3 md:bottom-4">
