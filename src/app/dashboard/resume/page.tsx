@@ -49,6 +49,12 @@ export default async function ResumePage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <main className="mx-auto max-w-2xl space-y-10 px-4 py-10">
+        <Link
+          href="/dashboard"
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+        >
+          ← Back
+        </Link>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
