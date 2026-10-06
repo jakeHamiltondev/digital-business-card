@@ -56,7 +56,8 @@ export default async function DashboardPage(props: {
 
   const cardUrl = profile ? `${siteUrl}/${profile.username}` : null
   const qrUrl = cardUrl ? `${cardUrl}?qr=1` : null
-  const isIncomplete = profile && (!profile.full_name || !profile.title)
+  const hasContact = !!(profile?.email || profile?.phones?.length || profile?.website)
+  const isIncomplete = profile && (!profile.full_name || !profile.title || !hasContact)
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
