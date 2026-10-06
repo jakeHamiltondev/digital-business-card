@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Eye, QrCode, Camera } from 'lucide-react'
+import { Eye, QrCode, Camera, FileText } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import BusinessCard from '@/components/BusinessCard'
 import UpgradeToast from '@/components/UpgradeToast'
@@ -140,6 +140,13 @@ export default async function DashboardPage(props: {
           >
             <Camera className="h-4 w-4" />
             Scan QR Code
+          </Link>
+          <Link
+            href="/dashboard/resume"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <FileText className="h-4 w-4" />
+            Resume
           </Link>
         </div>
       </main>

@@ -13,14 +13,34 @@ export async function uploadResume(formData: FormData): Promise<{ error: string 
 
   const file = formData.get('file') as File | null
   if (!file) return { error: 'No file provided.' }
-  if (file.type !== 'application/pdf') return { error: 'File must be a PDF.' }
+
+  const ALLOWED_TYPES: Record<string, string> = {
+    'application/pdf': 'pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    'application/msword': 'doc',
+  }
+  const ext = ALLOWED_TYPES[file.type]
+  if (!ext) return { error: 'File must be a PDF or Word document.' }
   if (file.size > 5 * 1024 * 1024) return { error: 'File must be under 5 MB.' }
 
-  const path = `${user.id}/resume.pdf`
+  // NOTE: Run this SQL in Supabase dashboard to allow DOCX uploads:
+  // UPDATE storage.buckets SET allowed_mime_types = array['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'] WHERE id = 'resumes';
+
+  // Delete any existing resume file (may have a different extension)
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('resume_url')
+    .eq('id', user.id)
+    .single()
+  if (profileData?.resume_url) {
+    await supabase.storage.from('resumes').remove([profileData.resume_url])
+  }
+
+  const path = `${user.id}/resume.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from('resumes')
-    .upload(path, file, { upsert: true, contentType: 'application/pdf' })
+    .upload(path, file, { upsert: true, contentType: file.type })
 
   if (uploadError) return { error: 'Upload failed. Please try again.' }
 
@@ -42,8 +62,14 @@ export async function deleteResume(): Promise<{ error: string | null }> {
   } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const path = `${user.id}/resume.pdf`
-  await supabase.storage.from('resumes').remove([path])
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('resume_url')
+    .eq('id', user.id)
+    .single()
+  if (profileData?.resume_url) {
+    await supabase.storage.from('resumes').remove([profileData.resume_url])
+  }
 
   const { error } = await supabase
     .from('profiles')

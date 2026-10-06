@@ -22,8 +22,13 @@ export default function ResumeUploadSection({
     e.target.value = ''
     if (!file) return
 
-    if (file.type !== 'application/pdf') {
-      setError('File must be a PDF.')
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+    ]
+    if (!allowedTypes.includes(file.type)) {
+      setError('File must be a PDF or Word document.')
       return
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -122,7 +127,7 @@ export default function ResumeUploadSection({
           ) : (
             <>
               <Upload className="h-4 w-4" />
-              Upload Resume (PDF, max 5 MB)
+              Upload Resume (PDF or Word, max 5 MB)
             </>
           )}
         </button>
@@ -131,7 +136,7 @@ export default function ResumeUploadSection({
       <input
         ref={inputRef}
         type="file"
-        accept="application/pdf"
+        accept=".pdf,.docx,.doc"
         className="hidden"
         onChange={handleFileChange}
       />

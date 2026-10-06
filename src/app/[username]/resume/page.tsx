@@ -124,6 +124,16 @@ export default async function PublicResumePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 print:bg-white">
       <div className="mx-auto max-w-3xl px-6 py-12 print:px-8 print:py-8">
+        {/* Back link — hidden when printing */}
+        <div className="mb-6 print:hidden">
+          <Link
+            href={`/${username}`}
+            className="text-sm text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
+          >
+            ← Back
+          </Link>
+        </div>
+
         {/* Download buttons — hidden when printing */}
         <div className="mb-6 flex justify-end gap-2 print:hidden">
           <a
@@ -254,15 +264,6 @@ export default async function PublicResumePage({ params }: Props) {
           })}
         </main>
 
-        {/* Back link — hidden when printing */}
-        <div className="mt-12 border-t border-zinc-100 pt-6 dark:border-zinc-800 print:hidden">
-          <Link
-            href={`/${username}`}
-            className="text-sm text-zinc-400 transition-colors hover:text-zinc-700 dark:hover:text-zinc-200"
-          >
-            ← Back to {profile.full_name ?? `@${username}`}&apos;s card
-          </Link>
-        </div>
       </div>
     </div>
   )
