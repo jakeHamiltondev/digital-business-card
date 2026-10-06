@@ -325,20 +325,8 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
         )}
       </div>
 
-      {/* Resume link — shows when user has a resume (uploaded or built) */}
-      {hasResume && (
-        <a
-          href={`/${profile.username}/resume`}
-          className="mb-2 inline-block text-xs underline underline-offset-4"
-          style={{ color: cc.textMuted }}
-          onClick={e => e.stopPropagation()}
-        >
-          View my resume →
-        </a>
-      )}
-
       {/* ── Contact rows ── */}
-      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} selectedFields={selectedFields} />
+      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} selectedFields={selectedFields} hasResume={hasResume} />
 
       {/* Spacer pushes QR + save to bottom */}
       <div style={{ flex: 1 }} />

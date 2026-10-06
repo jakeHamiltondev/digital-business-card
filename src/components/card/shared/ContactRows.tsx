@@ -1,6 +1,6 @@
 'use client'
 
-import { Phone, Mail, Globe, MapPin, Calendar } from 'lucide-react'
+import { Phone, Mail, Globe, MapPin, Calendar, FileText } from 'lucide-react'
 import type { Profile } from '@/lib/types'
 import type { Theme } from '@/lib/themes'
 import { getContrastColor } from '@/lib/color-utils'
@@ -31,7 +31,7 @@ type Row = {
   multiline?: string[]
 }
 
-function buildRows(profile: Profile, iconColor: string, selectedFields?: string[] | null): Row[] {
+function buildRows(profile: Profile, iconColor: string, selectedFields?: string[] | null, hasResume?: boolean): Row[] {
   const sel = selectedFields  // null = show all
   const rows: Row[] = []
 
@@ -185,6 +185,15 @@ function buildRows(profile: Profile, iconColor: string, selectedFields?: string[
     })
   }
 
+  if (hasResume && (!sel || sel.includes('resume'))) {
+    rows.push({
+      id: 'resume',
+      href: `/${profile.username}/resume`,
+      icon: <FileText className="h-4 w-4 shrink-0" style={{ color: iconColor }} />,
+      label: 'Resume',
+    })
+  }
+
   return rows
 }
 
@@ -195,6 +204,7 @@ export default function ContactRows({
   maxRows = 5,
   hideOverflowLink = false,
   selectedFields,
+  hasResume,
 }: {
   profile: Profile
   pageUrl: string
@@ -202,8 +212,9 @@ export default function ContactRows({
   maxRows?: number
   hideOverflowLink?: boolean
   selectedFields?: string[] | null
+  hasResume?: boolean
 }) {
-  const rows = buildRows(profile, t.colors.iconColor, selectedFields)
+  const rows = buildRows(profile, t.colors.iconColor, selectedFields, hasResume)
   const visible = rows.slice(0, maxRows)
   const hasOverflow = rows.length > maxRows
   const border = dividerColor(t)

@@ -39,6 +39,12 @@ export default async function EditProfilePage() {
     profile = created as Profile | null
   }
 
+  const { count: resumeCount } = await supabase
+    .from('resume_entries')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  const hasResume = (resumeCount ?? 0) > 0 || !!(profile as Profile | null)?.resume_url
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <main className="mx-auto max-w-2xl space-y-12 px-4 py-10 pb-24 md:pb-10">
@@ -47,7 +53,7 @@ export default async function EditProfilePage() {
             Edit Profile
           </h2>
           {profile ? (
-            <ProfileForm profile={profile} userId={user.id} />
+            <ProfileForm profile={profile} userId={user.id} hasResume={hasResume} />
           ) : (
             <p className="text-sm text-red-600 dark:text-red-400">
               Failed to load profile. Please refresh the page.

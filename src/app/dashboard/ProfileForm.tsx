@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { X, Plus, Lock, Mail, Phone, Globe, MapPin, QrCode } from 'lucide-react'
+import { X, Plus, Lock, Mail, Phone, Globe, MapPin, QrCode, FileText } from 'lucide-react'
 import ProfileTabs from '@/components/ProfileTabs'
 import type { TabId } from '@/components/ProfileTabs'
 import AvatarUpload from '@/components/AvatarUpload'
@@ -337,10 +337,12 @@ function TikTokPickerIcon() {
 
 function CardBackPicker({
   email, phones, linkedin, twitter, instagram, github, tiktok, website, location,
+  hasResume, username,
   value, onChange,
 }: {
   email: string; phones: PhoneEntry[]; linkedin: string; twitter: string; instagram: string
   github: string; tiktok: string; website: string; location: string
+  hasResume?: boolean; username: string
   value: string[] | null; onChange: (v: string[] | null) => void
 }) {
   type FieldRow = { id: string; label: string; displayValue: string; icon: React.ReactNode }
@@ -365,8 +367,11 @@ function CardBackPicker({
     available.push({ id: 'website', label: 'Website', displayValue: website.replace(/^https?:\/\//i, '').replace(/\/$/, '').slice(0, 40), icon: <Globe className="h-4 w-4 shrink-0 text-zinc-500" /> })
   if (location)
     available.push({ id: 'location', label: 'Location', displayValue: location, icon: <MapPin className="h-4 w-4 shrink-0 text-zinc-500" /> })
+  if (hasResume)
+    available.push({ id: 'resume', label: 'Resume', displayValue: `/${username}/resume`, icon: <FileText className="h-4 w-4 shrink-0 text-zinc-500" /> })
 
-  const allIds = [...available.map(f => f.id), 'qr']
+  // Resume is opt-in, so it's excluded from the default "show all" selection
+  const allIds = [...available.filter(f => f.id !== 'resume').map(f => f.id), 'qr']
   const effectiveSelected = value ?? allIds
 
   const isOn = (id: string) => effectiveSelected.includes(id)
@@ -435,9 +440,11 @@ function CardBackPicker({
 export default function ProfileForm({
   profile,
   userId,
+  hasResume = false,
 }: {
   profile: Profile
   userId: string
+  hasResume?: boolean
 }) {
   const userIsPro = isPro(profile)
   const social = profile.social_links ?? {}
@@ -877,6 +884,8 @@ export default function ProfileForm({
               tiktok={tiktok}
               website={website}
               location={location}
+              hasResume={hasResume}
+              username={username}
               value={cardBackFields}
               onChange={setCardBackFields}
             />

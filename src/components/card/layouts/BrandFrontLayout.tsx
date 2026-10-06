@@ -307,18 +307,6 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         </div>
       </div>
 
-      {/* Resume link — shows when user has a resume (uploaded or built) */}
-      {hasResume && (
-        <a
-          href={`/${profile.username}/resume`}
-          className="mt-2 inline-block text-xs underline underline-offset-4"
-          style={{ color: cc.textMuted }}
-          onClick={e => e.stopPropagation()}
-        >
-          View my resume →
-        </a>
-      )}
-
       {/* ── Action buttons ── */}
       <div style={{ marginTop: 6 }}>
         <ActionButtons profile={profile} t={brandT} />
@@ -326,7 +314,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
 
       {/* ── Contact rows (max 3 keeps layout on-card without scrolling) ── */}
       <div style={{ marginTop: 6 }}>
-        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} hideOverflowLink selectedFields={selectedFields} />
+        <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} hideOverflowLink selectedFields={selectedFields} hasResume={hasResume} />
       </div>
 
       {/* Spacer pushes QR + save to bottom */}

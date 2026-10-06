@@ -1,5 +1,6 @@
 'use client'
 
+import { FileText } from 'lucide-react'
 import type { LayoutFaceProps } from '../types'
 import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
 import { getThemeCardColors } from '@/lib/themes'
@@ -394,6 +395,8 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
     contactRows.push({ id: 'website', icon: <WebsiteIcon16 />, value: profile.website.replace(/^https?:\/\//, ''), href: profile.website })
   if (profile.location && (!selectedFields || selectedFields.includes('location')))
     contactRows.push({ id: 'location', icon: <MapPinIcon16 />, value: profile.location, href: null })
+  if (hasResume && (!selectedFields || selectedFields.includes('resume')))
+    contactRows.push({ id: 'resume', icon: <FileText width={16} height={16} />, value: 'Resume', href: `/${profile.username}/resume` })
 
   return (
     <div
@@ -522,18 +525,6 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
           return <div key={row.id} style={rowStyle}>{inner}</div>
         })}
       </div>
-
-      {/* Resume link — shows when user has a resume (uploaded or built) */}
-      {hasResume && (
-        <a
-          href={`/${profile.username}/resume`}
-          className="mb-2 inline-block text-xs underline underline-offset-4"
-          style={{ color: cc.textMuted }}
-          onClick={e => e.stopPropagation()}
-        >
-          View my resume →
-        </a>
-      )}
 
       {/* ── QR area — pushed to bottom ── */}
       {showQR && (

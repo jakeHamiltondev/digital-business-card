@@ -300,7 +300,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
       </div>
 
       {/* ── Middle: contact rows ── */}
-      {contactItems.length > 0 && (
+      {(contactItems.length > 0 || (hasResume && (!selectedFields || selectedFields.includes('resume')))) && (
         <div
           style={{
             marginTop: 20,
@@ -327,18 +327,26 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
               {item}
             </p>
           ))}
+          {hasResume && (!selectedFields || selectedFields.includes('resume')) && (
+            <a
+              href={`/${profile.username}/resume`}
+              style={{
+                fontFamily: cormorant.style.fontFamily,
+                fontWeight: 500,
+                fontSize: 13,
+                color: CREAM,
+                textAlign: 'center',
+                margin: 0,
+                opacity: 0.85,
+                textDecoration: 'underline',
+                display: 'block',
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              Resume
+            </a>
+          )}
         </div>
-      )}
-
-      {/* Resume link — shows when user has a resume (uploaded or built) */}
-      {hasResume && (
-        <a
-          href={`/${profile.username}/resume`}
-          style={{ color: GOLD, fontSize: 12, textDecoration: 'underline' }}
-          onClick={e => e.stopPropagation()}
-        >
-          View my resume →
-        </a>
       )}
 
       {/* Spacer pushes QR + save to bottom */}
