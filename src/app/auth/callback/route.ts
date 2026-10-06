@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           .maybeSingle()
 
         if (profile?.full_name) {
-          return NextResponse.redirect(new URL(`/${profile.username}`, origin))
+          return NextResponse.redirect(new URL('/dashboard', origin))
         }
 
         const refCookie = request.cookies.get('lf_ref')?.value

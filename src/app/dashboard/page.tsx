@@ -54,7 +54,6 @@ export default async function DashboardPage(props: {
     profile = created as Profile | null
   }
 
-  const displayName = profile?.full_name ?? profile?.username ?? 'there'
   const cardUrl = profile ? `${siteUrl}/${profile.username}` : null
   const qrUrl = cardUrl ? `${cardUrl}?qr=1` : null
   const isIncomplete = profile && (!profile.full_name || !profile.title)
@@ -78,44 +77,24 @@ export default async function DashboardPage(props: {
           </div>
         )}
 
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Welcome back, {displayName}
-        </h1>
-
-        <div className="flex gap-4">
-          <div className="rounded-2xl border border-zinc-200 bg-white px-6 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{totalViews ?? 0}</p>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Total card views</p>
-          </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white px-6 py-5 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{recentViews ?? 0}</p>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Views last 7 days</p>
-          </div>
-        </div>
-
         {profile && cardUrl && (
-          <section id="share">
-            <h2 className="mb-6 text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Share Your Card
-            </h2>
-            <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
-              {/* Card preview */}
-              <div className="flex justify-center sm:flex-1">
-                <BusinessCard profile={profile} pageUrl={cardUrl!} theme={profile.theme ?? 'midnight'} />
-              </div>
-
-              {/* Share tools */}
-              <div className="flex flex-col items-center gap-5 sm:flex-1">
-                <QRCodeBlock url={cardUrl} qrUrl={qrUrl ?? undefined} />
-                <Link
-                  href={`/${profile.username}`}
-                  className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  View my card
-                </Link>
-              </div>
+          <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
+            {/* Card preview */}
+            <div className="flex justify-center sm:flex-1">
+              <BusinessCard profile={profile} pageUrl={cardUrl!} theme={profile.theme ?? 'midnight'} />
             </div>
-          </section>
+
+            {/* Share tools */}
+            <div className="flex flex-col items-center gap-5 sm:flex-1">
+              <QRCodeBlock url={cardUrl} qrUrl={qrUrl ?? undefined} />
+              <Link
+                href={`/${profile.username}`}
+                className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                View my card
+              </Link>
+            </div>
+          </div>
         )}
 
         {/* Quick actions */}
@@ -149,6 +128,11 @@ export default async function DashboardPage(props: {
             Resume
           </Link>
         </div>
+
+        {/* Stats */}
+        <p className="text-center text-sm text-zinc-400 dark:text-zinc-500">
+          {totalViews ?? 0} total views · {recentViews ?? 0} this week
+        </p>
       </main>
     </div>
   )

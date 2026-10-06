@@ -298,7 +298,7 @@ export default function OnboardingClient({
       theme,
     })
     if (result.success && result.username) {
-      router.push(`/${result.username}`)
+      router.push('/dashboard')
     } else {
       setSaveError(result.error ?? 'Something went wrong. Please try again.')
       setIsSaving(false)
