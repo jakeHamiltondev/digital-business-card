@@ -100,96 +100,117 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
         padding: '20px 24px',
       }}
     >
-      {/* Logo — Pro + logo only */}
-      {userIsPro && profile.logo_url && (
-        <>
+      {/* ── Brand section: logo + company name, vertically centered in upper half ── */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        {userIsPro && profile.logo_url && (
           <img
             src={profile.logo_url}
             alt="Logo"
-            style={{ height: 96, maxWidth: 200, objectFit: 'contain', marginBottom: 6 }}
+            style={{ height: 96, maxWidth: 200, objectFit: 'contain', marginBottom: 14 }}
           />
-        </>
-      )}
+        )}
 
-      {/* Company / university name — fallback label when logo doesn't include text */}
-      {orgDisplay && (
-        <p
-          style={{
-            fontFamily: cormorant.style.fontFamily,
-            fontWeight: 500,
-            fontSize: 11,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: cc.textMuted,
-            textAlign: 'center',
-            opacity: 0.7,
-          }}
-        >
-          {orgDisplay}
-        </p>
-      )}
+        {/* Company / university name — fallback label when logo doesn't include text */}
+        {orgDisplay && (
+          <p
+            style={{
+              fontFamily: cormorant.style.fontFamily,
+              fontWeight: 500,
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: cc.textMuted,
+              textAlign: 'center',
+              opacity: 0.7,
+              margin: 0,
+            }}
+          >
+            {orgDisplay}
+          </p>
+        )}
+      </div>
 
       <Rule color={cc.buttonBg} />
 
-      {/* Full name — small-caps */}
-      <h1
+      {/* ── Person section: name + title + rule + contacts, centered in lower half ── */}
+      <div
         style={{
-          fontFamily: cormorant.style.fontFamily,
-          fontWeight: 500,
-          fontSize: 28,
-          fontVariant: 'small-caps',
-          color: cc.text,
-          textAlign: 'center',
-          lineHeight: 1.1,
-          margin: 0,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
         }}
       >
-        {profile.full_name || profile.username}
-      </h1>
-
-      {/* Title — italic */}
-      {titleDisplay && (
-        <p
+        {/* Full name — small-caps */}
+        <h1
           style={{
             fontFamily: cormorant.style.fontFamily,
-            fontStyle: 'italic',
             fontWeight: 500,
-            fontSize: 17,
-            color: cc.textMuted,
+            fontSize: 28,
+            fontVariant: 'small-caps',
+            color: cc.text,
             textAlign: 'center',
-            marginTop: 4,
+            lineHeight: 1.1,
+            margin: 0,
           }}
         >
-          {titleDisplay}
-        </p>
-      )}
+          {profile.full_name || profile.username}
+        </h1>
 
-      <Rule color={cc.buttonBg} />
+        {/* Title — italic */}
+        {titleDisplay && (
+          <p
+            style={{
+              fontFamily: cormorant.style.fontFamily,
+              fontStyle: 'italic',
+              fontWeight: 500,
+              fontSize: 17,
+              color: cc.textMuted,
+              textAlign: 'center',
+              marginTop: 4,
+            }}
+          >
+            {titleDisplay}
+          </p>
+        )}
 
-      {/* Contact stack */}
-      {contactItems.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-          {contactItems.map((item, i) => (
-            <p
-              key={i}
-              style={{
-                fontFamily: cormorant.style.fontFamily,
-                fontWeight: 500,
-                fontSize: 12,
-                color: cc.textMuted,
-                textAlign: 'center',
-                margin: 0,
-              }}
-            >
-              {item}
-            </p>
-          ))}
-        </div>
-      )}
+        <Rule color={cc.buttonBg} />
+
+        {/* Contact stack */}
+        {contactItems.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            {contactItems.map((item, i) => (
+              <p
+                key={i}
+                style={{
+                  fontFamily: cormorant.style.fontFamily,
+                  fontWeight: 500,
+                  fontSize: 12,
+                  color: cc.textMuted,
+                  textAlign: 'center',
+                  margin: 0,
+                }}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
