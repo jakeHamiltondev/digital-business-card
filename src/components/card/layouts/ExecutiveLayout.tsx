@@ -145,14 +145,15 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
 
       <Rule color={cc.buttonBg} />
 
-      {/* ── Person section: name + title + rule + contacts, centered in lower half ── */}
+      {/* ── Person section: name + title + rule + contacts, pinned to top of lower half ── */}
       <div
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
+          paddingTop: 6,
           width: '100%',
         }}
       >
