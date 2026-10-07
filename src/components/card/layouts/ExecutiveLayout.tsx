@@ -206,7 +206,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
     ? (profile.student_info?.university ?? null)
     : (profile.company ?? null)
 
-  // Build contact items for the middle section
+  // Company location — shown in header alongside logo and company name
   const addrDisplay = (() => {
     if (profile.address_visibility === 'public' && profile.work_address) {
       const a = profile.work_address
@@ -231,10 +231,8 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
   const contactItems: string[] = []
   if (primaryPhone && (!selectedFields || selectedFields.includes('phone')))
     contactItems.push(formatPhone(primaryPhone))
-  if (profile.email && (!selectedFields || selectedFields.includes('email')))
-    contactItems.push(profile.email)
-  if (addrDisplay && (!selectedFields || selectedFields.includes('location')))
-    contactItems.push(addrDisplay)
+  // email omitted — already shown on the front
+  // location omitted — shown in header alongside company name
   if (sl?.linkedin && (!selectedFields || selectedFields.includes('linkedin')))
     contactItems.push(sl.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\//, '').replace(/\/$/, ''))
   if (sl?.twitter && (!selectedFields || selectedFields.includes('twitter')))
@@ -293,6 +291,22 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
             }}
           >
             {orgDisplay}
+          </p>
+        )}
+
+        {addrDisplay && (
+          <p
+            style={{
+              fontFamily: cormorant.style.fontFamily,
+              fontWeight: 500,
+              fontSize: 12,
+              color: CREAM,
+              textAlign: 'center',
+              margin: 0,
+              opacity: 0.65,
+            }}
+          >
+            {addrDisplay}
           </p>
         )}
 
