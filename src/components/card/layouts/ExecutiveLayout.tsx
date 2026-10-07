@@ -1,12 +1,14 @@
 'use client'
 
 // Layout C — Executive Classic
-// Paper-like, serif typography, fixed color palette. No photo.
+// Paper-like, serif typography, theme-driven color palette. No photo.
 
 import { Cormorant_Garamond } from 'next/font/google'
 import { QRCodeSVG } from 'qrcode.react'
 import type { LayoutFaceProps } from '../types'
 import { getPersonaConfig } from '@/lib/persona-config'
+import { generateCardColors, getContrastColor, type CardColorTokens } from '@/lib/color-utils'
+import { getThemeCardColors } from '@/lib/themes'
 import SaveContactButton from '../shared/SaveContactButton'
 
 // Cormorant Garamond — loaded at module level per next/font requirements
@@ -16,15 +18,6 @@ const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
   display: 'swap',
 })
-
-// ── Fixed palette ─────────────────────────────────────────────────────────────
-const PAPER  = '#fbfaf7'
-const NAVY   = '#1d2a36'
-const GOLD   = '#b39b76'
-const CREAM  = '#efe9df'
-const INK    = '#1d1510'
-const WARM   = '#5a4f44'
-const MUTED  = '#8a7b6e'
 
 const SHADOW = '0 18px 40px -18px rgba(10,20,40,0.45), 0 2px 6px rgba(10,20,40,0.12)'
 
@@ -38,13 +31,13 @@ function formatPhone(raw: string): string {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
 }
 
-function GoldRule() {
+function Rule({ color }: { color: string }) {
   return (
     <div
       style={{
         width: 64,
         height: 1,
-        background: GOLD,
+        background: color,
         margin: '12px auto',
       }}
     />
@@ -55,6 +48,10 @@ function GoldRule() {
 
 export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
   const vcardCfg = getPersonaConfig(profile.persona).vcard
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
 
   const orgDisplay = vcardCfg.orgSource === 'university'
     ? (profile.student_info?.university ?? null)
@@ -96,7 +93,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: PAPER,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
@@ -127,16 +124,15 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
             fontSize: 14,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: WARM,
+            color: cc.textMuted,
             textAlign: 'center',
-            marginBottom: userIsPro && profile.logo_url ? 0 : 0,
           }}
         >
           {orgDisplay}
         </p>
       )}
 
-      <GoldRule />
+      <Rule color={cc.buttonBg} />
 
       {/* Full name — small-caps */}
       <h1
@@ -145,7 +141,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
           fontWeight: 500,
           fontSize: 28,
           fontVariant: 'small-caps',
-          color: INK,
+          color: cc.text,
           textAlign: 'center',
           lineHeight: 1.1,
           margin: 0,
@@ -162,7 +158,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
             fontStyle: 'italic',
             fontWeight: 500,
             fontSize: 17,
-            color: WARM,
+            color: cc.textMuted,
             textAlign: 'center',
             marginTop: 4,
           }}
@@ -171,7 +167,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
         </p>
       )}
 
-      <GoldRule />
+      <Rule color={cc.buttonBg} />
 
       {/* Contact stack */}
       {contactItems.length > 0 && (
@@ -183,7 +179,7 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
                 fontFamily: cormorant.style.fontFamily,
                 fontWeight: 500,
                 fontSize: 12,
-                color: MUTED,
+                color: cc.textMuted,
                 textAlign: 'center',
                 margin: 0,
               }}
@@ -201,12 +197,20 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
 
 export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: LayoutFaceProps) {
   const vcardCfg = getPersonaConfig(profile.persona).vcard
+  const hasBrandColors = userIsPro && !!profile.brand_color_primary
+  const cc: CardColorTokens = hasBrandColors
+    ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
+    : getThemeCardColors(profile.theme)
+
+  // QR dots must read against cc.qrBg (always white).
+  // Dark-bg themes: use cc.bg (dark) as dots. Light-bg themes: use cc.text (also dark).
+  const qrDot = getContrastColor(cc.bg) === '#ffffff' ? cc.bg : cc.text
 
   const orgDisplay = vcardCfg.orgSource === 'university'
     ? (profile.student_info?.university ?? null)
     : (profile.company ?? null)
 
-  // Build contact items for the middle section
+  // Company location — shown in header alongside logo and company name
   const addrDisplay = (() => {
     if (profile.address_visibility === 'public' && profile.work_address) {
       const a = profile.work_address
@@ -231,10 +235,8 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
   const contactItems: string[] = []
   if (primaryPhone && (!selectedFields || selectedFields.includes('phone')))
     contactItems.push(formatPhone(primaryPhone))
-  if (profile.email && (!selectedFields || selectedFields.includes('email')))
-    contactItems.push(profile.email)
-  if (addrDisplay && (!selectedFields || selectedFields.includes('location')))
-    contactItems.push(addrDisplay)
+  // email omitted — already shown on the front
+  // location omitted — shown in header alongside company name
   if (sl?.linkedin && (!selectedFields || selectedFields.includes('linkedin')))
     contactItems.push(sl.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\//, '').replace(/\/$/, ''))
   if (sl?.twitter && (!selectedFields || selectedFields.includes('twitter')))
@@ -255,7 +257,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: NAVY,
+        background: cc.bg,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
@@ -266,7 +268,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
         padding: '32px 24px 24px',
       }}
     >
-      {/* ── Top: logo + company name + rule ── */}
+      {/* ── Top: logo + company name + location + rule ── */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         {userIsPro && profile.logo_url && (
           <img
@@ -288,7 +290,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
               fontSize: 16,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: CREAM,
+              color: cc.text,
               textAlign: 'center',
             }}
           >
@@ -296,7 +298,23 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           </p>
         )}
 
-        <div style={{ width: 64, height: 1, background: GOLD }} />
+        {addrDisplay && (
+          <p
+            style={{
+              fontFamily: cormorant.style.fontFamily,
+              fontWeight: 500,
+              fontSize: 12,
+              color: cc.text,
+              textAlign: 'center',
+              margin: 0,
+              opacity: 0.65,
+            }}
+          >
+            {addrDisplay}
+          </p>
+        )}
+
+        <div style={{ width: 64, height: 1, background: cc.buttonBg }} />
       </div>
 
       {/* ── Middle: contact rows ── */}
@@ -318,7 +336,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
                 fontFamily: cormorant.style.fontFamily,
                 fontWeight: 500,
                 fontSize: 13,
-                color: CREAM,
+                color: cc.text,
                 textAlign: 'center',
                 margin: 0,
                 opacity: 0.85,
@@ -334,7 +352,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
                 fontFamily: cormorant.style.fontFamily,
                 fontWeight: 500,
                 fontSize: 13,
-                color: CREAM,
+                color: cc.text,
                 textAlign: 'center',
                 margin: 0,
                 opacity: 0.85,
@@ -362,11 +380,10 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           width: '100%',
         }}
       >
-        {/* QR — cream tinted */}
         {showQR && (
           <div
             style={{
-              background: CREAM,
+              background: cc.qrBg,
               borderRadius: 10,
               padding: 6,
             }}
@@ -375,16 +392,16 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
               value={`${pageUrl}?qr=1`}
               size={72}
               marginSize={1}
-              fgColor={NAVY}
-              bgColor={CREAM}
+              fgColor={qrDot}
+              bgColor={cc.qrBg}
             />
           </div>
         )}
 
         <SaveContactButton
           profile={profile}
-          bg={GOLD}
-          textColor={NAVY}
+          bg={cc.buttonBg}
+          textColor={cc.buttonText}
         />
       </div>
     </div>
