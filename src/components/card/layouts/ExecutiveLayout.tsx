@@ -110,22 +110,23 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
           <img
             src={profile.logo_url}
             alt="Logo"
-            style={{ height: 68, maxWidth: 180, objectFit: 'contain', marginBottom: 8 }}
+            style={{ height: 96, maxWidth: 200, objectFit: 'contain', marginBottom: 6 }}
           />
         </>
       )}
 
-      {/* Company / university name */}
+      {/* Company / university name — fallback label when logo doesn't include text */}
       {orgDisplay && (
         <p
           style={{
             fontFamily: cormorant.style.fontFamily,
-            fontWeight: 600,
-            fontSize: 14,
-            letterSpacing: '0.14em',
+            fontWeight: 500,
+            fontSize: 11,
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: cc.textMuted,
             textAlign: 'center',
+            opacity: 0.7,
           }}
         >
           {orgDisplay}
