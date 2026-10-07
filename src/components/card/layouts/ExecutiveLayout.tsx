@@ -103,14 +103,15 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
         padding: '20px 24px',
       }}
     >
-      {/* ── Brand section: logo + company name, vertically centered in upper half ── */}
+      {/* ── Brand section: logo + company name, pinned to bottom of upper half ── */}
       <div
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
+          paddingBottom: 6,
           width: '100%',
         }}
       >
