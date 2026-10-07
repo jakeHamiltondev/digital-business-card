@@ -31,14 +31,14 @@ function formatPhone(raw: string): string {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
 }
 
-function Rule({ color }: { color: string }) {
+function Rule({ color, my = 12 }: { color: string; my?: number }) {
   return (
     <div
       style={{
         width: 64,
         height: 1,
         background: color,
-        margin: '12px auto',
+        margin: `${my}px auto`,
       }}
     />
   )
@@ -103,116 +103,98 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
         padding: '20px 24px',
       }}
     >
-      {/* ── Brand section: logo + company name, pinned to bottom of upper half ── */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          paddingBottom: 6,
-          width: '100%',
-        }}
-      >
-        {userIsPro && profile.logo_url && (
-          <img
-            src={profile.logo_url}
-            alt="Logo"
-            style={{ height: 96, maxWidth: 200, objectFit: 'contain', marginBottom: 14 }}
-          />
-        )}
+      {/* Top spacer — distributes whitespace evenly above and below the content block */}
+      <div style={{ flex: 1 }} />
 
-        {/* Company / university name — fallback label when logo doesn't include text */}
-        {orgDisplay && (
-          <p
-            style={{
-              fontFamily: cormorant.style.fontFamily,
-              fontWeight: 500,
-              fontSize: 11,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: cc.textMuted,
-              textAlign: 'center',
-              opacity: 0.7,
-              margin: 0,
-            }}
-          >
-            {orgDisplay}
-          </p>
-        )}
-      </div>
+      {/* ── Logo ── */}
+      {userIsPro && profile.logo_url && (
+        <img
+          src={profile.logo_url}
+          alt="Logo"
+          style={{ height: 96, maxWidth: 200, objectFit: 'contain', marginBottom: 14 }}
+        />
+      )}
 
-      <Rule color={cc.buttonBg} />
-
-      {/* ── Person section: name + title + rule + contacts, pinned to top of lower half ── */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingTop: 6,
-          width: '100%',
-        }}
-      >
-        {/* Full name — small-caps */}
-        <h1
+      {/* Company / university name — fallback label when logo doesn't include text */}
+      {orgDisplay && (
+        <p
           style={{
             fontFamily: cormorant.style.fontFamily,
             fontWeight: 500,
-            fontSize: 28,
-            fontVariant: 'small-caps',
-            color: cc.text,
+            fontSize: 11,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: cc.textMuted,
             textAlign: 'center',
-            lineHeight: 1.1,
+            opacity: 0.7,
             margin: 0,
           }}
         >
-          {profile.full_name || profile.username}
-        </h1>
+          {orgDisplay}
+        </p>
+      )}
 
-        {/* Title — italic */}
-        {titleDisplay && (
-          <p
-            style={{
-              fontFamily: cormorant.style.fontFamily,
-              fontStyle: 'italic',
-              fontWeight: 500,
-              fontSize: 17,
-              color: cc.textMuted,
-              textAlign: 'center',
-              marginTop: 4,
-            }}
-          >
-            {titleDisplay}
-          </p>
-        )}
+      {/* ── Divider: tight margin so company name and name sit close on either side ── */}
+      <Rule color={cc.buttonBg} my={8} />
 
-        <Rule color={cc.buttonBg} />
+      {/* Full name — small-caps */}
+      <h1
+        style={{
+          fontFamily: cormorant.style.fontFamily,
+          fontWeight: 500,
+          fontSize: 28,
+          fontVariant: 'small-caps',
+          color: cc.text,
+          textAlign: 'center',
+          lineHeight: 1.1,
+          margin: 0,
+        }}
+      >
+        {profile.full_name || profile.username}
+      </h1>
 
-        {/* Contact stack */}
-        {contactItems.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-            {contactItems.map((item, i) => (
-              <p
-                key={i}
-                style={{
-                  fontFamily: cormorant.style.fontFamily,
-                  fontWeight: 500,
-                  fontSize: 12,
-                  color: cc.textMuted,
-                  textAlign: 'center',
-                  margin: 0,
-                }}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Title — italic */}
+      {titleDisplay && (
+        <p
+          style={{
+            fontFamily: cormorant.style.fontFamily,
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 17,
+            color: cc.textMuted,
+            textAlign: 'center',
+            marginTop: 4,
+          }}
+        >
+          {titleDisplay}
+        </p>
+      )}
+
+      <Rule color={cc.buttonBg} />
+
+      {/* Contact stack */}
+      {contactItems.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          {contactItems.map((item, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: cormorant.style.fontFamily,
+                fontWeight: 500,
+                fontSize: 12,
+                color: cc.textMuted,
+                textAlign: 'center',
+                margin: 0,
+              }}
+            >
+              {item}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* Bottom spacer — mirrors top spacer */}
+      <div style={{ flex: 1 }} />
     </div>
   )
 }
