@@ -261,6 +261,20 @@ export default async function UserCardPage({ params, searchParams }: Props) {
           </div>
         ) : null}
       </div>
+      {!user && (
+        <div className="mt-6 text-center">
+          <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
+            Want your own digital business card?
+          </p>
+          <a
+            href={`/sign-up?ref=${profile.username}`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            Create yours free with Linkfol
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      )}
       {!isPro(profile) && (
         <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-600">
           <a
