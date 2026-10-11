@@ -6,7 +6,7 @@
 import type { Profile } from '@/lib/types'
 import type { Theme } from '@/lib/themes'
 import type { LayoutFaceProps } from '../types'
-import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
+import { generateCardColors, getContrastColor, type CardColorTokens } from '@/lib/color-utils'
 import { getThemeCardColors } from '@/lib/themes'
 import { getPersonaConfig } from '@/lib/persona-config'
 import Avatar from '../shared/Avatar'
@@ -76,6 +76,7 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
   const cc: CardColorTokens = hasBrandColors
     ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
     : getThemeCardColors(profile.theme)
+  const isDark = getContrastColor(cc.bg) === '#ffffff'
 
   const orgName  = getOrgName(profile)
   const tagline  = getTagline(profile)
@@ -121,14 +122,14 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
             width: 90,
             height: 90,
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.15)',
-            border: '2px solid rgba(255,255,255,0.3)',
+            background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)',
+            border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 36,
             fontWeight: 700,
-            color: cc.text,
+            color: isDark ? '#ffffff' : cc.text,
           }}
         >
           {(orgName ?? profile.full_name ?? '?')[0]?.toUpperCase() ?? '?'}
@@ -194,8 +195,8 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: 'rgba(255,255,255,0.14)',
-          border: '1px solid rgba(255,255,255,0.25)',
+          background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.06)',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)'}`,
           borderRadius: 999,
           padding: '6px 14px',
         }}
@@ -217,7 +218,7 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
         >
           {initials}
         </div>
-        <span style={{ color: cc.text, fontSize: 12 }}>tap to connect</span>
+        <span style={{ color: isDark ? 'rgba(255,255,255,0.7)' : cc.textMuted, fontSize: 12 }}>tap to connect</span>
       </div>
     </div>
   )
@@ -252,7 +253,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         transform: 'rotateY(180deg)',
         display: 'flex',
         flexDirection: 'column',
-        padding: '8px 16px 8px',
+        padding: '18px 16px 8px',
       }}
     >
       {/* ── Identity row: avatar + name/title/org side-by-side ── */}
@@ -281,7 +282,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
                 fontSize: 12,
                 marginTop: 2,
                 display: '-webkit-box',
-                WebkitLineClamp: 3,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 lineHeight: 1.35,
@@ -329,6 +330,21 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
 
       {/* ── Save contact ── */}
       <SaveContactButton profile={profile} bg={cc.buttonBg} textColor={cc.buttonText} />
+
+      {!userIsPro && (
+        <p
+          style={{
+            fontSize: 9,
+            color: cc.textMuted,
+            textAlign: 'center',
+            marginTop: 8,
+            opacity: 0.5,
+            letterSpacing: '0.04em',
+          }}
+        >
+          Made with Linkfol
+        </p>
+      )}
     </div>
   )
 }
