@@ -5,7 +5,7 @@
 
 import type { Theme } from '@/lib/themes'
 import type { LayoutFaceProps } from '../types'
-import { generateCardColors, type CardColorTokens } from '@/lib/color-utils'
+import { generateCardColors, getContrastColor, type CardColorTokens } from '@/lib/color-utils'
 import { getThemeCardColors } from '@/lib/themes'
 import { getPersonaConfig } from '@/lib/persona-config'
 import ActionButtons from '../shared/ActionButtons'
@@ -55,6 +55,7 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
   const cc: CardColorTokens = hasBrandColors
     ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
     : getThemeCardColors(profile.theme)
+  const isDark = getContrastColor(cc.bg) === '#ffffff'
   const brandT = makeBrandTheme(cc, t)
 
   const vcardCfg = getPersonaConfig(profile.persona).vcard
@@ -85,9 +86,9 @@ export function PhotoHeroFront({ profile, userIsPro, t }: LayoutFaceProps) {
     textAlign: 'center',
     fontSize: 14,
     fontWeight: 600,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.14)',
-    border: '1px solid rgba(255,255,255,0.25)',
+    color: isDark ? '#ffffff' : cc.text,
+    background: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.06)',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)'}`,
     textDecoration: 'none',
     boxSizing: 'border-box',
   }
@@ -340,6 +341,21 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
 
       {/* ── Save contact ── */}
       <SaveContactButton profile={profile} bg={cc.buttonBg} textColor={cc.buttonText} />
+
+      {!userIsPro && (
+        <p
+          style={{
+            fontSize: 9,
+            color: cc.textMuted,
+            textAlign: 'center',
+            marginTop: 8,
+            opacity: 0.5,
+            letterSpacing: '0.04em',
+          }}
+        >
+          Made with Linkfol
+        </p>
+      )}
     </div>
   )
 }
