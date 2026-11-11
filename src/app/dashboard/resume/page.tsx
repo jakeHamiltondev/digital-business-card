@@ -88,6 +88,7 @@ export default async function ResumePage() {
         <ResumeUploadSection
           resumeUrl={profile?.resume_url ?? null}
           signedUrl={signedUrl}
+          canAccessBuilder={!!canAccessBuilder}
         />
 
         {/* Pro resume builder */}

@@ -192,3 +192,124 @@ export async function reorderResumeEntries(
   revalidatePath('/dashboard/resume')
   return { error: null }
 }
+
+export async function importResumeEntries(parsed: {
+  experience: Array<{ title: string; organization?: string; location?: string; start_date?: string; end_date?: string; description?: string }>
+  education: Array<{ title: string; organization?: string; location?: string; start_date?: string; end_date?: string; description?: string }>
+  skills: Array<{ title: string; skills_list?: string[] }>
+  projects: Array<{ title: string; organization?: string; description?: string }>
+  certifications: Array<{ title: string; organization?: string; end_date?: string }>
+}): Promise<{ error: string | null }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error: deleteError } = await supabase
+    .from('resume_entries')
+    .delete()
+    .eq('user_id', user.id)
+  if (deleteError) return { error: deleteError.message }
+
+  type InsertRow = {
+    user_id: string
+    type: ResumeEntryType
+    title: string
+    organization: string | null
+    location: string | null
+    start_date: string | null
+    end_date: string | null
+    description: string | null
+    skills_list: string[] | null
+    sort_order: number
+  }
+
+  const rows: InsertRow[] = []
+
+  parsed.experience.forEach((e, i) => {
+    rows.push({
+      user_id: user.id,
+      type: 'experience',
+      title: e.title,
+      organization: e.organization || null,
+      location: e.location || null,
+      start_date: e.start_date || null,
+      end_date: e.end_date || null,
+      description: e.description || null,
+      skills_list: null,
+      sort_order: i,
+    })
+  })
+
+  parsed.education.forEach((e, i) => {
+    rows.push({
+      user_id: user.id,
+      type: 'education',
+      title: e.title,
+      organization: e.organization || null,
+      location: e.location || null,
+      start_date: e.start_date || null,
+      end_date: e.end_date || null,
+      description: e.description || null,
+      skills_list: null,
+      sort_order: i,
+    })
+  })
+
+  parsed.skills.forEach((e, i) => {
+    rows.push({
+      user_id: user.id,
+      type: 'skill',
+      title: e.title,
+      organization: null,
+      location: null,
+      start_date: null,
+      end_date: null,
+      description: null,
+      skills_list: e.skills_list ?? null,
+      sort_order: i,
+    })
+  })
+
+  parsed.projects.forEach((e, i) => {
+    rows.push({
+      user_id: user.id,
+      type: 'project',
+      title: e.title,
+      organization: e.organization || null,
+      location: null,
+      start_date: null,
+      end_date: null,
+      description: e.description || null,
+      skills_list: null,
+      sort_order: i,
+    })
+  })
+
+  parsed.certifications.forEach((e, i) => {
+    rows.push({
+      user_id: user.id,
+      type: 'certification',
+      title: e.title,
+      organization: e.organization || null,
+      location: null,
+      start_date: e.end_date || null,
+      end_date: null,
+      description: null,
+      skills_list: null,
+      sort_order: i,
+    })
+  })
+
+  if (rows.length === 0) {
+    revalidatePath('/dashboard/resume')
+    return { error: null }
+  }
+
+  const { error: insertError } = await supabase.from('resume_entries').insert(rows)
+  if (insertError) return { error: insertError.message }
+
+  revalidatePath('/dashboard/resume')
+  return { error: null }
+}

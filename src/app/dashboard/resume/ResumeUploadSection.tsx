@@ -2,20 +2,23 @@
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileText, ExternalLink, Loader2, Upload, X } from 'lucide-react'
-import { uploadResume, deleteResume } from '@/app/actions/resume'
+import { FileText, ExternalLink, Loader2, Upload, X, FileDown } from 'lucide-react'
+import { uploadResume, deleteResume, importResumeEntries } from '@/app/actions/resume'
 
 export default function ResumeUploadSection({
   resumeUrl,
   signedUrl,
+  canAccessBuilder,
 }: {
   resumeUrl: string | null
   signedUrl: string | null
+  canAccessBuilder: boolean
 }) {
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [isImporting, setIsImporting] = useState(false)
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -62,6 +65,38 @@ export default function ResumeUploadSection({
     })
   }
 
+  async function handleImport() {
+    const confirmed = window.confirm(
+      'This will replace all current Resume Builder entries with data from your uploaded resume. Continue?',
+    )
+    if (!confirmed) return
+
+    setError(null)
+    setIsImporting(true)
+    try {
+      const res = await fetch('/api/resume/parse', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to parse resume')
+        return
+      }
+
+      const result = await importResumeEntries(data.entries)
+      if (result.error) {
+        setError(result.error)
+        return
+      }
+
+      router.refresh()
+    } catch {
+      setError('Network error — please try again')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
+  const anyPending = isPending || isImporting
+
   return (
     <section className="space-y-4">
       <div>
@@ -90,10 +125,30 @@ export default function ResumeUploadSection({
               View
             </a>
           )}
+          {canAccessBuilder && (
+            <button
+              type="button"
+              onClick={handleImport}
+              disabled={anyPending}
+              className="flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-900 disabled:opacity-50 dark:hover:text-zinc-100"
+            >
+              {isImporting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Parsing…
+                </>
+              ) : (
+                <>
+                  <FileDown className="h-3.5 w-3.5" />
+                  Import to Builder
+                </>
+              )}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            disabled={isPending}
+            disabled={anyPending}
             className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-900 disabled:opacity-50 dark:hover:text-zinc-100"
           >
             {isPending ? 'Working…' : 'Replace'}
@@ -101,7 +156,7 @@ export default function ResumeUploadSection({
           <button
             type="button"
             onClick={handleDelete}
-            disabled={isPending}
+            disabled={anyPending}
             className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-red-500 disabled:opacity-50 dark:hover:bg-zinc-700"
             aria-label="Remove resume"
           >
@@ -116,7 +171,7 @@ export default function ResumeUploadSection({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          disabled={isPending}
+          disabled={anyPending}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 bg-white px-4 py-6 text-sm font-medium text-zinc-500 transition-colors hover:border-zinc-400 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
         >
           {isPending ? (
