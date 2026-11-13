@@ -902,24 +902,6 @@ export default function ProfileForm({
           </section>
         )}
 
-        {activeTab === 'cardback' && (
-          <CardBackPicker
-            email={email}
-            phones={phones}
-            linkedin={linkedin}
-            twitter={twitter}
-            instagram={instagram}
-            github={github}
-            tiktok={tiktok}
-            website={website}
-            location={location}
-            hasResume={hasResume}
-            username={username}
-            value={cardBackFields}
-            onChange={setCardBackFields}
-          />
-        )}
-
         {activeTab === 'appearance' && (
           <>
             {/* Card Theme */}
@@ -1052,6 +1034,23 @@ export default function ProfileForm({
                 </div>
               )}
             </section>
+
+            {/* Card Back */}
+            <CardBackPicker
+              email={email}
+              phones={phones}
+              linkedin={linkedin}
+              twitter={twitter}
+              instagram={instagram}
+              github={github}
+              tiktok={tiktok}
+              website={website}
+              location={location}
+              hasResume={hasResume}
+              username={username}
+              value={cardBackFields}
+              onChange={setCardBackFields}
+            />
           </>
         )}
       </div>

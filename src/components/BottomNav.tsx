@@ -2,11 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CreditCard, Pencil, Users } from 'lucide-react'
+import { CreditCard, Users } from 'lucide-react'
 
 const tabs = [
   { label: 'My Card', href: '/dashboard', icon: CreditCard },
-  { label: 'Edit', href: '/dashboard/edit', icon: Pencil },
   { label: 'Contacts', href: '/cards', icon: Users },
 ]
 

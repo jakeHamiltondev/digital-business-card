@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { QrCode, Camera, FileText } from 'lucide-react'
+import { QrCode, FileText } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import BusinessCard from '@/components/BusinessCard'
 import UpgradeToast from '@/components/UpgradeToast'
+import ProfileForm from './ProfileForm'
+import DangerZone from './edit/DangerZone'
 import type { Profile } from '@/lib/types'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -96,20 +98,13 @@ export default async function DashboardPage(props: {
         )}
 
         {/* Quick actions */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex gap-3">
           <Link
             href="/dashboard/qr"
             className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             <QrCode className="h-4 w-4" />
-            Full Screen QR
-          </Link>
-          <Link
-            href="/dashboard/scan"
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            <Camera className="h-4 w-4" />
-            Scan QR Code
+            QR Code
           </Link>
           <Link
             href="/dashboard/resume"
@@ -124,6 +119,22 @@ export default async function DashboardPage(props: {
         <p className="text-center text-sm text-zinc-400 dark:text-zinc-500">
           {totalViews ?? 0} total views · {recentViews ?? 0} this week
         </p>
+
+        {/* Edit Profile */}
+        <section>
+          <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Edit Profile
+          </h2>
+          {profile ? (
+            <ProfileForm profile={profile} userId={user.id} hasResume={hasResume} />
+          ) : (
+            <p className="text-sm text-red-600 dark:text-red-400">
+              Failed to load profile. Please refresh the page.
+            </p>
+          )}
+        </section>
+
+        <DangerZone />
       </main>
     </div>
   )

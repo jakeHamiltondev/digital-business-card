@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import QRDisplay from './QRDisplay'
 
@@ -42,6 +42,13 @@ export default async function QRPage() {
       <QRDisplay url={qrUrl} />
       <p className="mt-6 text-xl font-semibold text-zinc-50">{displayName}</p>
       <p className="mt-2 text-sm text-zinc-400">linkfol.com/{profile.username}</p>
+      <Link
+        href="/dashboard/scan"
+        className="mt-4 flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+      >
+        <Camera className="h-4 w-4" />
+        Scan a QR Code
+      </Link>
     </div>
   )
 }
