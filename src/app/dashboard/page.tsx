@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Eye, QrCode, Camera, FileText } from 'lucide-react'
+import { QrCode, Camera, FileText } from 'lucide-react'
 import QRCodeBlock from '@/components/QRCodeBlock'
 import BusinessCard from '@/components/BusinessCard'
 import UpgradeToast from '@/components/UpgradeToast'
@@ -36,10 +36,12 @@ export default async function DashboardPage(props: {
     { data: existing },
     { count: totalViews },
     { count: recentViews },
+    { count: resumeCount },
   ] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('card_views').select('*', { count: 'exact', head: true }).eq('profile_id', user.id),
     supabase.from('card_views').select('*', { count: 'exact', head: true }).eq('profile_id', user.id).gte('created_at', sevenDaysAgo),
+    supabase.from('resume_entries').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
   ])
 
   if (existing) {
@@ -58,6 +60,7 @@ export default async function DashboardPage(props: {
   const qrUrl = cardUrl ? `${cardUrl}?qr=1` : null
   const hasContact = !!(profile?.email || profile?.phones?.length || profile?.website)
   const isIncomplete = profile && (!profile.full_name || !profile.title || !hasContact)
+  const hasResume = (resumeCount ?? 0) > 0 || !!profile?.resume_url
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
@@ -82,7 +85,7 @@ export default async function DashboardPage(props: {
           <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
             {/* Card preview */}
             <div className="flex justify-center sm:flex-1">
-              <BusinessCard profile={profile} pageUrl={cardUrl!} theme={profile.theme ?? 'midnight'} />
+              <BusinessCard profile={profile} pageUrl={cardUrl!} theme={profile.theme ?? 'midnight'} hasResume={hasResume} />
             </div>
 
             {/* Share tools */}
@@ -94,13 +97,6 @@ export default async function DashboardPage(props: {
 
         {/* Quick actions */}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            href={profile ? `/${profile.username}` : '#'}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            <Eye className="h-4 w-4" />
-            View My Card
-          </Link>
           <Link
             href="/dashboard/qr"
             className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
