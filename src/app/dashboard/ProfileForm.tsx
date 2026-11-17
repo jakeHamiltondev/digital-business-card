@@ -213,14 +213,19 @@ function LogoUpload({
   value,
   onChange,
   userId,
+  onColorsExtracted,
 }: {
   value: string
   onChange: (url: string) => void
   userId: string
+  onColorsExtracted?: (primary: string, accent: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [isRemovingBg, setIsRemovingBg] = useState(false)
+  const [isExtractingColors, setIsExtractingColors] = useState(false)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
 
   async function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
@@ -252,6 +257,46 @@ function LogoUpload({
     const { data } = supabase.storage.from('avatars').getPublicUrl(path)
     onChange(`${data.publicUrl}?t=${Date.now()}`)
     setIsUploading(false)
+  }
+
+  async function handleRemoveBg() {
+    setIsRemovingBg(true)
+    setActionMessage(null)
+    try {
+      const res = await fetch('/api/logo/remove-bg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logoUrl: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed')
+      onChange(data.url)
+      setActionMessage('Background removed!')
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Background removal failed')
+    } finally {
+      setIsRemovingBg(false)
+    }
+  }
+
+  async function handleExtractColors() {
+    setIsExtractingColors(true)
+    setActionMessage(null)
+    try {
+      const res = await fetch('/api/logo/extract-colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logoUrl: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed')
+      onColorsExtracted?.(data.primary, data.accent)
+      setActionMessage('Brand colors applied!')
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Color extraction failed')
+    } finally {
+      setIsExtractingColors(false)
+    }
   }
 
   return (
@@ -294,6 +339,37 @@ function LogoUpload({
           if (f) handleFile(f)
         }}
       />
+      {value && (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleRemoveBg}
+            disabled={isRemovingBg || isExtractingColors}
+            className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          >
+            {isRemovingBg ? (
+              <span className="flex items-center gap-1.5">
+                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></svg>
+                Removing…
+              </span>
+            ) : '✂️ Remove background'}
+          </button>
+          <button
+            type="button"
+            onClick={handleExtractColors}
+            disabled={isRemovingBg || isExtractingColors}
+            className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-100 disabled:opacity-50 dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900"
+          >
+            {isExtractingColors ? (
+              <span className="flex items-center gap-1.5">
+                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></svg>
+                Extracting…
+              </span>
+            ) : '🎨 Match card to my brand'}
+          </button>
+        </div>
+      )}
+      {actionMessage && <p className="text-xs text-emerald-600 dark:text-emerald-400">{actionMessage}</p>}
       {uploadError && <p className="text-xs text-red-500">{uploadError}</p>}
     </div>
   )
@@ -649,7 +725,16 @@ export default function ProfileForm({
               {def.label}
               <ProBadge />
             </label>
-            <LogoUpload value={logoUrl} onChange={setLogoUrl} userId={userId} />
+            <LogoUpload
+              value={logoUrl}
+              onChange={setLogoUrl}
+              userId={userId}
+              onColorsExtracted={(primary, accent) => {
+                setBrandPrimary(primary)
+                setBrandAccent(accent)
+                setUseCustomColors(true)
+              }}
+            />
           </div>
         )
       case 'brand_color_primary':
