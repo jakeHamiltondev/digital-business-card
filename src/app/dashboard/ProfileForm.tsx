@@ -12,6 +12,7 @@ import { isPro } from '@/lib/subscription'
 import { PERSONA_CONFIG, FIELD_DEFS, UNIVERSAL_EDITOR_SECTIONS, PRO_EDITOR_SECTION } from '@/lib/persona-config'
 import type { EditorSectionDef, FieldKey } from '@/lib/persona-config'
 import { createClient } from '@/lib/supabase/client'
+import { removeBackground } from '@imgly/background-removal'
 import LayoutSelector from '@/components/card/LayoutSelector'
 import type { CardLayout } from '@/components/card/LayoutSelector'
 
@@ -263,14 +264,22 @@ function LogoUpload({
     setIsRemovingBg(true)
     setActionMessage(null)
     try {
-      const res = await fetch('/api/logo/remove-bg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logoUrl: value }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed')
-      onChange(data.url)
+      const imgRes = await fetch(value)
+      if (!imgRes.ok) throw new Error('Failed to fetch logo')
+      const imgBlob = await imgRes.blob()
+
+      const resultBlob = await removeBackground(imgBlob)
+
+      const supabase = createClient()
+      const path = `${userId}/logo-nobg.png`
+      const file = new File([resultBlob], 'logo-nobg.png', { type: 'image/png' })
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: 'image/png' })
+      if (uploadError) throw new Error('Upload failed')
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      onChange(`${data.publicUrl}?t=${Date.now()}`)
       setActionMessage('Background removed!')
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : 'Background removal failed')
@@ -350,7 +359,7 @@ function LogoUpload({
             {isRemovingBg ? (
               <span className="flex items-center gap-1.5">
                 <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></svg>
-                Removing…
+                Removing… (this may take a moment)
               </span>
             ) : '✂️ Remove background'}
           </button>
