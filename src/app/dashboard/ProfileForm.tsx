@@ -6,7 +6,9 @@ import ProfileTabs from '@/components/ProfileTabs'
 import type { TabId } from '@/components/ProfileTabs'
 import AvatarUpload from '@/components/AvatarUpload'
 import { updateProfile } from './actions'
-import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks } from '@/lib/types'
+import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks, ResumeEntry } from '@/lib/types'
+import ResumeClient from '@/app/dashboard/resume/ResumeClient'
+import ResumeUploadSection from '@/app/dashboard/resume/ResumeUploadSection'
 import { themes } from '@/lib/themes'
 import { isPro } from '@/lib/subscription'
 import { PERSONA_CONFIG, FIELD_DEFS, UNIVERSAL_EDITOR_SECTIONS, PRO_EDITOR_SECTION } from '@/lib/persona-config'
@@ -526,10 +528,16 @@ export default function ProfileForm({
   profile,
   userId,
   hasResume = false,
+  resumeEntries = [],
+  resumeSignedUrl = null,
+  canAccessBuilder = false,
 }: {
   profile: Profile
   userId: string
   hasResume?: boolean
+  resumeEntries?: ResumeEntry[]
+  resumeSignedUrl?: string | null
+  canAccessBuilder?: boolean
 }) {
   const userIsPro = isPro(profile)
   const social = profile.social_links ?? {}
@@ -858,9 +866,58 @@ export default function ProfileForm({
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
+      {activeTab === 'resume' && (
+        <div className="min-h-[400px] space-y-10">
+          <ResumeUploadSection
+            resumeUrl={profile.resume_url ?? null}
+            signedUrl={resumeSignedUrl ?? null}
+            canAccessBuilder={canAccessBuilder}
+          />
+          {canAccessBuilder ? (
+            <section className="space-y-4">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Resume Builder
+                </h2>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  Build your professional history. This information will power your AI-generated resume.
+                </p>
+              </div>
+              {resumeEntries.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/api/resume/pdf/${profile.username}`}
+                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    PDF
+                  </a>
+                  <a
+                    href={`/api/resume/docx/${profile.username}`}
+                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    DOCX
+                  </a>
+                </div>
+              )}
+              <ResumeClient initialEntries={resumeEntries} />
+            </section>
+          ) : (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Resume Builder is a Pro feature
+              </p>
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                Upgrade to build and AI-polish your professional resume.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+    <form onSubmit={handleSubmit} className={activeTab === 'resume' ? 'hidden' : ''}>
       <div className="min-h-[400px] space-y-8">
         {activeTab === 'basic' && (
           <>
@@ -1149,7 +1206,7 @@ export default function ProfileForm({
         )}
       </div>
 
-      {/* Sticky save — always visible */}
+      {/* Sticky save — hidden on resume tab */}
       <div className="sticky bottom-20 z-30 flex items-center justify-end gap-3 py-3 md:bottom-4">
         {saveError && (
           <p className="text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
@@ -1167,5 +1224,6 @@ export default function ProfileForm({
         </button>
       </div>
     </form>
+    </div>
   )
 }

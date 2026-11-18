@@ -1,12 +1,13 @@
 'use client'
 
-import { User, Phone, Share2, Palette } from 'lucide-react'
+import { User, Phone, Share2, Palette, FileText } from 'lucide-react'
 
 const tabs = [
   { id: 'basic', label: 'Basic Info', icon: User },
   { id: 'contact', label: 'Contact', icon: Phone },
   { id: 'social', label: 'Social Links', icon: Share2 },
   { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'resume', label: 'Resume', icon: FileText },
 ] as const
 
 export type TabId = (typeof tabs)[number]['id']
