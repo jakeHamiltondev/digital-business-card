@@ -15,7 +15,6 @@ import SaveContactButton from '../shared/SaveContactButton'
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['500', '600'],
-  style: ['normal', 'italic'],
   display: 'swap',
 })
 
