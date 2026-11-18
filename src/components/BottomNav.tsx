@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CreditCard, Users } from 'lucide-react'
+import { CreditCard, Pencil, Users } from 'lucide-react'
 
 const tabs = [
   { label: 'My Card', href: '/dashboard', icon: CreditCard },
+  { label: 'Edit', href: '/edit', icon: Pencil },
   { label: 'Contacts', href: '/cards', icon: Users },
 ]
 
@@ -17,7 +18,7 @@ export default function BottomNav() {
     pathname === '/dashboard/qr' ||
     pathname === '/dashboard/scan' ||
     pathname === '/' ||
-    (!pathname.startsWith('/dashboard') && pathname !== '/cards')
+    (!pathname.startsWith('/dashboard') && !pathname.startsWith('/edit') && pathname !== '/cards')
   ) {
     return null
   }

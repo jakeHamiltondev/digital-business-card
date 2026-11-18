@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const links = [
   { label: 'My Card', href: '/dashboard' },
+  { label: 'Edit', href: '/edit' },
   { label: 'Contacts', href: '/cards' },
 ]
 
@@ -14,7 +15,9 @@ export default function NavLinks() {
   return (
     <nav className="hidden items-center gap-1 md:flex">
       {links.map((link) => {
-        const isActive = pathname === link.href
+        const isActive = link.href === '/dashboard'
+          ? pathname.startsWith('/dashboard')
+          : pathname === link.href
         return (
           <Link
             key={link.href}
