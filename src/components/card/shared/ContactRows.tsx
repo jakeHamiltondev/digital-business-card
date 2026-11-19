@@ -189,8 +189,9 @@ function buildRows(profile: Profile, iconColor: string, selectedFields?: string[
     rows.push({
       id: 'resume',
       href: `/${profile.username}/resume`,
+      isExternal: true,
       icon: <FileText className="h-4 w-4 shrink-0" style={{ color: iconColor }} />,
-      label: 'Resume',
+      label: 'View Resume',
     })
   }
 

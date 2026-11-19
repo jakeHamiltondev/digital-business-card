@@ -353,6 +353,8 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           {hasResume && (!selectedFields || selectedFields.includes('resume')) && (
             <a
               href={`/${profile.username}/resume`}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 fontFamily: cormorant.style.fontFamily,
                 fontWeight: 500,
@@ -366,7 +368,7 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
               }}
               onClick={e => e.stopPropagation()}
             >
-              Resume
+              View Resume
             </a>
           )}
         </div>

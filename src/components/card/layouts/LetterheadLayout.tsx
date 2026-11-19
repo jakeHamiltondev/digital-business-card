@@ -396,7 +396,7 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
   if (profile.location && (!selectedFields || selectedFields.includes('location')))
     contactRows.push({ id: 'location', icon: <MapPinIcon16 />, value: profile.location, href: null })
   if (hasResume && (!selectedFields || selectedFields.includes('resume')))
-    contactRows.push({ id: 'resume', icon: <FileText width={16} height={16} />, value: 'Resume', href: `/${profile.username}/resume` })
+    contactRows.push({ id: 'resume', icon: <FileText width={16} height={16} />, value: 'View Resume', href: `/${profile.username}/resume` })
 
   return (
     <div
@@ -509,12 +509,13 @@ export function LetterheadBack({ profile, pageUrl, userIsPro, t, hasResume }: La
             </>
           )
           if (row.href) {
+            const newTab = row.href.startsWith('http') || row.id === 'resume'
             return (
               <a
                 key={row.id}
                 href={row.href}
-                target={row.href.startsWith('http') ? '_blank' : undefined}
-                rel={row.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                target={newTab ? '_blank' : undefined}
+                rel={newTab ? 'noopener noreferrer' : undefined}
                 style={rowStyle}
                 onClick={e => e.stopPropagation()}
               >
