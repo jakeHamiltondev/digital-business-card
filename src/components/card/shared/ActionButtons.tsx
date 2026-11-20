@@ -8,9 +8,11 @@ import { LinkedInIcon } from './SocialIcons'
 export default function ActionButtons({
   profile,
   t,
+  selectedFields,
 }: {
   profile: Profile
   t: Theme
+  selectedFields?: string[] | null
 }) {
   const phones =
     (profile.phones?.length ?? 0) > 0
@@ -21,11 +23,13 @@ export default function ActionButtons({
 
   const primaryPhone = phones?.[0]
 
+  const sf = selectedFields ?? null
+
   const buttons = [
-    primaryPhone && { href: `tel:${primaryPhone.number}`, label: 'Call',     Icon: Phone },
-    profile.email && { href: `mailto:${profile.email}`,   label: 'Email',    Icon: Mail },
-    profile.website && { href: profile.website,           label: 'Website',  Icon: Globe },
-    profile.social_links?.linkedin && {
+    primaryPhone && (sf === null || sf.includes('phone')) && { href: `tel:${primaryPhone.number}`, label: 'Call',     Icon: Phone },
+    profile.email && (sf === null || sf.includes('email')) && { href: `mailto:${profile.email}`,   label: 'Email',    Icon: Mail },
+    profile.website && (sf === null || sf.includes('website')) && { href: profile.website,         label: 'Website',  Icon: Globe },
+    profile.social_links?.linkedin && (sf === null || sf.includes('linkedin')) && {
       href: profile.social_links.linkedin,
       label: 'LinkedIn',
       Icon: LinkedInIcon,
