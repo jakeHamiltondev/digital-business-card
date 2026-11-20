@@ -215,8 +215,13 @@ export default function ContactRows({
   hasResume?: boolean
 }) {
   const rows = buildRows(profile, t.colors.iconColor, selectedFields, hasResume)
-  const visible = rows.slice(0, maxRows)
-  const hasOverflow = rows.length > maxRows
+  // Always include the resume row if present — don't let maxRows cut it off
+  const resumeRow = rows.find(r => r.id === 'resume')
+  const nonResumeRows = rows.filter(r => r.id !== 'resume')
+  const visible = resumeRow
+    ? [...nonResumeRows.slice(0, maxRows - 1), resumeRow]
+    : rows.slice(0, maxRows)
+  const hasOverflow = nonResumeRows.length > (resumeRow ? maxRows - 1 : maxRows)
   const border = dividerColor(t)
 
   return (
