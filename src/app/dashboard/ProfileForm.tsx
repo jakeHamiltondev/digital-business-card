@@ -6,7 +6,7 @@ import ProfileTabs from '@/components/ProfileTabs'
 import type { TabId } from '@/components/ProfileTabs'
 import AvatarUpload from '@/components/AvatarUpload'
 import { updateProfile } from './actions'
-import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks, ResumeEntry } from '@/lib/types'
+import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks, ResumeEntry, FrontIdentityDisplay } from '@/lib/types'
 import ResumeClient from '@/app/dashboard/resume/ResumeClient'
 import ResumeUploadSection from '@/app/dashboard/resume/ResumeUploadSection'
 import { themes } from '@/lib/themes'
@@ -594,6 +594,11 @@ export default function ProfileForm({
     profile.card_back_fields ?? null
   )
 
+  // Card front identity display
+  const [frontIdentityDisplay, setFrontIdentityDisplay] = useState<FrontIdentityDisplay>(
+    profile.front_identity_display ?? 'both'
+  )
+
   // Submit state
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -854,6 +859,7 @@ export default function ProfileForm({
         student_info: hasStudentInfo ? studentInfo : null,
         recruiter_info: hasRecruiterInfo ? recruiterInfo : null,
         card_back_fields: cardBackFields,
+        front_identity_display: frontIdentityDisplay,
       })
       setSaveError(result.error)
     } catch {
@@ -1185,6 +1191,40 @@ export default function ProfileForm({
                 </div>
               )}
             </section>
+
+            {/* Card Front Display (Pro — Brand Front / Executive only, requires logo) */}
+            {userIsPro && logoUrl && (cardLayout === 'brand_front' || cardLayout === 'executive_classic') && (
+              <section className="space-y-3">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Card Front Display
+                  </h2>
+                  <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">Choose what branding to show on the front of your card.</p>
+                </div>
+                <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+                  {([
+                    { value: 'both',      label: 'Logo + Company Name' },
+                    { value: 'logo_only', label: 'Logo Only' },
+                    { value: 'name_only', label: 'Company Name Only' },
+                  ] as const).map((opt, i) => (
+                    <label
+                      key={opt.value}
+                      className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 ${i > 0 ? 'border-t border-zinc-100 dark:border-zinc-800' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="front_identity_display"
+                        value={opt.value}
+                        checked={frontIdentityDisplay === opt.value}
+                        onChange={() => setFrontIdentityDisplay(opt.value)}
+                        className="accent-zinc-900 dark:accent-zinc-50"
+                      />
+                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Card Back */}
             <CardBackPicker

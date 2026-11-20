@@ -39,6 +39,8 @@ export type RecruiterInfo = {
   careers_page_url?: string
 }
 
+export type FrontIdentityDisplay = 'logo_only' | 'name_only' | 'both'
+
 export type Profile = {
   id: string
   username: string
@@ -79,6 +81,8 @@ export type Profile = {
   card_layout: string | null
   // Card back field visibility — null = show all (backward compat)
   card_back_fields: string[] | null
+  // Card front identity display — which branding elements to show (Pro only, Brand Front / Executive)
+  front_identity_display: FrontIdentityDisplay
   // Uploaded resume PDF — Supabase Storage path, not a signed URL
   resume_url: string | null
 }

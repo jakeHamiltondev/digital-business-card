@@ -13,6 +13,7 @@ import type {
   StudentInfo,
   RecruiterInfo,
   SocialLinks,
+  FrontIdentityDisplay,
 } from '@/lib/types'
 
 export type FormState = {
@@ -43,6 +44,7 @@ export async function updateProfile(data: {
   student_info: StudentInfo | null
   recruiter_info: RecruiterInfo | null
   card_back_fields: string[] | null
+  front_identity_display: FrontIdentityDisplay
 }): Promise<FormState> {
   const supabase = await createClient()
   const {
@@ -87,6 +89,7 @@ export async function updateProfile(data: {
     student_info: data.student_info,
     recruiter_info: data.recruiter_info,
     card_back_fields: data.card_back_fields,
+    front_identity_display: data.front_identity_display,
     updated_at: new Date().toISOString(),
   }
 

@@ -106,7 +106,7 @@ export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFace
       <div style={{ flex: 1 }} />
 
       {/* Logo or monogram */}
-      {userIsPro && profile.logo_url ? (
+      {userIsPro && profile.logo_url && (profile.front_identity_display ?? 'both') !== 'name_only' ? (
         <img
           src={profile.logo_url}
           alt="Logo"
@@ -137,7 +137,7 @@ export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFace
       )}
 
       {/* Company / university name */}
-      {orgName && (
+      {orgName && (profile.front_identity_display ?? 'both') !== 'logo_only' && (
         <p
           style={{
             color: cc.text,
