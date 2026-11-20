@@ -6,12 +6,15 @@ import ProfileTabs from '@/components/ProfileTabs'
 import type { TabId } from '@/components/ProfileTabs'
 import AvatarUpload from '@/components/AvatarUpload'
 import { updateProfile } from './actions'
-import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks } from '@/lib/types'
+import type { Profile, Persona, AddressVisibility, PhoneEntry, WorkAddress, StudentInfo, RecruiterInfo, SocialLinks, ResumeEntry, FrontIdentityDisplay } from '@/lib/types'
+import ResumeClient from '@/app/dashboard/resume/ResumeClient'
+import ResumeUploadSection from '@/app/dashboard/resume/ResumeUploadSection'
 import { themes } from '@/lib/themes'
 import { isPro } from '@/lib/subscription'
 import { PERSONA_CONFIG, FIELD_DEFS, UNIVERSAL_EDITOR_SECTIONS, PRO_EDITOR_SECTION } from '@/lib/persona-config'
 import type { EditorSectionDef, FieldKey } from '@/lib/persona-config'
 import { createClient } from '@/lib/supabase/client'
+import { removeBackground } from '@imgly/background-removal'
 import LayoutSelector from '@/components/card/LayoutSelector'
 import type { CardLayout } from '@/components/card/LayoutSelector'
 
@@ -263,14 +266,22 @@ function LogoUpload({
     setIsRemovingBg(true)
     setActionMessage(null)
     try {
-      const res = await fetch('/api/logo/remove-bg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logoUrl: value }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Failed')
-      onChange(data.url)
+      const imgRes = await fetch(value)
+      if (!imgRes.ok) throw new Error('Failed to fetch logo')
+      const imgBlob = await imgRes.blob()
+
+      const resultBlob = await removeBackground(imgBlob)
+
+      const supabase = createClient()
+      const path = `${userId}/logo-nobg.png`
+      const file = new File([resultBlob], 'logo-nobg.png', { type: 'image/png' })
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: 'image/png' })
+      if (uploadError) throw new Error('Upload failed')
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      onChange(`${data.publicUrl}?t=${Date.now()}`)
       setActionMessage('Background removed!')
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : 'Background removal failed')
@@ -350,7 +361,7 @@ function LogoUpload({
             {isRemovingBg ? (
               <span className="flex items-center gap-1.5">
                 <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25" /><path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /></svg>
-                Removing…
+                Removing… (this may take a moment)
               </span>
             ) : '✂️ Remove background'}
           </button>
@@ -517,10 +528,16 @@ export default function ProfileForm({
   profile,
   userId,
   hasResume = false,
+  resumeEntries = [],
+  resumeSignedUrl = null,
+  canAccessBuilder = false,
 }: {
   profile: Profile
   userId: string
   hasResume?: boolean
+  resumeEntries?: ResumeEntry[]
+  resumeSignedUrl?: string | null
+  canAccessBuilder?: boolean
 }) {
   const userIsPro = isPro(profile)
   const social = profile.social_links ?? {}
@@ -575,6 +592,11 @@ export default function ProfileForm({
   // Card back fields
   const [cardBackFields, setCardBackFields] = useState<string[] | null>(
     profile.card_back_fields ?? null
+  )
+
+  // Card front identity display
+  const [frontIdentityDisplay, setFrontIdentityDisplay] = useState<FrontIdentityDisplay>(
+    profile.front_identity_display ?? 'both'
   )
 
   // Submit state
@@ -837,6 +859,7 @@ export default function ProfileForm({
         student_info: hasStudentInfo ? studentInfo : null,
         recruiter_info: hasRecruiterInfo ? recruiterInfo : null,
         card_back_fields: cardBackFields,
+        front_identity_display: frontIdentityDisplay,
       })
       setSaveError(result.error)
     } catch {
@@ -849,9 +872,58 @@ export default function ProfileForm({
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
+      {activeTab === 'resume' && (
+        <div className="min-h-[400px] space-y-10">
+          <ResumeUploadSection
+            resumeUrl={profile.resume_url ?? null}
+            signedUrl={resumeSignedUrl ?? null}
+            canAccessBuilder={canAccessBuilder}
+          />
+          {canAccessBuilder ? (
+            <section className="space-y-4">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                  Resume Builder
+                </h2>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  Build your professional history. This information will power your AI-generated resume.
+                </p>
+              </div>
+              {resumeEntries.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/api/resume/pdf/${profile.username}`}
+                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    PDF
+                  </a>
+                  <a
+                    href={`/api/resume/docx/${profile.username}`}
+                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    DOCX
+                  </a>
+                </div>
+              )}
+              <ResumeClient initialEntries={resumeEntries} />
+            </section>
+          ) : (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Resume Builder is a Pro feature
+              </p>
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                Upgrade to build and AI-polish your professional resume.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+    <form onSubmit={handleSubmit} className={activeTab === 'resume' ? 'hidden' : ''}>
       <div className="min-h-[400px] space-y-8">
         {activeTab === 'basic' && (
           <>
@@ -1120,6 +1192,40 @@ export default function ProfileForm({
               )}
             </section>
 
+            {/* Card Front Display (Pro — Brand Front / Executive only, requires logo) */}
+            {userIsPro && logoUrl && (cardLayout === 'brand_front' || cardLayout === 'executive_classic') && (
+              <section className="space-y-3">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Card Front Display
+                  </h2>
+                  <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">Choose what branding to show on the front of your card.</p>
+                </div>
+                <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+                  {([
+                    { value: 'both',      label: 'Logo + Company Name' },
+                    { value: 'logo_only', label: 'Logo Only' },
+                    { value: 'name_only', label: 'Company Name Only' },
+                  ] as const).map((opt, i) => (
+                    <label
+                      key={opt.value}
+                      className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 ${i > 0 ? 'border-t border-zinc-100 dark:border-zinc-800' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="front_identity_display"
+                        value={opt.value}
+                        checked={frontIdentityDisplay === opt.value}
+                        onChange={() => setFrontIdentityDisplay(opt.value)}
+                        className="accent-zinc-900 dark:accent-zinc-50"
+                      />
+                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Card Back */}
             <CardBackPicker
               email={email}
@@ -1140,7 +1246,7 @@ export default function ProfileForm({
         )}
       </div>
 
-      {/* Sticky save — always visible */}
+      {/* Sticky save — hidden on resume tab */}
       <div className="sticky bottom-20 z-30 flex items-center justify-end gap-3 py-3 md:bottom-4">
         {saveError && (
           <p className="text-sm font-medium text-red-600 dark:text-red-400">{saveError}</p>
@@ -1158,5 +1264,6 @@ export default function ProfileForm({
         </button>
       </div>
     </form>
+    </div>
   )
 }

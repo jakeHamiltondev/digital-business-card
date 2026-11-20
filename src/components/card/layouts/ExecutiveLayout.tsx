@@ -114,7 +114,7 @@ export function ExecutiveFront({ profile, userIsPro, hasResume }: LayoutFaceProp
           width: '100%',
         }}
       >
-        {userIsPro && profile.logo_url && (
+        {userIsPro && profile.logo_url && (profile.front_identity_display ?? 'both') !== 'name_only' && (
           <img
             src={profile.logo_url}
             alt="Logo"
@@ -123,7 +123,7 @@ export function ExecutiveFront({ profile, userIsPro, hasResume }: LayoutFaceProp
         )}
 
         {/* Company / university name — fallback label when logo doesn't include text */}
-        {orgDisplay && (
+        {orgDisplay && (profile.front_identity_display ?? 'both') !== 'logo_only' && (
           <p
             style={{
               fontFamily: cormorant.style.fontFamily,
