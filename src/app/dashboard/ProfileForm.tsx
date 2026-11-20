@@ -875,55 +875,7 @@ export default function ProfileForm({
     <div className="space-y-6">
       <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === 'resume' && (
-        <div className="min-h-[400px] space-y-10">
-          <ResumeUploadSection
-            resumeUrl={profile.resume_url ?? null}
-            signedUrl={resumeSignedUrl ?? null}
-            canAccessBuilder={canAccessBuilder}
-          />
-          {canAccessBuilder ? (
-            <section className="space-y-4">
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                  Resume Builder
-                </h2>
-                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                  Build your professional history. This information will power your AI-generated resume.
-                </p>
-              </div>
-              {resumeEntries.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`/api/resume/pdf/${profile.username}`}
-                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  >
-                    PDF
-                  </a>
-                  <a
-                    href={`/api/resume/docx/${profile.username}`}
-                    className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  >
-                    DOCX
-                  </a>
-                </div>
-              )}
-              <ResumeClient initialEntries={resumeEntries} />
-            </section>
-          ) : (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                Resume Builder is a Pro feature
-              </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Upgrade to build and AI-polish your professional resume.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-    <form onSubmit={handleSubmit} className={activeTab === 'resume' ? 'hidden' : ''}>
+    <form onSubmit={handleSubmit} className="">
       <div className="min-h-[400px] space-y-8">
         {activeTab === 'basic' && (
           <>
@@ -1026,6 +978,51 @@ export default function ProfileForm({
             {PERSONA_CONFIG[persona].editorSections
               .filter((s) => s.id !== 'contact' && s.id !== 'address' && s.id !== 'scheduling')
               .map(renderSection)}
+
+            {/* Resume */}
+            <ResumeUploadSection
+              resumeUrl={profile.resume_url ?? null}
+              signedUrl={resumeSignedUrl ?? null}
+              canAccessBuilder={canAccessBuilder}
+            />
+            {canAccessBuilder ? (
+              <section className="space-y-4">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    Resume Builder
+                  </h2>
+                  <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                    Build your professional history. This information will power your AI-generated resume.
+                  </p>
+                </div>
+                {resumeEntries.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`/api/resume/pdf/${profile.username}`}
+                      className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      PDF
+                    </a>
+                    <a
+                      href={`/api/resume/docx/${profile.username}`}
+                      className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      DOCX
+                    </a>
+                  </div>
+                )}
+                <ResumeClient initialEntries={resumeEntries} />
+              </section>
+            ) : (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+                <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                  Resume Builder is a Pro feature
+                </p>
+                <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                  Upgrade to build and AI-polish your professional resume.
+                </p>
+              </div>
+            )}
           </>
         )}
 
