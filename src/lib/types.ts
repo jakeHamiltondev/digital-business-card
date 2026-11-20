@@ -82,7 +82,8 @@ export type Profile = {
   // Card back field visibility — null = show all (backward compat)
   card_back_fields: string[] | null
   // Card front identity display — which branding elements to show (Pro only, Brand Front / Executive)
-  front_identity_display: FrontIdentityDisplay
+  // Optional: defaults to 'both' for backward compat with existing rows
+  front_identity_display?: FrontIdentityDisplay
   // Uploaded resume PDF — Supabase Storage path, not a signed URL
   resume_url: string | null
 }
