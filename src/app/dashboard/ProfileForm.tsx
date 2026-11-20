@@ -876,7 +876,7 @@ export default function ProfileForm({
       <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
     <form onSubmit={handleSubmit} className="">
-      <div className="min-h-[400px] space-y-8">
+      <div className={`${activeTab !== 'resume' ? 'min-h-[400px] ' : ''}space-y-8`}>
         {activeTab === 'basic' && (
           <>
             <AvatarUpload userId={userId} avatarUrl={profile.avatar_url} fullName={profile.full_name} />
