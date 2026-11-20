@@ -1219,7 +1219,7 @@ export default function ProfileForm({
     </form>
 
     {activeTab === 'resume' && (
-      <div className="min-h-[400px] space-y-10">
+      <div className="space-y-10">
         <ResumeUploadSection
           resumeUrl={profile.resume_url ?? null}
           signedUrl={resumeSignedUrl ?? null}
