@@ -69,6 +69,15 @@ function getTagline(profile: Profile): string | null {
   }
 }
 
+/** Convert '#aabbcc' → '170,187,204' for use in rgba() */
+function hexToRgb(hex: string): string {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.substring(0, 2), 16)
+  const g = parseInt(h.substring(2, 4), 16)
+  const b = parseInt(h.substring(4, 6), 16)
+  return `${r},${g},${b}`
+}
+
 // ── Front ─────────────────────────────────────────────────────────────────────
 
 export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFaceProps) {
@@ -89,7 +98,7 @@ export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFace
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: cc.bg,
+        background: `radial-gradient(ellipse at 50% 40%, rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.18 : 0.12}) 0%, ${cc.bg} 65%)`,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
@@ -102,34 +111,62 @@ export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFace
         paddingRight: 20,
       }}
     >
+      {/* Atmospheric brand glow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 200,
+          height: 200,
+          background: `radial-gradient(circle, rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.12 : 0.08}) 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Spacer pushes logo+text toward vertical center */}
       <div style={{ flex: 1 }} />
 
       {/* Logo or monogram */}
       {userIsPro && profile.logo_url && (profile.front_identity_display ?? 'both') !== 'name_only' ? (
-        <img
-          src={profile.logo_url}
-          alt="Logo"
+        <div
           style={{
-            height: 110,
-            maxWidth: 200,
-            objectFit: 'contain',
+            background: `rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.15 : 0.08})`,
+            border: `1px solid rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.25 : 0.15})`,
+            borderRadius: 16,
+            padding: '12px 16px',
+            boxShadow: `0 0 30px rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.15 : 0.08})`,
+            zIndex: 1,
           }}
-        />
+        >
+          <img
+            src={profile.logo_url}
+            alt="Logo"
+            style={{
+              height: 90,
+              maxWidth: 180,
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        </div>
       ) : (
         <div
           style={{
-            width: 90,
-            height: 90,
-            borderRadius: '50%',
-            background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)',
-            border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,
+            width: 80,
+            height: 80,
+            borderRadius: 16,
+            background: `rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.15 : 0.08})`,
+            border: `1px solid rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.25 : 0.15})`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 36,
+            fontSize: 32,
             fontWeight: 700,
             color: isDark ? '#ffffff' : cc.text,
+            boxShadow: `0 0 30px rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.15 : 0.08})`,
+            zIndex: 1,
           }}
         >
           {(orgName ?? profile.full_name ?? '?')[0]?.toUpperCase() ?? '?'}
@@ -256,6 +293,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
   const cc: CardColorTokens = hasBrandColors
     ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
     : getThemeCardColors(profile.theme)
+  const isDark = getContrastColor(cc.bg) === '#ffffff'
   const brandT = makeBrandTheme(cc, t)
 
   const orgName = getOrgName(profile)
@@ -269,7 +307,7 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         inset: 0,
         borderRadius: 18,
         overflow: 'hidden',
-        background: cc.bg,
+        background: `radial-gradient(ellipse at 50% 15%, rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.12 : 0.08}) 0%, ${cc.bg} 55%)`,
         boxShadow: SHADOW,
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
@@ -279,6 +317,20 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
         padding: '18px 16px 8px',
       }}
     >
+      {/* Atmospheric brand glow (subtle) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 220,
+          height: 140,
+          background: `radial-gradient(circle, rgba(${hexToRgb(cc.buttonBg)}, ${isDark ? 0.08 : 0.05}) 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* ── Identity row: avatar + name/title/org side-by-side ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ flexShrink: 0 }}>
