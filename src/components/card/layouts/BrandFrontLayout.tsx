@@ -332,12 +332,12 @@ export function BrandFrontBack({ profile, pageUrl, userIsPro, t, hasResume }: La
       </div>
 
       {/* ── Action buttons ── */}
-      <div style={{ marginTop: 6 }}>
-        <ActionButtons profile={profile} t={brandT} />
+      <div style={{ marginTop: 12 }}>
+        <ActionButtons profile={profile} t={brandT} selectedFields={selectedFields} />
       </div>
 
       {/* ── Contact rows (max 3 keeps layout on-card without scrolling) ── */}
-      <div style={{ marginTop: 6 }}>
+      <div style={{ marginTop: 10 }}>
         <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={3} hideOverflowLink selectedFields={selectedFields} hasResume={hasResume} />
       </div>
 

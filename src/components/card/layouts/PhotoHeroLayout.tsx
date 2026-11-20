@@ -171,10 +171,10 @@ export function PhotoHeroFront({ profile, userIsPro, t, hasResume }: LayoutFaceP
               top: 12,
               left: 12,
               zIndex: 10,
-              background: 'rgba(0,0,0,0.45)',
+              background: 'rgba(0,0,0,0.25)',
               borderRadius: 8,
               padding: '4px 8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
             }}
           >
             <img
@@ -344,7 +344,7 @@ export function PhotoHeroBack({ profile, pageUrl, userIsPro, t, hasResume }: Lay
       </div>
 
       {/* ── Contact rows ── */}
-      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} selectedFields={selectedFields} hasResume={hasResume} />
+      <ContactRows profile={profile} pageUrl={pageUrl} t={brandT} maxRows={4} hideOverflowLink selectedFields={selectedFields} hasResume={hasResume} />
 
       {/* Spacer pushes QR + save to bottom */}
       <div style={{ flex: 1 }} />
