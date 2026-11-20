@@ -46,7 +46,7 @@ function Rule({ color }: { color: string }) {
 
 // ── Front ─────────────────────────────────────────────────────────────────────
 
-export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
+export function ExecutiveFront({ profile, userIsPro, hasResume }: LayoutFaceProps) {
   const vcardCfg = getPersonaConfig(profile.persona).vcard
   const hasBrandColors = userIsPro && !!profile.brand_color_primary
   const cc: CardColorTokens = hasBrandColors
@@ -208,6 +208,48 @@ export function ExecutiveFront({ profile, userIsPro }: LayoutFaceProps) {
                 {item}
               </p>
             ))}
+            {hasResume && (
+              <a
+                href={`/${profile.username}/resume`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: cormorant.style.fontFamily,
+                  fontWeight: 500,
+                  fontSize: 12,
+                  color: cc.iconColor,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '3px',
+                  marginTop: 2,
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                View Resume ↗
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* View Resume — shown when no other contact items exist but resume is available */}
+        {hasResume && contactItems.length === 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <a
+              href={`/${profile.username}/resume`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: cormorant.style.fontFamily,
+                fontWeight: 500,
+                fontSize: 12,
+                color: cc.iconColor,
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
+                marginTop: 2,
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              View Resume ↗
+            </a>
           </div>
         )}
       </div>

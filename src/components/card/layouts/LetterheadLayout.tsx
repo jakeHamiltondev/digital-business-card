@@ -151,7 +151,7 @@ function SavePersonIcon() {
 
 // ── Front ─────────────────────────────────────────────────────────────────────
 
-export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFaceProps) {
+export function LetterheadFront({ profile, pageUrl, userIsPro, t, hasResume }: LayoutFaceProps) {
   const hasBrandColors = userIsPro && !!profile.brand_color_primary
   const themeTokens = getThemeCardColors(profile.theme)
   const cc: CardColorTokens = hasBrandColors
@@ -336,6 +336,36 @@ export function LetterheadFront({ profile, pageUrl, userIsPro, t }: LayoutFacePr
               </a>
             ))}
           </div>
+        )}
+
+        {/* View Resume — full-width tinted button */}
+        {hasResume && (
+          <a
+            href={`/${profile.username}/resume`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              width: '100%',
+              padding: '11px 16px',
+              marginTop: 10,
+              borderRadius: 10,
+              background: `${cc.buttonBg}18`,
+              border: `1px solid ${cc.buttonBg}40`,
+              color: cc.iconColor,
+              fontSize: 13.5,
+              fontWeight: 500,
+              textDecoration: 'none',
+              boxSizing: 'border-box',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <FileText width={15} height={15} />
+            View Resume
+          </a>
         )}
 
         {/* Save contact CTA */}

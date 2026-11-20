@@ -71,7 +71,7 @@ function getTagline(profile: Profile): string | null {
 
 // ── Front ─────────────────────────────────────────────────────────────────────
 
-export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
+export function BrandFrontFront({ profile, userIsPro, t, hasResume }: LayoutFaceProps) {
   const hasBrandColors = userIsPro && !!profile.brand_color_primary
   const cc: CardColorTokens = hasBrandColors
     ? generateCardColors(profile.brand_color_primary, profile.brand_color_accent)
@@ -188,6 +188,29 @@ export function BrandFrontFront({ profile, userIsPro, t }: LayoutFaceProps) {
 
       {/* Spacer pushes chip to bottom */}
       <div style={{ flex: 1 }} />
+
+      {/* View Resume — subtle text link */}
+      {hasResume && (
+        <a
+          href={`/${profile.username}/resume`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontSize: 12,
+            color: cc.iconColor,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            marginBottom: 10,
+            opacity: 0.8,
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>
+          View Resume
+        </a>
+      )}
 
       {/* Initials chip — "tap to connect" */}
       <div
