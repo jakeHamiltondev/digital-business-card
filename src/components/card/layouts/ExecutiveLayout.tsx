@@ -467,6 +467,20 @@ export function ExecutiveBack({ profile, pageUrl, userIsPro, hasResume }: Layout
           bg={cc.buttonBg}
           textColor={cc.buttonText}
         />
+        {!userIsPro && (
+          <p
+            style={{
+              fontSize: 9,
+              color: cc.textMuted,
+              textAlign: 'center',
+              marginTop: 8,
+              opacity: 0.5,
+              letterSpacing: '0.04em',
+            }}
+          >
+            Made with Linkfol
+          </p>
+        )}
       </div>
     </div>
   )
