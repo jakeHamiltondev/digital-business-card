@@ -5,11 +5,11 @@ import { Lock } from 'lucide-react'
 
 export type CardLayout = 'letterhead' | 'brand_front' | 'executive_classic' | 'photo_hero'
 
-const LAYOUTS: { id: CardLayout; name: string; proOnly: boolean }[] = [
+const LAYOUTS: { id: CardLayout; name: string; proOnly: boolean; hidden?: boolean }[] = [
   { id: 'letterhead',        name: 'Letterhead',  proOnly: false },
   { id: 'brand_front',       name: 'Brand Front', proOnly: true  },
-  { id: 'executive_classic', name: 'Executive',   proOnly: true  },
-  { id: 'photo_hero',        name: 'Photo Hero',  proOnly: true  },
+  { id: 'executive_classic', name: 'Executive',   proOnly: true,  hidden: true },
+  { id: 'photo_hero',        name: 'Photo Hero',  proOnly: true,  hidden: true },
 ]
 
 // ── Thumbnail sketches ────────────────────────────────────────────────────────
@@ -159,7 +159,7 @@ export default function LayoutSelector({
   return (
     <div className="space-y-3">
       <div className="flex gap-3 overflow-x-auto pb-2">
-        {LAYOUTS.map((layout) => {
+        {LAYOUTS.filter(l => !l.hidden).map((layout) => {
           const locked = !userIsPro && layout.proOnly
           const selected = value === layout.id
 
@@ -232,7 +232,7 @@ export default function LayoutSelector({
                 Card layouts are available on Pro
               </p>
               <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                Upgrade to unlock Brand Front, Executive, and Photo Hero.
+                Upgrade to unlock the Brand Front layout.
               </p>
               <a
                 href="/pricing"
