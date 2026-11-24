@@ -2,7 +2,32 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import type { ResumeEntry, ResumeEntryType } from '@/lib/types'
+import { isPro } from '@/lib/subscription'
+import type { ResumeEntry, ResumeEntryType, Profile } from '@/lib/types'
+
+const BYPASS_EMAIL = 'jh0695@gmail.com'
+
+async function requireProForBuilder(): Promise<{ allowed: false; error: string } | { allowed: true; userId: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { allowed: false, error: 'Not authenticated' }
+
+  if (user.email !== BYPASS_EMAIL) {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (!profileData || !isPro(profileData as Profile)) {
+      return { allowed: false, error: 'Pro subscription required' }
+    }
+  }
+
+  return { allowed: true, userId: user.id }
+}
 
 export async function uploadResume(formData: FormData): Promise<{ error: string | null }> {
   const supabase = await createClient()
@@ -104,14 +129,12 @@ export async function addResumeEntry(formData: {
   skills_list?: string[]
   sort_order?: number
 }): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const check = await requireProForBuilder()
+  if (!check.allowed) return { error: check.error }
 
+  const supabase = await createClient()
   const { error } = await supabase.from('resume_entries').insert({
-    user_id: user.id,
+    user_id: check.userId,
     ...formData,
   })
 
@@ -133,17 +156,15 @@ export async function updateResumeEntry(
     sort_order?: number
   },
 ): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const check = await requireProForBuilder()
+  if (!check.allowed) return { error: check.error }
 
+  const supabase = await createClient()
   const { error } = await supabase
     .from('resume_entries')
     .update({ ...formData, updated_at: new Date().toISOString() })
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', check.userId)
 
   if (error) return { error: error.message }
   revalidatePath('/dashboard/resume')
@@ -151,17 +172,15 @@ export async function updateResumeEntry(
 }
 
 export async function deleteResumeEntry(id: string): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const check = await requireProForBuilder()
+  if (!check.allowed) return { error: check.error }
 
+  const supabase = await createClient()
   const { error } = await supabase
     .from('resume_entries')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', check.userId)
 
   if (error) return { error: error.message }
   revalidatePath('/dashboard/resume')
@@ -171,18 +190,16 @@ export async function deleteResumeEntry(id: string): Promise<{ error: string | n
 export async function reorderResumeEntries(
   entries: { id: string; sort_order: number }[],
 ): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const check = await requireProForBuilder()
+  if (!check.allowed) return { error: check.error }
 
+  const supabase = await createClient()
   const updates = entries.map(({ id, sort_order }) =>
     supabase
       .from('resume_entries')
       .update({ sort_order, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('user_id', user.id),
+      .eq('user_id', check.userId),
   )
 
   const results = await Promise.all(updates)
@@ -200,16 +217,14 @@ export async function importResumeEntries(parsed: {
   projects: Array<{ title: string; organization?: string; description?: string }>
   certifications: Array<{ title: string; organization?: string; end_date?: string }>
 }): Promise<{ error: string | null }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const check = await requireProForBuilder()
+  if (!check.allowed) return { error: check.error }
 
+  const supabase = await createClient()
   const { error: deleteError } = await supabase
     .from('resume_entries')
     .delete()
-    .eq('user_id', user.id)
+    .eq('user_id', check.userId)
   if (deleteError) return { error: deleteError.message }
 
   type InsertRow = {
@@ -229,7 +244,7 @@ export async function importResumeEntries(parsed: {
 
   parsed.experience.forEach((e, i) => {
     rows.push({
-      user_id: user.id,
+      user_id: check.userId,
       type: 'experience',
       title: e.title,
       organization: e.organization || null,
@@ -244,7 +259,7 @@ export async function importResumeEntries(parsed: {
 
   parsed.education.forEach((e, i) => {
     rows.push({
-      user_id: user.id,
+      user_id: check.userId,
       type: 'education',
       title: e.title,
       organization: e.organization || null,
@@ -259,7 +274,7 @@ export async function importResumeEntries(parsed: {
 
   parsed.skills.forEach((e, i) => {
     rows.push({
-      user_id: user.id,
+      user_id: check.userId,
       type: 'skill',
       title: e.title,
       organization: null,
@@ -274,7 +289,7 @@ export async function importResumeEntries(parsed: {
 
   parsed.projects.forEach((e, i) => {
     rows.push({
-      user_id: user.id,
+      user_id: check.userId,
       type: 'project',
       title: e.title,
       organization: e.organization || null,
@@ -289,7 +304,7 @@ export async function importResumeEntries(parsed: {
 
   parsed.certifications.forEach((e, i) => {
     rows.push({
-      user_id: user.id,
+      user_id: check.userId,
       type: 'certification',
       title: e.title,
       organization: e.organization || null,
