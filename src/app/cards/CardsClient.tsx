@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useMemo } from 'react'
-import { Search, Bookmark } from 'lucide-react'
+import { Search, Bookmark, Download } from 'lucide-react'
 import type { SavedCardWithProfile } from '@/lib/types'
 import {
   toggleFavorite,
@@ -16,8 +16,10 @@ type FilterMode = 'all' | 'favorites'
 
 export default function CardsClient({
   initialCards,
+  userIsPro,
 }: {
   initialCards: SavedCardWithProfile[]
+  userIsPro: boolean
 }) {
   const [cards, setCards] = useState(initialCards)
   const [search, setSearch] = useState('')
@@ -25,6 +27,7 @@ export default function CardsClient({
   const [filterTag, setFilterTag] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('saved_at_desc')
   const [, startTransition] = useTransition()
+  const [exporting, setExporting] = useState(false)
 
   const allTags = useMemo(
     () => Array.from(new Set(cards.flatMap((c) => c.tags ?? []))).sort(),
@@ -111,6 +114,31 @@ export default function CardsClient({
     })
   }
 
+  async function handleExport() {
+    setExporting(true)
+    try {
+      const res = await fetch('/api/cards/export')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        alert(data.error ?? 'Export failed')
+        return
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `linkfol-contacts-${new Date().toISOString().slice(0, 10)}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch {
+      alert('Export failed — please try again')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const handleDelete = (savedCardId: string) => {
     const snapshot = cards.find((c) => c.id === savedCardId)
     setCards((prev) => prev.filter((c) => c.id !== savedCardId))
@@ -144,7 +172,17 @@ export default function CardsClient({
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        {userIsPro && (
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <Download className="h-4 w-4" />
+            {exporting ? 'Exporting…' : 'Export'}
+          </button>
+        )}
         <div className="relative flex-1" style={{ minWidth: '180px' }}>
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
           <input
