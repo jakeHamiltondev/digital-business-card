@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isPro } from '@/lib/subscription'
 import { getSavedCards } from '@/app/actions/saved-cards'
 import CardsClient from './CardsClient'
+import type { Profile } from '@/lib/types'
 
 export const metadata: Metadata = {
   title: 'Contacts | Linkfol',
@@ -18,6 +20,17 @@ export default async function CardsPage() {
     redirect('/')
   }
 
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const profile = profileData as Profile | null
+  const userIsPro = profile
+    ? isPro(profile) || profile.email === 'jh0695@gmail.com'
+    : false
+
   const savedCards = await getSavedCards()
 
   return (
@@ -26,7 +39,7 @@ export default async function CardsPage() {
         <h2 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           Contacts
         </h2>
-        <CardsClient initialCards={savedCards} />
+        <CardsClient initialCards={savedCards} userIsPro={userIsPro} />
       </main>
     </div>
   )
